@@ -11,6 +11,8 @@ import {
   useState,
 } from 'react';
 
+import { ChevronRightIcon } from 'lucide-react';
+
 import { METADATA_BASE, NAVBAR_SOLUTIONS } from '@/lib/constants/site';
 import type { PageSlug } from '@/lib/types/site';
 import { cn } from '@/lib/utils';
@@ -29,11 +31,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 type SubNavBarProps = {
-  selected?: PageSlug;
+  selected?: string[];
 };
 
 const NavBar = () => {
-  const selected = usePathname() as PageSlug;
+  const selected = (usePathname() as PageSlug)
+    .split('/')
+    .slice(1)
+    .map((slug) => `/${slug}`);
 
   return (
     <Fragment>
@@ -47,14 +52,24 @@ const NavBar = () => {
 /*                                   DESKTOP                                  */
 /* -------------------------------------------------------------------------- */
 
-const DesktopNavBar: FC<SubNavBarProps> = ({ selected }) => {
+const DesktopNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
+  console.log(selected);
   return (
     <nav className="z-popover pointer-events-auto mr-4 hidden items-center md:flex">
-      <Icons.logo className="flex h-6 w-6 items-center" />
+      <Icons.logo
+        className={cn('h-6 w-6 items-center', selected[0] === '/' ? 'text-muted-foreground' : '')}
+      />
       <NavigationMenu className="ml-4">
         <NavigationMenuList>
           <NavigationMenuItem>
-            <NavigationMenuTrigger>Solutions</NavigationMenuTrigger>
+            <NavigationMenuTrigger
+              className={cn(
+                'font-semibold',
+                selected[0] === '/solutions' ? 'text-muted-foreground' : '',
+              )}
+            >
+              Solutions
+            </NavigationMenuTrigger>
             <NavigationMenuContent>
               <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                 <li className="row-span-3">
@@ -75,7 +90,12 @@ const DesktopNavBar: FC<SubNavBarProps> = ({ selected }) => {
                 </li>
                 {NAVBAR_SOLUTIONS.map((page) => {
                   return (
-                    <ListItem key={page.slug} href={page.slug} title={page.name}>
+                    <ListItem
+                      key={page.slug}
+                      href={page.slug}
+                      title={page.name}
+                      selected={selected.join('') === page.slug}
+                    >
                       {page.description || ''}
                     </ListItem>
                   );
@@ -93,7 +113,7 @@ const DesktopNavBar: FC<SubNavBarProps> = ({ selected }) => {
 /*                                   MOBILE                                   */
 /* -------------------------------------------------------------------------- */
 
-const MobileNavBar: FC<SubNavBarProps> = ({ selected }) => {
+const MobileNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -121,8 +141,14 @@ const MobileNavBar: FC<SubNavBarProps> = ({ selected }) => {
                   key={item.slug}
                   href={item.slug}
                   onOpenChange={setOpen}
-                  className="text-muted-foreground"
+                  className="flex items-center text-muted-foreground"
                 >
+                  {selected.join('') === item.slug ? (
+                    <ChevronRightIcon
+                      className="mr-1 inline-block h-3 w-3 transition"
+                      aria-hidden="true"
+                    />
+                  ) : null}
                   {item.name}
                 </MobileLink>
               ) : null,
@@ -138,27 +164,36 @@ const MobileNavBar: FC<SubNavBarProps> = ({ selected }) => {
 /*                                  LIST ITEM                                 */
 /* -------------------------------------------------------------------------- */
 
-const ListItem = forwardRef<ElementRef<'a'>, ComponentPropsWithoutRef<'a'>>(
-  ({ className, title, children, ...props }, ref) => {
-    return (
-      <li>
-        <NavigationMenuLink asChild>
-          <a
-            ref={ref}
-            className={cn(
-              'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
-              className,
-            )}
-            {...props}
-          >
-            <div className="text-sm font-medium leading-none">{title}</div>
-            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">{children}</p>
-          </a>
-        </NavigationMenuLink>
-      </li>
-    );
-  },
-);
+const ListItem = forwardRef<
+  ElementRef<'a'>,
+  ComponentPropsWithoutRef<'a'> & { selected?: boolean }
+>(({ className, title, children, selected, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={cn(
+            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+            className,
+          )}
+          {...props}
+        >
+          <div className="flex items-center text-sm font-medium leading-none">
+            {selected ? (
+              <ChevronRightIcon
+                className="mr-1 inline-block h-3 w-3 transition"
+                aria-hidden="true"
+              />
+            ) : null}
+            {title}
+          </div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">{children}</p>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  );
+});
 
 ListItem.displayName = 'ListItem';
 

@@ -1,4 +1,4 @@
-export type PageSlug = '/' | '/airdrop';
+export type PageSlug = '/' | '/solutions/airdrop';
 
 export type Page = {
   name: string;

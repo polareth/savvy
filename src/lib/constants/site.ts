@@ -55,7 +55,7 @@ export const METADATA_EXTRA: MetadataExtra = {
 export const NAVBAR_SOLUTIONS: Page[] = [
   {
     name: 'Airdrop',
-    slug: '/airdrop',
+    slug: '/solutions/airdrop',
     description: 'Find the most optimized airdrop solution for your use case',
   },
 ];

@@ -7,6 +7,19 @@ type Config = {
   radius: number;
 };
 
+const createJsonStorage = <T>(storage: Storage) => ({
+  getItem: (name: string): T | null => {
+    const value = storage.getItem(name);
+    return value ? JSON.parse(value) : null;
+  },
+  setItem: (name: string, value: T) => {
+    storage.setItem(name, JSON.stringify(value));
+  },
+  removeItem: (name: string) => {
+    storage.removeItem(name);
+  },
+});
+
 export const useConfigStore = create(
   persist<Config>(
     () => ({
@@ -16,7 +29,7 @@ export const useConfigStore = create(
     }),
     {
       name: 'config',
-      getStorage: () => localStorage,
+      storage: createJsonStorage(localStorage),
     },
   ),
 );
