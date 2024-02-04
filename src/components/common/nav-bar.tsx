@@ -1,16 +1,22 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { ComponentPropsWithoutRef, ElementRef, type FC, forwardRef, Fragment } from 'react';
+import Link, { LinkProps } from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import {
+  ComponentPropsWithoutRef,
+  ElementRef,
+  type FC,
+  forwardRef,
+  Fragment,
+  useState,
+} from 'react';
 
-import clsx from 'clsx';
-
-import { METADATA_BASE, NAVBAR_MAIN } from '@/lib/constants/site';
+import { METADATA_BASE, NAVBAR_SOLUTIONS } from '@/lib/constants/site';
 import type { PageSlug } from '@/lib/types/site';
 import { cn } from '@/lib/utils';
 
 import { Icons } from '@/components/common/icons';
+import { Button } from '@/components/ui/button';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -19,6 +25,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 type SubNavBarProps = {
   selected?: PageSlug;
@@ -39,11 +47,11 @@ const NavBar = () => {
 /*                                   DESKTOP                                  */
 /* -------------------------------------------------------------------------- */
 
-const DesktopNavBar: FC<SubNavBarProps> = () => {
+const DesktopNavBar: FC<SubNavBarProps> = ({ selected }) => {
   return (
-    // <nav className="z-popover border-gray-6 pointer-events-auto sticky top-0 hidden h-12 items-center border-b bg-white px-4 dark:bg-black md:flex">
-    <nav className="mr-4 hidden md:flex">
-      <NavigationMenu>
+    <nav className="z-popover pointer-events-auto mr-4 hidden items-center md:flex">
+      <Icons.logo className="flex h-6 w-6 items-center" />
+      <NavigationMenu className="ml-4">
         <NavigationMenuList>
           <NavigationMenuItem>
             <NavigationMenuTrigger>Solutions</NavigationMenuTrigger>
@@ -65,7 +73,7 @@ const DesktopNavBar: FC<SubNavBarProps> = () => {
                     </a>
                   </NavigationMenuLink>
                 </li>
-                {NAVBAR_MAIN.map((page) => {
+                {NAVBAR_SOLUTIONS.map((page) => {
                   return (
                     <ListItem key={page.slug} href={page.slug} title={page.name}>
                       {page.description || ''}
@@ -86,24 +94,43 @@ const DesktopNavBar: FC<SubNavBarProps> = () => {
 /* -------------------------------------------------------------------------- */
 
 const MobileNavBar: FC<SubNavBarProps> = ({ selected }) => {
-  return (
-    <nav className="z-popover border-gray-6 pointer-events-auto sticky top-0 flex h-12 items-center border-b bg-white px-4 dark:bg-black md:hidden">
-      <Icons.logo />
-      {NAVBAR_MAIN.map((page) => {
-        const pageSelected = selected === page.slug;
+  const [open, setOpen] = useState(false);
 
-        return (
-          <Link
-            key={page.slug}
-            href={page.slug}
-            className={clsx('ml-2', pageSelected ? 'bg-gray-4 cursor-default' : '')}
-          >
-            {page.name}
-          </Link>
-        );
-      })}
-      {/* <div className="flex-grow" /> */}
-    </nav>
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <Button
+          variant="ghost"
+          className="justify-start px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
+        >
+          <Icons.menu />
+          <span className="sr-only">Toggle Menu</span>
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="pr-0">
+        <MobileLink href="/" className="flex items-center" onOpenChange={setOpen}>
+          <Icons.logo className="mr-2 h-4 w-4" />
+          <span className="font-bold">{METADATA_BASE.title?.toString()}</span>
+        </MobileLink>
+        <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
+          <div className="flex flex-col space-y-3">
+            <h4 className="font-medium">Solutions</h4>
+            {NAVBAR_SOLUTIONS.map((item) =>
+              item.slug ? (
+                <MobileLink
+                  key={item.slug}
+                  href={item.slug}
+                  onOpenChange={setOpen}
+                  className="text-muted-foreground"
+                >
+                  {item.name}
+                </MobileLink>
+              ) : null,
+            )}
+          </div>
+        </ScrollArea>
+      </SheetContent>
+    </Sheet>
   );
 };
 
@@ -134,5 +161,31 @@ const ListItem = forwardRef<ElementRef<'a'>, ComponentPropsWithoutRef<'a'>>(
 );
 
 ListItem.displayName = 'ListItem';
+
+type MobileLinkProps = LinkProps & {
+  onOpenChange?: (open: boolean) => void;
+  children: React.ReactNode;
+  className?: string;
+};
+
+const MobileLink = ({ href, onOpenChange, className, children, ...props }: MobileLinkProps) => {
+  const router = useRouter();
+
+  return (
+    <Link
+      href={href}
+      onClick={() => {
+        router.push(href.toString());
+        onOpenChange?.(false);
+      }}
+      className={cn(className)}
+      {...props}
+    >
+      {children}
+    </Link>
+  );
+};
+
+MobileLink.displayName = 'MobileLink';
 
 export default NavBar;

@@ -52,7 +52,7 @@ export const METADATA_EXTRA: MetadataExtra = {
 /*                                 NAVIGATION                                 */
 /* -------------------------------------------------------------------------- */
 
-export const NAVBAR_MAIN: Page[] = [
+export const NAVBAR_SOLUTIONS: Page[] = [
   {
     name: 'Airdrop',
     slug: '/airdrop',
