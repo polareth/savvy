@@ -1,26 +1,26 @@
 'use client';
 
 import { useSelectedLayoutSegment } from 'next/navigation';
-import * as React from 'react';
+import { useEffect } from 'react';
 
-import { useConfig } from '@/hooks/use-config';
+import { useConfigStore } from '@/lib/store/use-config';
 
 export const ThemeSwitcher = () => {
-  const [config] = useConfig();
+  const storedTheme = useConfigStore((state) => state.theme);
   const segment = useSelectedLayoutSegment();
 
-  React.useEffect(() => {
+  useEffect(() => {
     document.body.classList.forEach((className) => {
       if (className.match(/^theme.*/)) {
         document.body.classList.remove(className);
       }
     });
 
-    const theme = segment === 'themes' ? config.theme : null;
+    const theme = segment === 'themes' ? storedTheme : null;
     if (theme) {
       return document.body.classList.add(`theme-${theme}`);
     }
-  }, [segment, config]);
+  }, [segment, storedTheme]);
 
   return null;
 };
