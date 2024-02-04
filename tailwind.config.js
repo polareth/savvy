@@ -1,6 +1,6 @@
-import type { Config } from 'tailwindcss';
-import { fontFamily } from 'tailwindcss/defaultTheme';
+const { fontFamily } = require('tailwindcss/defaultTheme');
 
+/** @type {import('tailwindcss').Config} */
 const config = {
   darkMode: ['class'],
   content: [
@@ -79,7 +79,11 @@ const config = {
       },
     },
   },
+  fontFamily: {
+    sans: ['var(--inter-font)', ...fontFamily.sans],
+    mono: ['var(--fira-code-font)', ...fontFamily.mono],
+  },
   plugins: [require('tailwindcss-animate')],
-} satisfies Config;
+};
 
 export default config;

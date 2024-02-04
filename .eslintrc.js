@@ -20,7 +20,7 @@ module.exports = {
   plugins: ['react', '@typescript-eslint', 'prettier'],
   rules: {
     'linebreak-style': ['error', 'unix'],
-    quotes: ['error', 'single'],
+    quotes: ['error', 'single', { avoidEscape: true }],
     semi: ['error', 'always'],
     'comma-dangle': [2, 'always-multiline'],
     'react/react-in-jsx-scope': 'off',
