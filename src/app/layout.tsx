@@ -1,12 +1,25 @@
-import type { Metadata } from 'next';
-import { Inter as FontSans, Fira_Code as FontMono } from 'next/font/google';
+import { Viewport } from 'next';
+import { Fira_Code as FontMono, Inter as FontSans } from 'next/font/google';
+
 import '@/styles/globals.css';
-import { SITE_CONFIG } from '@/lib/constants/site';
+
+import { METADATA_BASE } from '@/lib/constants/site';
 import { cn } from '@/lib/utils';
 
-export const metadata: Metadata = {
-  title: SITE_CONFIG.title,
-  description: SITE_CONFIG.description,
+import { Analytics } from '@/components/config/analytics';
+import { ThemeProvider } from '@/components/config/providers';
+import { ThemeSwitcher } from '@/components/config/theme-switcher';
+import BaseLayout from '@/components/layouts/base';
+import ContainerLayout from '@/components/layouts/container';
+import { Toaster } from '@/components/ui/sonner';
+
+export const metadata = METADATA_BASE;
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: 'black' },
+  ],
 };
 
 export const fontSans = FontSans({
@@ -25,7 +38,7 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <html lang='en'>
+    <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
           'min-h-screen bg-background font-sans antialiased',
@@ -33,7 +46,19 @@ const RootLayout = ({
           fontMono.variable,
         )}
       >
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <BaseLayout>
+            <ContainerLayout>{children}</ContainerLayout>
+          </BaseLayout>
+          <ThemeSwitcher />
+          <Analytics />
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
