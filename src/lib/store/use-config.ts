@@ -29,7 +29,7 @@ export const useConfigStore = create(
     }),
     {
       name: 'config',
-      storage: createJsonStorage(localStorage),
+      storage: typeof window !== 'undefined' ? createJsonStorage(localStorage) : undefined,
     },
   ),
 );

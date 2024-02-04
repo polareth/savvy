@@ -1,14 +1,14 @@
 import { create } from 'zustand';
 
-import { DEFAULTS } from '@/lib/constants/defaults';
-import { Chain } from '@/lib/types/chains';
+import { ChainOption } from '@/lib/types/chains';
 
 type Selection = {
-  chain: Chain;
+  chain: ChainOption | null;
+  setChain: (chain: ChainOption | null) => void;
 };
 
 export const useSelectionStore = create<Selection>((set, get) => ({
-  chain: DEFAULTS.chain,
+  chain: null,
 
-  setChain: (chain: Chain) => set({ chain }),
+  setChain: (chain) => set({ chain }),
 }));

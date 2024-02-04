@@ -53,7 +53,6 @@ const NavBar = () => {
 /* -------------------------------------------------------------------------- */
 
 const DesktopNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
-  console.log(selected);
   return (
     <nav className="z-popover pointer-events-auto mr-4 hidden items-center md:flex">
       <Icons.logo

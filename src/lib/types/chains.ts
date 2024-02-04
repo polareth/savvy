@@ -1,4 +1,4 @@
-import { Client } from 'viem';
+import { ComboboxOption } from './templates';
 import { type Chain as ViemChain } from 'viem/chains';
 
 type ChainBase = {
@@ -20,8 +20,13 @@ export type OPStackSupport = ChainLayer & {
 };
 
 type ChainType = OPStackSupport & {
-  client: Client;
+  rpcUrl: string;
 };
 
-export type Chain = ViemChain & ChainType;
+export type Chain = ChainType & {
+  config: ViemChain;
+};
+
+export type ChainOption = Chain & ComboboxOption;
+
 export type { ViemChain };
