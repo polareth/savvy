@@ -25,7 +25,8 @@
     "react-dom": "^18",
     "sonner": "^1.4.0",
     "tailwind-merge": "^2.2.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "viem": "^2.7.3"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
