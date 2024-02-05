@@ -1,6 +1,8 @@
 import { ComboboxOption } from './templates';
 import { type Chain as ViemChain } from 'viem/chains';
 
+import { Icon } from '@/components/common/icons';
+
 type ChainBase = {
   consensusMechanism: 'PoW' | 'PoS' | 'DPoS' | 'Optimistic Rollup';
   nativeTokenSlug: string; // Coinmarketcap slug
@@ -19,12 +21,10 @@ export type OPStackSupport = ChainLayer & {
   hasCustomStack: boolean;
 };
 
-type ChainType = OPStackSupport & {
+export type Chain = OPStackSupport & {
   rpcUrl: string;
-};
-
-export type Chain = ChainType & {
   config: ViemChain;
+  icon?: Icon;
 };
 
 export type ChainOption = Chain & ComboboxOption;

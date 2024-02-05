@@ -2,6 +2,8 @@
 
 import { FC, useState } from 'react';
 
+import { ChevronDownIcon } from 'lucide-react';
+
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { ComboboxOption, ComboboxOptionCompatible } from '@/lib/types/templates';
 
@@ -37,8 +39,17 @@ const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
     return (
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="w-[150px] justify-start">
-            {selected ? <>{selected.label}</> : <>+ Select {name}</>}
+          <Button variant="outline" className="flex w-[150px] items-center justify-start">
+            {selected ? (
+              <>
+                {selected.icon ? <selected.icon className="mr-2 h-4 w-4" /> : null}
+                {selected.label}
+              </>
+            ) : (
+              <>
+                <ChevronDownIcon className="mr-2 h-4 w-4" /> Select {name}
+              </>
+            )}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0" align="start">
@@ -51,8 +62,17 @@ const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="outline" className="w-[150px] justify-start">
-          {selected ? <>{selected.label}</> : <>+ Select {name}</>}
+        <Button variant="outline" className="flex w-[150px] items-center justify-start">
+          {selected ? (
+            <>
+              {selected.icon ? <selected.icon className="mr-2 h-4 w-4" /> : null}
+              {selected.label}
+            </>
+          ) : (
+            <>
+              <ChevronDownIcon className="mr-2 h-4 w-4" /> Select {name}
+            </>
+          )}
         </Button>
       </DrawerTrigger>
       <DrawerContent>
@@ -95,7 +115,10 @@ const ItemList: FC<ItemListProps> = ({ items, name, setOpen, setSelectedItem }) 
                 setOpen(false);
               }}
             >
-              {item.label}
+              <div className="flex items-center">
+                {item.icon ? <item.icon className="mr-2 h-4 w-4" /> : null}
+                {item.label}
+              </div>
             </CommandItem>
           ))}
         </CommandGroup>
