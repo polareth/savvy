@@ -14,9 +14,9 @@ const items: ComboboxOption[] = CHAINS.map((chain: Chain) => ({
 }));
 
 const ChainSelection = () => {
-  const { chain, setChain } = useSelectionStore((state) => ({
-    chain: state.chain,
-    setChain: state.setChain,
+  const { chain, setChain } = useSelectionStore.global((state) => ({
+    chain: state.chainOption,
+    setChain: state.setChainOption,
   }));
 
   return <ComboBoxResponsive items={items} label="Chain" selected={chain} setSelected={setChain} />;

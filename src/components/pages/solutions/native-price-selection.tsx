@@ -10,17 +10,18 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const NativePriceSelection = () => {
   const [loading, setLoading] = useState(false);
-  const { chain, current, nativeTokenPrice, setNativeTokenPrice } = useSelectionStore((state) => ({
-    chain: state.chain,
-    current: state.current,
-    nativeTokenPrice: state.nativeTokenPrice,
-    setNativeTokenPrice: state.setNativeTokenPrice,
-  }));
+  const { chainOption, getCurrentChain, nativeTokenPrice, setNativeTokenPrice } =
+    useSelectionStore.global((state) => ({
+      chainOption: state.chainOption,
+      getCurrentChain: state.getCurrentChain,
+      nativeTokenPrice: state.nativeTokenPrice,
+      setNativeTokenPrice: state.setNativeTokenPrice,
+    }));
 
   useEffect(() => {
     const fetchAndUpdateNativeTokenPrice = async () => {
       setLoading(true);
-      const currentChain = current().chain;
+      const currentChain = getCurrentChain();
       if (!currentChain) return;
 
       const price = await fetchNativeTokenPrice(currentChain.nativeTokenSlug);
@@ -28,8 +29,8 @@ const NativePriceSelection = () => {
       setLoading(false);
     };
 
-    if (chain) fetchAndUpdateNativeTokenPrice();
-  }, [chain, current, setNativeTokenPrice]);
+    if (chainOption) fetchAndUpdateNativeTokenPrice();
+  }, [chainOption, getCurrentChain, setNativeTokenPrice]);
 
   // return price formatted in us dollars
   return (

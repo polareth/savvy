@@ -12,8 +12,8 @@ import { Slider } from '@/components/ui/slider';
 
 const GasPriceSelection = () => {
   const [loading, setLoading] = useState(false);
-  const { chain, gasPrice, setGasPrice } = useSelectionStore((state) => ({
-    chain: state.chain,
+  const { chain, gasPrice, setGasPrice } = useSelectionStore.global((state) => ({
+    chain: state.chainOption,
     gasPrice: state.gasPrice,
     setGasPrice: state.setGasPrice,
   }));

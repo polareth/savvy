@@ -13,9 +13,9 @@ const items: ComboboxOption[] = AIRDROP_METHODS.map((method) => ({
 }));
 
 const AirdropMethodSelection = () => {
-  const { method, setMethod } = useSelectionStore((state) => ({
-    method: state.method,
-    setMethod: state.setMethod,
+  const { method, setMethod } = useSelectionStore.airdrop((state) => ({
+    method: state.methodOption,
+    setMethod: state.setMethodOption,
   }));
 
   return (

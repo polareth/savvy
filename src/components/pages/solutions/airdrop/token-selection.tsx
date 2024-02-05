@@ -13,9 +13,9 @@ const items: ComboboxOption[] = AIRDROP_TOKENS.map((token) => ({
 }));
 
 const TokenSelection = () => {
-  const { token, setToken } = useSelectionStore((state) => ({
-    token: state.token,
-    setToken: state.setToken,
+  const { token, setToken } = useSelectionStore.airdrop((state) => ({
+    token: state.tokenOption,
+    setToken: state.setTokenOption,
   }));
 
   return (
