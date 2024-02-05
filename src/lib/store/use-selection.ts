@@ -27,6 +27,8 @@ type Selection = {
     method: AirdropMethod | null;
     solution: AirdropSolution | null;
   };
+  isAllSelected: () => boolean;
+  getSolution: () => AirdropSolution | null;
 };
 
 export const useSelectionStore = create<Selection>((set, get) => ({
@@ -59,5 +61,16 @@ export const useSelectionStore = create<Selection>((set, get) => ({
       method: AIRDROP_METHODS.find((m) => m.id === methodId) || null,
       solution: tokenId && methodId ? AIRDROP_SOLUTIONS[tokenId][methodId] : null,
     };
+  },
+  isAllSelected: () => {
+    const { chain, token, method } = get();
+    if (!chain || !token || !method) return false;
+    return true;
+  },
+  getSolution: () => {
+    const { token, method } = get();
+    return token && method
+      ? AIRDROP_SOLUTIONS[token.value as Token['id']][method.value as AirdropMethod['id']]
+      : null;
   },
 }));

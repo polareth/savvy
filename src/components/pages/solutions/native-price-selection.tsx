@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useSelectionStore } from '@/lib/store/use-selection';
 import { fetchNativeTokenPrice } from '@/lib/utils/native-token';
 
+import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const NativePriceSelection = () => {
@@ -36,10 +37,18 @@ const NativePriceSelection = () => {
       {loading ? (
         <Skeleton className="my-1 h-4 w-24 rounded-md" />
       ) : (
-        nativeTokenPrice.toLocaleString('en-US', {
-          style: 'currency',
-          currency: 'USD',
-        })
+        <div className="relative">
+          <Input
+            type="number"
+            className="pl-8"
+            style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
+            value={Number(nativeTokenPrice.toFixed(2))}
+            onChange={(e) => setNativeTokenPrice(Number(e.target.value))}
+          />
+          <span className="absolute left-3 top-[50%] translate-y-[-50%] text-sm text-muted-foreground">
+            $
+          </span>
+        </div>
       )}
     </div>
   );
