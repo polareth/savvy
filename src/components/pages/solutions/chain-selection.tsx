@@ -2,14 +2,15 @@
 
 import { CHAINS } from '@/lib/constants/chains';
 import { useSelectionStore } from '@/lib/store/use-selection';
-import { Chain, ChainOption } from '@/lib/types/chains';
+import { Chain } from '@/lib/types/chains';
+import { ComboboxOption } from '@/lib/types/templates';
 
 import ComboBoxResponsive from '@/components/templates/combobox-responsive';
 
-const items: ChainOption[] = CHAINS.map((chain: Chain) => ({
-  ...chain,
+const items: ComboboxOption[] = CHAINS.map((chain: Chain) => ({
   label: chain.config.name,
-  value: chain.config.name,
+  value: chain.config.id.toString(),
+  icon: chain.icon,
 }));
 
 const ChainSelection = () => {
@@ -18,7 +19,7 @@ const ChainSelection = () => {
     setChain: state.setChain,
   }));
 
-  return <ComboBoxResponsive items={items} name="chain" selected={chain} setSelected={setChain} />;
+  return <ComboBoxResponsive items={items} label="Chain" selected={chain} setSelected={setChain} />;
 };
 
 export default ChainSelection;

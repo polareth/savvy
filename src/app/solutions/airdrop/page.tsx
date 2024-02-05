@@ -1,4 +1,7 @@
+import AirdropMethodSelection from '@/components/pages/solutions/airdrop-method-selection';
 import ChainSelection from '@/components/pages/solutions/chain-selection';
+import GasPriceSelection from '@/components/pages/solutions/gas-price-selection';
+import NativePriceSelection from '@/components/pages/solutions/native-price-selection';
 import TokenSelection from '@/components/pages/solutions/token-selection';
 
 const Airdrop = () => {
@@ -6,9 +9,9 @@ const Airdrop = () => {
     <div className="flex flex-col">
       <ChainSelection />
       <TokenSelection />
-      <p>Native token/ERC20/ERC721/ERC1155</p>
-      <p>Push-based (direct transfer)/claim-based airdrop::(merkle tree/signature)</p>
-      <p>(show cheapest badge on the cheapest)</p>
+      <AirdropMethodSelection />
+      <GasPriceSelection />
+      <NativePriceSelection />
     </div>
   );
 };

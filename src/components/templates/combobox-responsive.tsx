@@ -5,7 +5,7 @@ import { FC, useState } from 'react';
 import { ChevronDownIcon } from 'lucide-react';
 
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
-import { ComboboxOption, ComboboxOptionCompatible } from '@/lib/types/templates';
+import { ComboboxOption } from '@/lib/types/templates';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -24,14 +24,14 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 /* -------------------------------------------------------------------------- */
 
 type ComboBoxResponsiveProps = {
-  items: ComboboxOptionCompatible[];
-  name: string;
-  selected: ComboboxOptionCompatible | null;
-  setSelected: (item: ComboboxOptionCompatible | null) => void;
+  items: ComboboxOption[];
+  label: string;
+  selected: ComboboxOption | null;
+  setSelected: (item: ComboboxOption | null) => void;
 };
 
 const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
-  const { name, selected, setSelected } = props;
+  const { label, selected, setSelected } = props;
   const [open, setOpen] = useState(false);
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
@@ -47,12 +47,12 @@ const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
               </>
             ) : (
               <>
-                <ChevronDownIcon className="mr-2 h-4 w-4" /> Select {name}
+                <ChevronDownIcon className="mr-2 h-4 w-4" /> {label}
               </>
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0" align="start">
+        <PopoverContent className="w-[250px] p-0" align="start">
           <ItemList setOpen={setOpen} setSelectedItem={setSelected} {...props} />
         </PopoverContent>
       </Popover>
@@ -70,7 +70,7 @@ const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
             </>
           ) : (
             <>
-              <ChevronDownIcon className="mr-2 h-4 w-4" /> Select {name}
+              <ChevronDownIcon className="mr-2 h-4 w-4" /> {label}
             </>
           )}
         </Button>
@@ -89,16 +89,16 @@ const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
 /* -------------------------------------------------------------------------- */
 
 type ItemListProps = {
-  items: ComboboxOptionCompatible[];
-  name: string;
+  items: ComboboxOption[];
+  label: string;
   setOpen: (open: boolean) => void;
-  setSelectedItem: (item: ComboboxOptionCompatible | null) => void;
+  setSelectedItem: (item: ComboboxOption | null) => void;
 };
 
-const ItemList: FC<ItemListProps> = ({ items, name, setOpen, setSelectedItem }) => {
+const ItemList: FC<ItemListProps> = ({ items, label, setOpen, setSelectedItem }) => {
   return (
     <Command>
-      <CommandInput placeholder={`Filter ${name}s...`} />
+      <CommandInput placeholder={`Filter ${label.toLowerCase()}s...`} />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup>
@@ -107,7 +107,6 @@ const ItemList: FC<ItemListProps> = ({ items, name, setOpen, setSelectedItem }) 
               key={item.value}
               value={item.value}
               onSelect={(value) => {
-                console.log(items, value, item.value);
                 setSelectedItem(
                   items.find((priority) => priority.value.toLowerCase() === value.toLowerCase()) ||
                     null,

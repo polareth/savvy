@@ -1,4 +1,3 @@
-import { ComboboxOption } from './templates';
 import { type Chain as ViemChain } from 'viem/chains';
 
 import { Icon } from '@/components/common/icons';
@@ -27,6 +26,6 @@ export type Chain = OPStackSupport & {
   icon?: Icon;
 };
 
-export type ChainOption = Chain & ComboboxOption;
+// export type ChainId = 1 | 10 | 137 | 8453 | 42161;
 
 export type { ViemChain };

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { LucideProps, Moon, SunMedium, Zap } from 'lucide-react';
+import { type LucideProps, Moon, SunMedium } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
@@ -37,7 +37,15 @@ export const Icons = {
       className={cn('h-8 w-8 hover:brightness-75', props.className)}
       aria-label="Home"
     >
-      <Zap {...props} />
+      <svg fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <g data-name="Layer 2">
+          <g data-name="done-all">
+            <path d="M16.62 6.21a1 1 0 0 0-1.41.17l-7 9-3.43-4.18a1 1 0 1 0-1.56 1.25l4.17 5.18a1 1 0 0 0 .78.37 1 1 0 0 0 .83-.38l7.83-10a1 1 0 0 0-.21-1.41z" />
+            <path d="M21.62 6.21a1 1 0 0 0-1.41.17l-7 9-.61-.75-1.26 1.62 1.1 1.37a1 1 0 0 0 .78.37 1 1 0 0 0 .78-.38l7.83-10a1 1 0 0 0-.21-1.4z" />
+            <path d="M8.71 13.06L10 11.44l-.2-.24a1 1 0 0 0-1.43-.2 1 1 0 0 0-.15 1.41z" />
+          </g>
+        </g>
+      </svg>
     </Link>
   ),
   menu: (props: LucideProps) => (
@@ -84,7 +92,6 @@ export const Icons = {
       x="0px"
       y="0px"
       viewBox="0 0 500 500"
-      enable-background="new 0 0 500 500"
       {...props}
     >
       <polygon fill="#2F3030" points="249.982,6.554 397.98,251.112 250.53,188.092 " />

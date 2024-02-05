@@ -56,7 +56,7 @@ const DesktopNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
   return (
     <nav className="z-popover pointer-events-auto mr-4 hidden items-center md:flex">
       <Icons.logo
-        className={cn('h-6 w-6 items-center', selected[0] === '/' ? 'text-muted-foreground' : '')}
+        className={cn('h-8 w-8 items-center', selected[0] === '/' ? 'text-muted-foreground' : '')}
       />
       <NavigationMenu className="ml-4">
         <NavigationMenuList>
