@@ -1,3 +1,12 @@
+- Put gas price & native token price inside Advanced (in a collapsible)
+- Utils to convert gwei (or anything really) based on currency; e.g. L2 on OP stack need at least 3-4 decimals when Ethereum/Polygon is ok with 2
+
+- Get historical fe data over a long period of time (defined blocks in constants)
+- Set the default base fee and priority fee based on this data (use next block for default) USE A RANGE SLIDER
+- Let the user change both and indicate loosely how it is (normal, high congestion, high priority fee, etc FOR BOTH) based on historical data
+
+---
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
