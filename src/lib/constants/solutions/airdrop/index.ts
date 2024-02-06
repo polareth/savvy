@@ -31,7 +31,7 @@ const findMethod = (id: AirdropMethod['id']): AirdropMethod => {
 /*                                 PUSH-BASED                                 */
 /* -------------------------------------------------------------------------- */
 
-const gasliteDrop: AirdropSolution = {
+const gasliteDrop: Omit<AirdropSolution, 'functionSig'> = {
   name: 'GasliteDrop',
   description: 'Bulk transfers for ERC20, ERC721, and Native Network Tokens',
   tokens: [findToken('native'), findToken('ERC20'), findToken('ERC721')],
@@ -48,7 +48,7 @@ const gasliteDrop: AirdropSolution = {
   },
 };
 
-const gasliteDrop1155: AirdropSolution = {
+const gasliteDrop1155: Omit<AirdropSolution, 'functionSig'> = {
   name: 'GasliteDrop1155',
   description: 'Bulk transfers for ERC1155',
   tokens: [findToken('ERC1155')],
@@ -69,7 +69,7 @@ const gasliteDrop1155: AirdropSolution = {
 /*                                 CLAIM-BASED                                */
 /* -------------------------------------------------------------------------- */
 
-const gasliteMerkle: AirdropSolution = {
+const gasliteMerkle: Omit<AirdropSolution, 'functionSig'> = {
   name: 'GasliteMerkle',
   description: 'Merkle tree-based airdrop solution',
   tokens: [findToken('native'), findToken('ERC20'), findToken('ERC721'), findToken('ERC1155')],
@@ -86,7 +86,7 @@ const gasliteMerkle: AirdropSolution = {
   },
 };
 
-const gasliteSignature: AirdropSolution = {
+const gasliteSignature: Omit<AirdropSolution, 'functionSig'> = {
   name: 'GasliteSignature',
   description: 'Signature-based airdrop solution',
   tokens: [findToken('native'), findToken('ERC20'), findToken('ERC721'), findToken('ERC1155')],
@@ -109,23 +109,35 @@ const gasliteSignature: AirdropSolution = {
 
 export const AIRDROP_SOLUTIONS: AirdropSolutionsList = {
   native: {
-    push: gasliteDrop,
-    merkle: gasliteMerkle,
-    signature: gasliteSignature,
+    push: {
+      ...gasliteDrop,
+      functionSig: 'airdropETH(address[],uint256[])',
+    },
+    merkle: { ...gasliteMerkle, functionSig: '' },
+    signature: { ...gasliteSignature, functionSig: '' },
   },
   ERC20: {
-    push: gasliteDrop,
-    merkle: gasliteMerkle,
-    signature: gasliteSignature,
+    push: {
+      ...gasliteDrop,
+      functionSig: 'airdropERC20(address,address[],uint256[],uint256)',
+    },
+    merkle: { ...gasliteMerkle, functionSig: '' },
+    signature: { ...gasliteSignature, functionSig: '' },
   },
   ERC721: {
-    push: gasliteDrop,
-    merkle: gasliteMerkle,
-    signature: gasliteSignature,
+    push: {
+      ...gasliteDrop,
+      functionSig: 'airdropERC721(address,address[],uint256[])',
+    },
+    merkle: { ...gasliteMerkle, functionSig: '' },
+    signature: { ...gasliteSignature, functionSig: '' },
   },
   ERC1155: {
-    push: gasliteDrop1155,
-    merkle: gasliteMerkle,
-    signature: gasliteSignature,
+    push: {
+      ...gasliteDrop1155,
+      functionSig: 'airdropERC1155(address,(uint256,(uint256,address[])[])[])',
+    },
+    merkle: { ...gasliteMerkle, functionSig: '' },
+    signature: { ...gasliteSignature, functionSig: '' },
   },
 };

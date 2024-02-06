@@ -2,14 +2,15 @@ import { create } from 'zustand';
 
 import { CHAINS } from '@/lib/constants/chains';
 import { Chain } from '@/lib/types/chains';
+import { GasFeesData } from '@/lib/types/estimate';
 import { ComboboxOption } from '@/lib/types/templates';
 
 type SelectionGlobal = {
   chainOption: ComboboxOption | null;
-  gasPrice: bigint;
+  gasFeesData: GasFeesData | null;
   nativeTokenPrice: number;
   setChainOption: (chainOption: ComboboxOption | null) => void;
-  setGasPrice: (gasPrice: bigint) => void;
+  setGasFeesData: (gasFeesData: GasFeesData) => void;
   setNativeTokenPrice: (nativeTokenPrice: number) => void;
   getCurrentChain: () => Chain | null;
 };
@@ -18,13 +19,13 @@ export const useGlobalStore = create<SelectionGlobal>((set, get) => ({
   // Current options (selected by user)
   chainOption: null,
   // Current options (selected by user or current onchain values)
-  gasPrice: BigInt(0),
+  gasFeesData: null,
   nativeTokenPrice: 0,
 
   // Set options
   setChainOption: (chainOption) => set({ chainOption }),
   // Set options (onchain)
-  setGasPrice: (gasPrice) => set({ gasPrice }),
+  setGasFeesData: (gasFeesData) => set({ gasFeesData }),
   setNativeTokenPrice: (nativeTokenPrice) => set({ nativeTokenPrice }),
 
   // Get current chain

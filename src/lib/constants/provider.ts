@@ -1,20 +1,33 @@
 import { createPublicClient, http, PublicClient } from 'viem';
 
 import { CHAINS } from '@/lib/constants/chains';
-import { ViemChain } from '@/lib/types/chains';
+import { Chain, ViemChain } from '@/lib/types/chains';
+
+type PublicClientCustomParams = PublicClient & {
+  chain: {
+    custom: Omit<Chain, 'config'>;
+  };
+};
 
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID || '';
 
-const createViemClient = (chain: ViemChain, rpc: string): PublicClient => {
+// Extend public client with chain.custom types
+const createViemClient = (chain: Chain): PublicClientCustomParams => {
+  const { config, ...rest } = chain;
   return createPublicClient({
-    chain,
-    transport: http(`${rpc}${alchemyId}`, {
-      name: `Alchemy provider for ${chain.name}`,
+    chain: {
+      ...config,
+      custom: {
+        ...rest,
+      },
+    },
+    transport: http(`${chain.rpcUrl}${alchemyId}`, {
+      name: `Alchemy provider for ${chain.config.name}`,
     }),
   });
 };
 
-const clients = CHAINS.map((chain) => createViemClient(chain.config, chain.rpcUrl));
+const clients = CHAINS.map((chain) => createViemClient(chain));
 
 export const getClient = (chainId: number) => {
   const client = clients.find((client) => client.chain?.id === chainId);

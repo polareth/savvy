@@ -13,7 +13,7 @@ type SelectionAirdrop = {
   methodOption: ComboboxOption | null;
   setTokenOption: (tokenOption: ComboboxOption | null) => void;
   setMethodOption: (methodOption: ComboboxOption | null) => void;
-  current: () => {
+  getCurrent: () => {
     token: Token | null;
     method: AirdropMethod | null;
     solution: AirdropSolution | null;
@@ -31,7 +31,7 @@ export const useAirdropStore = create<SelectionAirdrop>((set, get) => ({
   setMethodOption: (methodOption) => set({ methodOption }),
 
   // Get current selection & solution
-  current: () => {
+  getCurrent: () => {
     const { tokenOption, methodOption } = get();
     const tokenId = tokenOption ? (tokenOption.value as Token['id']) : null;
     const methodId = methodOption ? (methodOption.value as AirdropMethod['id']) : null;

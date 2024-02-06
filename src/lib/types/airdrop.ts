@@ -15,6 +15,7 @@ export type AirdropSolution = {
   description: string;
   tokens: Token[];
   method: AirdropMethod;
+  functionSig: string;
   sourceUrl: string;
   website: string;
   contract: string;

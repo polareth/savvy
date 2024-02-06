@@ -39,7 +39,7 @@ const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
     return (
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="flex w-[150px] items-center justify-start">
+          <Button variant="outline" className="flex w-[250px] items-center justify-start">
             {selected ? (
               <>
                 {selected.icon ? <selected.icon className="mr-2 h-4 w-4" /> : null}

@@ -1,5 +1,7 @@
 import { type Chain as ViemChain } from 'viem/chains';
 
+import { GasControls } from '@/lib/types/estimate';
+
 import { Icon } from '@/components/common/icons';
 
 type ChainBase = {
@@ -20,12 +22,16 @@ export type OPStackSupport = ChainLayer & {
   hasCustomStack: boolean;
 };
 
-export type Chain = OPStackSupport & {
-  rpcUrl: string;
-  config: ViemChain;
-  icon?: Icon;
+type GasFeesModel = OPStackSupport & {
+  hasPriorityFee: boolean;
 };
 
-// export type ChainId = 1 | 10 | 137 | 8453 | 42161;
+export type Chain = GasFeesModel & {
+  config: ViemChain;
+  rpcUrl: string;
+  avgBlockTime: number;
+  gascontrols?: GasControls;
+  icon?: Icon;
+};
 
 export type { ViemChain };
