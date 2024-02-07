@@ -42,7 +42,12 @@ const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
           <Button variant="outline" className="flex w-[250px] items-center justify-start">
             {selected ? (
               <>
-                {selected.icon ? <selected.icon className="mr-2 h-4 w-4" /> : null}
+                {selected.icon ? (
+                  <selected.icon
+                    className="mr-2 h-4 w-4"
+                    style={{ stroke: selected.iconColor || 'currentColor' }}
+                  />
+                ) : null}
                 {selected.label}
               </>
             ) : (
@@ -65,7 +70,12 @@ const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
         <Button variant="outline" className="flex w-[150px] items-center justify-start">
           {selected ? (
             <>
-              {selected.icon ? <selected.icon className="mr-2 h-4 w-4" /> : null}
+              {selected.icon ? (
+                <selected.icon
+                  className="mr-2 h-4 w-4"
+                  style={{ stroke: selected.iconColor || 'currentColor' }}
+                />
+              ) : null}
               {selected.label}
             </>
           ) : (
@@ -115,7 +125,12 @@ const ItemList: FC<ItemListProps> = ({ items, label, setOpen, setSelectedItem })
               }}
             >
               <div className="flex items-center">
-                {item.icon ? <item.icon className="mr-2 h-4 w-4" /> : null}
+                {item.icon ? (
+                  <item.icon
+                    className="mr-2 h-4 w-4"
+                    style={{ stroke: item.iconColor || 'currentColor' }}
+                  />
+                ) : null}
                 {item.label}
               </div>
             </CommandItem>

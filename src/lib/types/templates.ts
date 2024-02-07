@@ -4,4 +4,5 @@ export type ComboboxOption = {
   label: string;
   value: string;
   icon?: Icon;
+  iconColor?: string;
 };

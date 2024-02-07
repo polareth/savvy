@@ -7,10 +7,10 @@ import { AirdropMethod, AirdropSolution, AirdropSolutionsList, Token } from '@/l
 import { Icon } from '@/components/common/icons';
 
 export const AIRDROP_TOKENS: Token[] = [
-  { id: 'native', label: 'Native token' },
-  { id: 'ERC20', label: 'ERC20' },
-  { id: 'ERC721', label: 'ERC721' },
-  { id: 'ERC1155', label: 'ERC1155' },
+  { id: 'native', label: 'Native token', iconColor: 'currentColor' },
+  { id: 'ERC20', label: 'ERC20', iconColor: 'hsl(var(--blue))' },
+  { id: 'ERC721', label: 'ERC721', iconColor: 'hsl(var(--green))' },
+  { id: 'ERC1155', label: 'ERC1155', iconColor: 'hsl(var(--rose))' },
 ];
 
 export const AIRDROP_METHODS: AirdropMethod[] = [

@@ -3,7 +3,11 @@ import { Address } from 'viem';
 
 import { Icon } from '@/components/common/icons';
 
-export type Token = { id: 'native' | 'ERC20' | 'ERC721' | 'ERC1155'; label: string };
+export type Token = {
+  id: 'native' | 'ERC20' | 'ERC721' | 'ERC1155';
+  label: string;
+  iconColor?: string;
+};
 export type AirdropMethod = {
   id: 'push' | 'merkle' | 'signature';
   label: string;

@@ -10,8 +10,18 @@
     --card-foreground: 20 14.3% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 20 14.3% 4.1%;
+
     --primary: 24.6 95% 53.1%;
     --primary-foreground: 60 9.1% 97.8%;
+    --blue: 221.2 83.2% 53.3%;
+    --blue-foreground: 210 40% 98%;
+    --yellow: 47.9 95.8% 53.1%;
+    --yellow-foreground: 26 83.3% 14.1%;
+    --green: 142.1 76.2% 36.3%;
+    --green-foreground: 355.7 100% 97.3%;
+    --rose: 346.8 77.2% 49.8%;
+    --rose-foreground: 355.7 100% 97.3%;
+
     --secondary: 60 4.8% 95.9%;
     --secondary-foreground: 24 9.8% 10%;
     --muted: 60 4.8% 95.9%;
@@ -34,8 +44,18 @@
     --card-foreground: 60 9.1% 97.8%;
     --popover: 20 14.3% 4.1%;
     --popover-foreground: 60 9.1% 97.8%;
+
     --primary: 20.5 90.2% 48.2%;
     --primary-foreground: 60 9.1% 97.8%;
+    --blue: 217.2 91.2% 59.8%;
+    --blue-foreground: 222.2 47.4% 11.2%;
+    --yellow: 47.9 95.8% 53.1%;
+    --yellow-foreground: 26 83.3% 14.1%;
+    --green: 142.1 70.6% 45.3%;
+    --green-foreground: 144.9 80.4% 10%;
+    --rose: 346.8 77.2% 49.8%;
+    --rose-foreground: 355.7 100% 97.3%;
+
     --secondary: 12 6.5% 15.1%;
     --secondary-foreground: 60 9.1% 97.8%;
     --muted: 12 6.5% 15.1%;

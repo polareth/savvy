@@ -1,21 +1,50 @@
 'use client';
 
+import { useMemo } from 'react';
+
+import { Coins } from 'lucide-react';
+
 import { AIRDROP_TOKENS } from '@/lib/constants/solutions/airdrop';
 import { useSelectionStore } from '@/lib/store/use-selection';
 import { ComboboxOption } from '@/lib/types/templates';
 
+import { Icon, Icons } from '@/components/common/icons';
 import ComboBoxResponsive from '@/components/templates/combobox-responsive';
-
-const items: ComboboxOption[] = AIRDROP_TOKENS.map((token) => ({
-  label: token.label,
-  value: token.id,
-}));
 
 const TokenSelection = () => {
   const { token, setToken } = useSelectionStore.airdrop((state) => ({
     token: state.tokenOption,
     setToken: state.setTokenOption,
   }));
+
+  const { chainOption, getCurrentChain } = useSelectionStore.global((state) => ({
+    chainOption: state.chainOption,
+    getCurrentChain: state.getCurrentChain,
+  }));
+
+  const items: ComboboxOption[] = useMemo(
+    () =>
+      AIRDROP_TOKENS.map((token) => {
+        if (chainOption && token.id === 'native') {
+          const chain = getCurrentChain();
+          if (chain) {
+            return {
+              label: `${chain.config.nativeCurrency.symbol} (native)`,
+              value: token.id,
+              icon: Icons[chain.config.name.toLowerCase() as keyof typeof Icons] as Icon,
+            };
+          }
+        }
+
+        return {
+          label: token.label,
+          value: token.id,
+          icon: Coins as Icon,
+          iconColor: token.iconColor,
+        };
+      }),
+    [chainOption, getCurrentChain],
+  );
 
   return <ComboBoxResponsive items={items} label="Token" selected={token} setSelected={setToken} />;
 };
