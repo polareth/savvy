@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 
+import { DEFAULTS } from '@/lib/constants/defaults';
 import {
   AIRDROP_METHODS,
   AIRDROP_SOLUTIONS,
@@ -7,6 +8,7 @@ import {
 } from '@/lib/constants/solutions/airdrop';
 import { AirdropMethod, AirdropSolution, Token } from '@/lib/types/airdrop';
 import { ComboboxOption } from '@/lib/types/templates';
+import { toMethodOption, toTokenOption } from '@/lib/utils/combobox';
 
 type SelectionAirdrop = {
   tokenOption: ComboboxOption | null;
@@ -23,8 +25,8 @@ type SelectionAirdrop = {
 
 export const useAirdropStore = create<SelectionAirdrop>((set, get) => ({
   // Current options (selected by user)
-  tokenOption: null,
-  methodOption: null,
+  tokenOption: toTokenOption(DEFAULTS.airdropToken),
+  methodOption: toMethodOption(DEFAULTS.airdropMethod),
 
   // Set options
   setTokenOption: (tokenOption) => set({ tokenOption }),

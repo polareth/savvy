@@ -5,4 +5,5 @@ export type ComboboxOption = {
   value: string;
   icon?: Icon;
   iconColor?: string;
+  disabled?: boolean;
 };

@@ -116,6 +116,7 @@ const ItemList: FC<ItemListProps> = ({ items, label, setOpen, setSelectedItem })
             <CommandItem
               key={item.value}
               value={item.value}
+              disabled={item.disabled}
               onSelect={(value) => {
                 setSelectedItem(
                   items.find((priority) => priority.value.toLowerCase() === value.toLowerCase()) ||

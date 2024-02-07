@@ -1,9 +1,11 @@
 import { create } from 'zustand';
 
 import { CHAINS } from '@/lib/constants/chains';
+import { DEFAULTS } from '@/lib/constants/defaults';
 import { Chain } from '@/lib/types/chains';
 import { GasFeesData } from '@/lib/types/estimate';
 import { ComboboxOption } from '@/lib/types/templates';
+import { toChainOption } from '@/lib/utils/combobox';
 
 type SelectionGlobal = {
   chainOption: ComboboxOption | null;
@@ -17,7 +19,7 @@ type SelectionGlobal = {
 
 export const useGlobalStore = create<SelectionGlobal>((set, get) => ({
   // Current options (selected by user)
-  chainOption: null,
+  chainOption: toChainOption(DEFAULTS.chain),
   // Current options (selected by user or current onchain values)
   gasFeesData: null,
   nativeTokenPrice: 0,

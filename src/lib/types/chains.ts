@@ -30,8 +30,10 @@ export type Chain = GasFeesModel & {
   config: ViemChain;
   rpcUrl: string;
   avgBlockTime: number;
+
   gascontrols?: GasControls;
   icon?: Icon;
+  disabled?: boolean;
 };
 
 export type { ViemChain };

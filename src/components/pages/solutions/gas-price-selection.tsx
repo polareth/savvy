@@ -68,8 +68,6 @@ const GasPriceSelection = () => {
       <div className="flex flex-col gap-2">
         Base fee (simulate network conditions)
         <Slider
-          // ! TEMP
-          disabled
           min={0}
           max={Number(parseGwei('1000'))}
           value={[Number(gasFeesData?.nextBaseFee || 0)]}
@@ -89,8 +87,6 @@ const GasPriceSelection = () => {
           Priority fee (derived from the selected base fee, using historical data + give link)
         </span>
         <ToggleGroup
-          // ! TEMP
-          disabled
           type="single"
           value={selectedPriorityFee}
           onValueChange={(v) => {

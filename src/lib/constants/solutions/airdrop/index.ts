@@ -15,8 +15,8 @@ export const AIRDROP_TOKENS: Token[] = [
 
 export const AIRDROP_METHODS: AirdropMethod[] = [
   { id: 'push', label: 'Airdrop (direct transfer)', icon: SendHorizonal as Icon },
-  { id: 'merkle', label: 'Claim (merkle tree)', icon: Network as Icon },
-  { id: 'signature', label: 'Claim (signature)', icon: PenLine as Icon },
+  { id: 'merkle', label: 'Claim (merkle tree)', icon: Network as Icon, disabled: true },
+  { id: 'signature', label: 'Claim (signature)', icon: PenLine as Icon, disabled: true },
 ];
 
 const findToken = (id: Token['id']): Token => {

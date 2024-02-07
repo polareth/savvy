@@ -7,11 +7,13 @@ export type Token = {
   id: 'native' | 'ERC20' | 'ERC721' | 'ERC1155';
   label: string;
   iconColor?: string;
+  disabled?: boolean;
 };
 export type AirdropMethod = {
   id: 'push' | 'merkle' | 'signature';
   label: string;
   icon?: Icon;
+  disabled?: boolean;
 };
 
 export type AirdropSolution = {
