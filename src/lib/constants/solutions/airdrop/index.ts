@@ -1,4 +1,4 @@
-import { GasliteDrop as gasliteDropContract } from './contracts/GasliteDrop';
+import { GasliteDropContract as gasliteDropContract } from './contracts/GasliteDrop';
 import { GasliteDrop1155 as gasliteDrop1155Contract } from './contracts/GasliteDrop1155';
 import { Network, PenLine, SendHorizonal } from 'lucide-react';
 

@@ -54,7 +54,7 @@ const GasPriceSelection = () => {
   useEffect(() => {
     if (gasFeesData) {
       const { lowerBound, middleBound, upperBound } = estimatePriorityFeesForBaseFee(
-        gasFeesData.nextBaseFee,
+        gasFeesData.nextBaseFeePerGas,
         gasFeesData.baseFeeToPriorityFeeBounds,
       );
       setPriorityFeeBounds([lowerBound, middleBound, upperBound]);
@@ -70,16 +70,18 @@ const GasPriceSelection = () => {
         <Slider
           min={0}
           max={Number(parseGwei('1000'))}
-          value={[Number(gasFeesData?.nextBaseFee || 0)]}
+          value={[Number(gasFeesData?.nextBaseFeePerGas || 0)]}
           defaultValue={[0]}
           onValueChange={(v) => {
-            gasFeesData ? setGasFeesData({ ...gasFeesData, nextBaseFee: BigInt(v[0]) }) : null;
+            gasFeesData
+              ? setGasFeesData({ ...gasFeesData, nextBaseFeePerGas: BigInt(v[0]) })
+              : null;
           }}
         />
         {loading ? (
           <Skeleton className="h-4 w-24 rounded-md" />
         ) : (
-          formatGwei(gasFeesData?.nextBaseFee || BigInt(0))
+          formatGwei(gasFeesData?.nextBaseFeePerGas || BigInt(0))
         )}
       </div>
       <div className="flex flex-col">
@@ -92,13 +94,16 @@ const GasPriceSelection = () => {
           onValueChange={(v) => {
             if (v) setSelectedPriorityFee(v as 'low' | 'mid' | 'high');
             if (gasFeesData) {
-              const totalFee =
+              const totalFeePerGas =
                 v === 'low'
                   ? priorityFeeBounds[0]
                   : v === 'mid'
                   ? priorityFeeBounds[1]
                   : priorityFeeBounds[2];
-              setGasFeesData({ ...gasFeesData, totalFee: gasFeesData?.nextBaseFee + totalFee });
+              setGasFeesData({
+                ...gasFeesData,
+                totalFeePerGas: gasFeesData?.nextBaseFeePerGas + totalFeePerGas,
+              });
             }
           }}
         >

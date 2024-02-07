@@ -1,9 +1,17 @@
+## TODO
+
 - Put gas price & native token price inside Advanced (in a collapsible)
 - Utils to convert gwei (or anything really) based on currency; e.g. L2 on OP stack need at least 3-4 decimals when Ethereum/Polygon is ok with 2
+- See if there is a "maxSupply" for the provided token (BEFORE fetching local-chain), and if so, compare it to the amount of tokens airdropped; if not enough, ask the user to provide an account that owns enough tokens
+- in the local-chain api, return different error codes based on what failed, and decode them browser-side to display in the toast
 
-- Get historical fe data over a long period of time (defined blocks in constants)
-- Set the default base fee and priority fee based on this data (use next block for default) USE A RANGE SLIDER
-- Let the user change both and indicate loosely how it is (normal, high congestion, high priority fee, etc FOR BOTH) based on historical data
+---
+
+## Steps
+
+- For ERC20, just fetch the owner of the token contract (if any), and either mint as them or as the contract itself
+- For ERC721, except if there is something better, crawl through the token IDS, see if there is an owner; if there is, impersonate them and send the token(s) to our caller, if not, mint them
+- For ERC1155, same as ERC721, but just mint the tokens for each id
 
 ---
 

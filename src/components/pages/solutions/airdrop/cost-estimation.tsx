@@ -6,7 +6,9 @@ import { toast } from 'sonner';
 
 import { useSelectionStore } from '@/lib/store/use-selection';
 import { GasCostEstimation } from '@/lib/types/estimate';
+import { toastErrorWithContact } from '@/lib/utils';
 import { estimateGasCostAirdrop } from '@/lib/utils/estimate';
+import { testTevmERC20, testTevmNativeToken } from '@/lib/utils/test';
 
 import TooltipConditional from '@/components/common/tooltip-conditional';
 import { Button } from '@/components/ui/button';
@@ -19,11 +21,11 @@ const CostEstimation = () => {
   const [estimation, setEstimation] = useState<GasCostEstimation | null>(null);
 
   /* --------------------------------- stores --------------------------------- */
-  const { chainOption, getCurrentChain, gasPrice, nativeTokenPrice } = useSelectionStore.global(
+  const { chainOption, getCurrentChain, gasFeesData, nativeTokenPrice } = useSelectionStore.global(
     (state) => ({
       chainOption: state.chainOption,
       getCurrentChain: state.getCurrentChain,
-      gasPrice: state.gasPrice,
+      gasFeesData: state.gasFeesData,
       nativeTokenPrice: state.nativeTokenPrice,
     }),
   );
@@ -45,8 +47,17 @@ const CostEstimation = () => {
     }
 
     setLoading(true);
-    // const est = await estimateGasCostAirdrop(currentChain, solution, gasPrice, nativeTokenPrice);
-    // setEstimation(est);
+    if (!gasFeesData || !nativeTokenPrice) {
+      toastErrorWithContact('There seems to be an issue fetching data.', '');
+    } else {
+      const est = await estimateGasCostAirdrop(
+        currentChain,
+        solution,
+        gasFeesData,
+        nativeTokenPrice,
+      );
+      setEstimation(est);
+    }
     setLoading(false);
   };
 
@@ -59,9 +70,18 @@ const CostEstimation = () => {
     }
   }, [chainOption, tokenOption, methodOption]);
 
+  // ! TEMP
+  // useEffect(() => {
+  //   testTevm().then((res) => {
+  //     console.log('res', res);
+  //   });
+  // }, []);
+
   /* -------------------------------- component ------------------------------- */
   return (
     <div className="flex flex-col">
+      {/* ! TEMP */}
+      <button onClick={testTevmERC20}>test tevm</button>
       <TooltipConditional condition={!ready} tooltip="Please select a chain, a token and a method">
         <Button className="w-full" onClick={estimateCostForSolution} disabled={!ready}>
           Estimate cost

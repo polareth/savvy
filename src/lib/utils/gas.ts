@@ -33,7 +33,7 @@ export const getGasFeesData = async (chainId: number): Promise<GasFeesData> => {
     rewardPercentiles: [FEES_DATA_LOWER_BOUND, FEES_DATA_MIDDLE_BOUND, FEES_DATA_UPPER_BOUND],
   });
 
-  const nextBaseFee = feeHistory.baseFeePerGas[feeHistory.baseFeePerGas.length - 1];
+  const nextBaseFeePerGas = feeHistory.baseFeePerGas[feeHistory.baseFeePerGas.length - 1];
 
   // Calculate the average period of the calculation (we don't need anything too precise here)
   const averageTimePerBlock: number = client.chain.custom.avgBlockTime || 0;
@@ -43,13 +43,13 @@ export const getGasFeesData = async (chainId: number): Promise<GasFeesData> => {
   // except if it's a chain without a priority fee (e.g. Arbitrum One)
   if (!feeHistory.reward || !feeHistory.reward.length) {
     return {
-      nextBaseFee,
+      nextBaseFeePerGas,
       baseFeeToPriorityFeeBounds: {
         lowRatio: BigInt(0),
         middleRatio: BigInt(0),
         highRatio: BigInt(0),
       },
-      totalFee: nextBaseFee,
+      totalFeePerGas: nextBaseFeePerGas,
       analysisPeriod,
       hasChainPriorityFee: client.chain.custom.hasPriorityFee,
     };
@@ -89,13 +89,13 @@ export const getGasFeesData = async (chainId: number): Promise<GasFeesData> => {
       );
 
     return {
-      nextBaseFee,
+      nextBaseFeePerGas,
       baseFeeToPriorityFeeBounds: {
         lowRatio: count > 0 ? totalLowerBoundRatio / BigInt(count) : BigInt(0),
         middleRatio: count > 0 ? totalMiddleBoundRatio / BigInt(count) : BigInt(0),
         highRatio: count > 0 ? totalUpperBoundRatio / BigInt(count) : BigInt(0),
       },
-      totalFee: nextBaseFee + (totalLowerBoundRatio * nextBaseFee) / PRECISION,
+      totalFeePerGas: nextBaseFeePerGas + (totalLowerBoundRatio * nextBaseFeePerGas) / PRECISION,
       analysisPeriod,
       hasChainPriorityFee: client.chain.custom.hasPriorityFee,
     };
