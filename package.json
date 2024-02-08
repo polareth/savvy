@@ -20,6 +20,7 @@
     "@radix-ui/react-toggle": "^1.0.3",
     "@radix-ui/react-toggle-group": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
+    "@tevm/bundler": "1.0.0-next.25",
     "@tevm/state": "1.0.0-next.23",
     "@typescript-eslint/parser": "^6.20.0",
     "@vercel/analytics": "^1.1.2",
@@ -41,6 +42,7 @@
   },
   "devDependencies": {
     "@tevm/api": "1.0.0-next.22",
+    "@tevm/ts-plugin": "1.0.0-next.25",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/node": "^20",
     "@types/prettier": "^2.7.3",
@@ -55,8 +57,10 @@
     "postcss": "^8",
     "prettier": "^2.8.7",
     "prettier-plugin-tailwindcss": "^0.2.7",
+    "solady": "^0.0.167",
     "tailwindcss": "^3.3.0",
     "tailwindcss-animate": "^1.0.5",
+    "ts-plugin": "link:@tevm/plugin/ts-plugin",
     "typescript": "^5"
   }
 }

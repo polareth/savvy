@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "target": "ES2021",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -15,7 +16,8 @@
     "plugins": [
       {
         "name": "next"
-      }
+      },
+      { "name": "@tevm/ts-plugin" }
     ],
     "paths": {
       "@/*": ["./src/*"]

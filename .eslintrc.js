@@ -27,5 +27,6 @@ module.exports = {
     'prettier/prettier': 'error',
     indent: 'off',
     '@typescript-eslint/no-empty-interface': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
   },
 };
