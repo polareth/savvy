@@ -100,6 +100,7 @@ const GasPriceSelection = () => {
                   : v === 'mid'
                   ? priorityFeeBounds[1]
                   : priorityFeeBounds[2];
+
               setGasFeesData({
                 ...gasFeesData,
                 totalFeePerGas: gasFeesData?.nextBaseFeePerGas + totalFeePerGas,

@@ -1,4 +1,5 @@
 import { Chain } from './chains';
+import { type Contract } from 'tevm';
 import { Address } from 'viem';
 
 import { Icon } from '@/components/common/icons';
@@ -16,15 +17,18 @@ export type AirdropMethod = {
   disabled?: boolean;
 };
 
-export type AirdropSolution = {
+export type AirdropSolution<
+  TContract extends Contract<string, string[]> = Contract<string, string[]>,
+> = {
+  id: `${AirdropMethod['id']}-${Token['id']}`;
   name: string;
   description: string;
   tokens: Token[];
   method: AirdropMethod;
-  functionSig: string;
+  functionName: string;
   sourceUrl: string;
   website: string;
-  contract: string;
+  contract: TContract;
   deployments: {
     [chain: Chain['config']['id']]: Address;
   };
@@ -34,4 +38,10 @@ export type AirdropSolutionsList = {
   [token in Token['id']]: {
     [method in AirdropMethod['id']]: AirdropSolution;
   };
+};
+
+export type AirdropData = {
+  recipients: `0x${string}`[];
+  amounts: string[];
+  ids: string[]; // for ERC721 and ERC1155, empty if not relevant
 };

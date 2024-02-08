@@ -1,4 +1,4 @@
-export const GasliteDrop1155 = `pragma solidity 0.8.20;
+pragma solidity 0.8.20;
 
 // forgefmt: disable-start
 /**
@@ -111,4 +111,4 @@ contract GasliteDrop1155 {
             }
         }
     }
-}`;
+}

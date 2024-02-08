@@ -19,22 +19,27 @@ export type GasFeesData = {
   hasChainPriorityFee: boolean;
 };
 
-export type TxCosts = {
+type TxGasResult = {
   deployment: {
-    rootCostUsd: number;
-    l1submissionCostUsd?: number;
+    root: string;
+    l1submission?: string;
   };
   call: {
-    rootCostUsd: number;
-    l1submissionCostUsd?: number;
+    root: string;
+    l1submission?: string;
   };
 };
 
-export type GasCostEstimation = TxCosts & {
+export type TxGasUsed = TxGasResult;
+export type TxGasCostsUsd = TxGasResult;
+
+export type GasCostEstimation = {
   config: {
     chain: Chain;
     solution: AirdropSolution;
     gasFeesData: GasFeesData;
     nativeTokenPrice: number;
   };
+  gasUsed: TxGasUsed;
+  gasCostsUsd: TxGasCostsUsd;
 };

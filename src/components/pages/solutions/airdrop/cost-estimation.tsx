@@ -7,8 +7,7 @@ import { toast } from 'sonner';
 import { useSelectionStore } from '@/lib/store/use-selection';
 import { GasCostEstimation } from '@/lib/types/estimate';
 import { toastErrorWithContact } from '@/lib/utils';
-import { estimateGasCostAirdrop } from '@/lib/utils/estimate';
-import { testTevmERC20, testTevmNativeToken } from '@/lib/utils/test';
+import { estimateGasCostAirdrop } from '@/lib/utils/estimation/router';
 
 import TooltipConditional from '@/components/common/tooltip-conditional';
 import { Button } from '@/components/ui/button';
@@ -29,13 +28,13 @@ const CostEstimation = () => {
       nativeTokenPrice: state.nativeTokenPrice,
     }),
   );
-  const { tokenOption, methodOption, getCurrentAirdropSelection } = useSelectionStore.airdrop(
-    (state) => ({
+  const { tokenOption, methodOption, recipientsCount, getCurrentAirdropSelection } =
+    useSelectionStore.airdrop((state) => ({
       tokenOption: state.tokenOption,
       methodOption: state.methodOption,
+      recipientsCount: state.recipientsCount,
       getCurrentAirdropSelection: state.getCurrent,
-    }),
-  );
+    }));
 
   /* ------------------------------- estimation ------------------------------- */
   const estimateCostForSolution = async () => {
@@ -46,18 +45,27 @@ const CostEstimation = () => {
       return;
     }
 
-    setLoading(true);
     if (!gasFeesData || !nativeTokenPrice) {
       toastErrorWithContact('There seems to be an issue fetching data.', '');
-    } else {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
       const est = await estimateGasCostAirdrop(
         currentChain,
         solution,
         gasFeesData,
         nativeTokenPrice,
+        recipientsCount,
+        { recipients: [], amounts: [], ids: [] },
       );
       setEstimation(est);
+    } catch (error) {
+      toast.error('There seems to be an issue estimating the cost.');
     }
+
     setLoading(false);
   };
 
@@ -70,24 +78,41 @@ const CostEstimation = () => {
     }
   }, [chainOption, tokenOption, methodOption]);
 
-  // ! TEMP
-  // useEffect(() => {
-  //   testTevm().then((res) => {
-  //     console.log('res', res);
-  //   });
-  // }, []);
-
   /* -------------------------------- component ------------------------------- */
   return (
     <div className="flex flex-col">
-      {/* ! TEMP */}
-      <button onClick={testTevmERC20}>test tevm</button>
       <TooltipConditional condition={!ready} tooltip="Please select a chain, a token and a method">
         <Button className="w-full" onClick={estimateCostForSolution} disabled={!ready}>
           Estimate cost
         </Button>
       </TooltipConditional>
-      {loading ? <Skeleton className="h-4 w-24 rounded-md" /> : 'result'}
+      <div className="mt-4">
+        {loading ? (
+          <Skeleton className="h-8 w-full rounded-md" />
+        ) : estimation?.gasUsed && estimation.gasCostsUsd ? (
+          <div className="flex flex-col">
+            <span className="font-medium">Deployment</span>
+            <span>
+              Gas used: {estimation.gasUsed.deployment.root} +{' '}
+              {estimation.gasUsed.deployment.l1submission}
+            </span>
+            <span>
+              Cost in USD: {estimation.gasCostsUsd.deployment.root} +{' '}
+              {estimation.gasCostsUsd.deployment.l1submission}
+            </span>
+            <span className="mt-4 font-medium">Call</span>
+            <span>
+              Gas used: {estimation.gasUsed.call.root} + {estimation.gasUsed.call.l1submission}
+            </span>
+            <span>
+              Cost in USD: {estimation.gasCostsUsd.call.root} +{' '}
+              {estimation.gasCostsUsd.call.l1submission}
+            </span>
+          </div>
+        ) : (
+          'no estimation yet'
+        )}
+      </div>
     </div>
   );
 };

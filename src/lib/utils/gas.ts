@@ -88,14 +88,18 @@ export const getGasFeesData = async (chainId: number): Promise<GasFeesData> => {
         },
       );
 
+    const lowRatio = count > 0 ? totalLowerBoundRatio / BigInt(count) : BigInt(0);
+    const middleRatio = count > 0 ? totalMiddleBoundRatio / BigInt(count) : BigInt(0);
+    const highRatio = count > 0 ? totalUpperBoundRatio / BigInt(count) : BigInt(0);
+
     return {
       nextBaseFeePerGas,
       baseFeeToPriorityFeeBounds: {
-        lowRatio: count > 0 ? totalLowerBoundRatio / BigInt(count) : BigInt(0),
-        middleRatio: count > 0 ? totalMiddleBoundRatio / BigInt(count) : BigInt(0),
-        highRatio: count > 0 ? totalUpperBoundRatio / BigInt(count) : BigInt(0),
+        lowRatio,
+        middleRatio,
+        highRatio,
       },
-      totalFeePerGas: nextBaseFeePerGas + (totalLowerBoundRatio * nextBaseFeePerGas) / PRECISION,
+      totalFeePerGas: nextBaseFeePerGas + (lowRatio * nextBaseFeePerGas) / PRECISION,
       analysisPeriod,
       hasChainPriorityFee: client.chain.custom.hasPriorityFee,
     };

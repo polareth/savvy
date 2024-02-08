@@ -1,5 +1,6 @@
 import AirdropMethodSelection from '@/components/pages/solutions/airdrop/airdrop-method-selection';
 import CostEstimation from '@/components/pages/solutions/airdrop/cost-estimation';
+import RecipientsSelection from '@/components/pages/solutions/airdrop/recipients-selection';
 import TokenSelection from '@/components/pages/solutions/airdrop/token-selection';
 import ChainSelection from '@/components/pages/solutions/chain-selection';
 import GasPriceSelection from '@/components/pages/solutions/gas-price-selection';
@@ -14,7 +15,7 @@ const Airdrop = () => {
       <AirdropMethodSelection />
       <GasPriceSelection />
       <NativePriceSelection />
-      {/* TODO AirdropParametersSelection */}
+      <RecipientsSelection />
       <Separator className="my-8" />
       <CostEstimation />
     </div>
