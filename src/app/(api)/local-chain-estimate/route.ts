@@ -1,9 +1,11 @@
-import { callToLocalChain } from '@/lib/utils/estimation/calls';
+import { CallToLocalChain, callToLocalChain } from '@/lib/utils/estimation/calls';
 
 export async function POST(req: Request) {
   try {
     const params = await req.json();
-    const { gasUsed, errors } = await callToLocalChain(params);
+    const { gasUsed, errors } = await callToLocalChain(
+      ...(Object.values(params) as Parameters<CallToLocalChain>),
+    );
 
     return Response.json({ status: 200, data: { gasUsed }, errors });
   } catch (err) {
