@@ -1,9 +1,20 @@
 ## TODO
 
+- More everything using alchemy id in an api route, pass the chainId, the method from the client (with the params) the params and return the data; for each call to the api, decode the params using a type for this specific call (considering what should be returned)
+- Error handling: whenever an error occurs, the toast "contact" button should open a modal, with:
+  - a code block with all the values for the stores in json that can be copy/pasted
+  - a quick and a more long version of bug reporting: quick is just drop a dm with the logs, longer would be with some details, screenshots, etc
+  - maybe just automatically send/save the logs somewhere? would rather have the user decide if they want to send it or not, although the logs (stores) won't contain any sensitive information at all; or at most only send the data that comes from the app and nothing related to the user input
 - Put gas price & native token price inside Advanced (in a collapsible)
 - Utils to convert gwei (or anything really) based on currency; e.g. L2 on OP stack need at least 3-4 decimals when Ethereum/Polygon is ok with 2
 - See if there is a "maxSupply" for the provided token (BEFORE fetching local-chain), and if so, compare it to the amount of tokens airdropped; if not enough, ask the user to provide an account that owns enough tokens
 - in the local-chain api, return different error codes based on what failed, and decode them browser-side to display in the toast
+- When integrating Arbitrum, will need to change 'hasCustomStack' to differenciate OP and Arbitrum + add oracle addresses to config
+- Add a "underlying" property on rollups to be able to calculate the fee later, for instance the id of the underlying chain (e.g. currentChain being Optimism, we need to access the Ethereum client)
+  - Use 2 gas price selection to simulate both the L2 and the L1 conditions
+  - We can't just return a l1Submission string/bigint to account for that, needs more complex logic
+- Put token above recipients, with a check "custom options" that opens a collapsible and sets some bool to true
+- Same with the recipients, with a custom option to use custom addresses/amounts/(ids)
 
 ---
 

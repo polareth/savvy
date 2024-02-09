@@ -1,4 +1,3 @@
-import { parseGwei } from 'viem';
 import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains';
 
 import { Chain, OPStackSupport } from '@/lib/types/chains';

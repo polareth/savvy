@@ -1,10 +1,16 @@
-import { toastErrorWithContact } from '..';
-import { CallError } from '@tevm/api';
-
-import { AirdropData, AirdropMethod, AirdropSolution, Token } from '@/lib/types/airdrop';
+import { AirdropData, AirdropParams, AirdropSolution, AirdropUniqueId } from '@/lib/types/airdrop';
+import { ApiTevmCall } from '@/lib/types/api';
 import { Chain } from '@/lib/types/chains';
-import { GasCostEstimation, GasFeesData, TxGasUsed } from '@/lib/types/estimate';
+import { GasCostEstimation, GasFeesData } from '@/lib/types/estimate';
+import { toastErrorWithContact } from '@/lib/utils';
+import { calculate } from '@/lib/utils/estimation/calculate';
 import { generateRandomAirdropData } from '@/lib/utils/estimation/random';
+
+type CustomTokenParams = {
+  enabled: boolean;
+  contract: string;
+  owner: string;
+};
 
 type EstimateGasCostAirdrop = (
   currentChain: Chain,
@@ -12,14 +18,9 @@ type EstimateGasCostAirdrop = (
   gasFeesData: GasFeesData,
   nativeTokenPrice: number,
   recipientCount: number,
-  airdropData?: AirdropData,
+  airdropData: AirdropData,
+  customTokenParams: CustomTokenParams,
 ) => Promise<GasCostEstimation>;
-
-type ApiCallData = {
-  status: number;
-  data: { gasUsed: TxGasUsed };
-  errors: CallError[];
-};
 
 /* -------------------------------------------------------------------------- */
 /*                                   ROUTER                                   */
@@ -32,6 +33,7 @@ export const estimateGasCostAirdrop: EstimateGasCostAirdrop = async (
   nativeTokenPrice,
   recipientCount,
   airdropData,
+  customTokenParams,
 ) => {
   const { contract, deployments, id, functionName } = solution;
   const { hasCustomStack } = currentChain;
@@ -41,7 +43,7 @@ export const estimateGasCostAirdrop: EstimateGasCostAirdrop = async (
   const forkUrl = currentChain.rpcUrl;
   const contractAddress = deployments[currentChain.config.id];
   const abi = contract.abi;
-  const args = getAirdropArgs(id, recipientCount, airdropData);
+  const params = getAirdropParams(id, recipientCount, airdropData, customTokenParams);
 
   // Call the local chain
   const callRes = await fetch('/local-chain-estimate', {
@@ -55,33 +57,18 @@ export const estimateGasCostAirdrop: EstimateGasCostAirdrop = async (
       contractAddress,
       abi,
       functionName,
-      args,
+      params,
       hasCustomStack,
     }),
   });
 
-  const callData: ApiCallData = await callRes.json();
+  const callResJson: ApiTevmCall = await callRes.json();
 
-  if (callData.errors.length > 0) {
+  if (callResJson.errors.length > 0) {
     toastErrorWithContact('Error estimating the gas cost.', 'See the console for more details.');
-    console.error(callData.errors);
+    console.error(callResJson.errors);
 
-    return {
-      config: {
-        chain: currentChain,
-        solution,
-        gasFeesData,
-        nativeTokenPrice,
-      },
-      gasUsed: {
-        deployment: { root: '0', l1submission: '0' },
-        call: { root: '0', l1submission: '0' },
-      },
-      gasCostsUsd: {
-        deployment: { root: '0', l1submission: '0' },
-        call: { root: '0', l1submission: '0' },
-      },
-    };
+    return emptyGasCostEstimation(currentChain, solution, gasFeesData);
   }
 
   /* ----------------------------- USD CALCULATION ---------------------------- */
@@ -93,18 +80,18 @@ export const estimateGasCostAirdrop: EstimateGasCostAirdrop = async (
   // Calculate costs in USD
   const costs = {
     deployment: {
-      root: gasUsedAndFeeToUsd(
+      root: calculate.gasUsedAndFeeToUsd(
         Number(feePerGas),
-        Number(callData.data.gasUsed.deployment.root),
+        Number(callResJson.data.gasUsed.deployment.root),
         currentChain.config.nativeCurrency.decimals,
         nativeTokenPrice,
       ),
       l1submission: '0',
     },
     call: {
-      root: gasUsedAndFeeToUsd(
+      root: calculate.gasUsedAndFeeToUsd(
         Number(feePerGas),
-        Number(callData.data.gasUsed.call.root),
+        Number(callResJson.data.gasUsed.call.root),
         currentChain.config.nativeCurrency.decimals,
         nativeTokenPrice,
       ),
@@ -119,58 +106,60 @@ export const estimateGasCostAirdrop: EstimateGasCostAirdrop = async (
       gasFeesData,
       nativeTokenPrice,
     },
-    gasUsed: callData.data.gasUsed,
+    gasUsed: callResJson.data.gasUsed,
     gasCostsUsd: costs,
   };
 };
 
 /* -------------------------------------------------------------------------- */
-/*                                CALCULATIONS                                */
+/*                              FORMATTING PARAMS                             */
 /* -------------------------------------------------------------------------- */
 
-const gasUsedAndFeeToUsd = (
-  feePerGas: number,
-  gasUsed: number,
-  decimals: number,
-  nativeTokenPrice: number,
-) => {
-  return ((gasUsed * feePerGas * nativeTokenPrice) / 10 ** decimals).toString();
-};
-
-/* -------------------------------------------------------------------------- */
-/*                                    UTILS                                   */
-/* -------------------------------------------------------------------------- */
-
-const getAirdropArgs = (
-  id: `${AirdropMethod['id']}-${Token['id']}`,
+const getAirdropParams = (
+  id: AirdropUniqueId,
   recipientCount: number,
-  airdropData?: AirdropData,
+  airdropData: AirdropData,
+  customTokenParams: CustomTokenParams,
 ) => {
   const { recipients, amounts, ids, totalAmount } = extractOrRandomAirdropData(
     recipientCount,
     airdropData,
   );
 
-  // We pass totalAmount for 'push-native' for easier access to transfer to the contract
-  // but it's not actually used as an arg
-  return id === 'push-native' || id === 'push-ERC20'
-    ? [recipients, amounts, totalAmount]
-    : id === 'push-ERC721'
-    ? [recipients, ids]
-    : id === 'push-ERC1155'
-    ? [recipients, amounts, ids]
-    : id === 'merkle-native' || id === 'merkle-ERC20'
-    ? generateMerkleRoot(recipients, amounts)
-    : id === 'merkle-ERC721'
-    ? generateMerkleRoot(recipients, ids)
-    : id === 'merkle-ERC1155'
-    ? generateMerkleRoot(recipients, amounts, ids)
-    : [];
+  switch (id) {
+    case 'push-native': {
+      return {
+        totalAmount: totalAmount,
+        args: [recipients, amounts],
+      } as AirdropParams['push-native'];
+    }
+
+    case 'push-ERC20': {
+      // TODO Temp, always a non-custom token
+      // const tokenAddress = (
+      //   customTokenParams.enabled ? customTokenParams.contract : '0x'
+      // ) as `0x${string}`;
+      // const tokenOwner = (
+      //   customTokenParams.enabled ? customTokenParams.owner : '0x'
+      // ) as `0x${string}`;
+      const tokenAddress = customTokenParams.contract as `0x${string}`;
+      const tokenOwner = customTokenParams.owner as `0x${string}`;
+
+      return {
+        tokenAddress: tokenAddress,
+        tokenOwner: tokenOwner,
+        args: [tokenAddress, recipients, amounts, totalAmount],
+      } as AirdropParams['push-ERC20'];
+    }
+
+    default:
+      throw new Error('Invalid airdrop method');
+  }
 };
 
-const extractOrRandomAirdropData = (recipientCount: number, airdropData?: AirdropData) => {
+const extractOrRandomAirdropData = (recipientCount: number, airdropData: AirdropData) => {
   // we already made sure recipients.length === amounts.length
-  if (airdropData && airdropData.recipients.length > 0) {
+  if (airdropData.recipients.length > 0) {
     const { recipients, amounts, ids } = airdropData;
     return {
       recipients,
@@ -185,4 +174,31 @@ const extractOrRandomAirdropData = (recipientCount: number, airdropData?: Airdro
 
 const generateMerkleRoot = (recipients: string[], amounts: string[], ids?: string[]) => {
   return '';
+};
+
+/* -------------------------------------------------------------------------- */
+/*                                    UTILS                                   */
+/* -------------------------------------------------------------------------- */
+
+const emptyGasCostEstimation = (
+  chain: Chain,
+  solution: AirdropSolution,
+  gasFeesData: GasFeesData,
+) => {
+  return {
+    config: {
+      chain,
+      solution,
+      gasFeesData,
+      nativeTokenPrice: 0,
+    },
+    gasUsed: {
+      deployment: { root: '0', l1submission: '0' },
+      call: { root: '0', l1submission: '0' },
+    },
+    gasCostsUsd: {
+      deployment: { root: '0', l1submission: '0' },
+      call: { root: '0', l1submission: '0' },
+    },
+  };
 };

@@ -2,8 +2,6 @@
 
 import { useMemo } from 'react';
 
-import { Coins } from 'lucide-react';
-
 import { AIRDROP_TOKENS } from '@/lib/constants/solutions/airdrop';
 import { useSelectionStore } from '@/lib/store/use-selection';
 import { ComboboxOption } from '@/lib/types/templates';

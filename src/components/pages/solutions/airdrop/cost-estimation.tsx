@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useSelectionStore } from '@/lib/store/use-selection';
@@ -28,18 +29,37 @@ const CostEstimation = () => {
       nativeTokenPrice: state.nativeTokenPrice,
     }),
   );
-  const { tokenOption, methodOption, recipientsCount, getCurrentAirdropSelection } =
-    useSelectionStore.airdrop((state) => ({
-      tokenOption: state.tokenOption,
-      methodOption: state.methodOption,
-      recipientsCount: state.recipientsCount,
-      getCurrentAirdropSelection: state.getCurrent,
-    }));
+  const {
+    tokenOption,
+    methodOption,
+    recipientsCount,
+    customToken,
+    customTokenAddress,
+    customTokenOwner,
+    getCurrentAirdropSelection,
+  } = useSelectionStore.airdrop((state) => ({
+    customToken: state.customToken,
+    customTokenAddress: state.customTokenAddress,
+    customTokenOwner: state.customTokenOwner,
+    tokenOption: state.tokenOption,
+    methodOption: state.methodOption,
+    recipientsCount: state.recipientsCount,
+    getCurrentAirdropSelection: state.getCurrent,
+  }));
 
   /* ------------------------------- estimation ------------------------------- */
   const estimateCostForSolution = async () => {
     const currentChain = getCurrentChain();
     const { solution } = getCurrentAirdropSelection();
+    const customTokenParams = {
+      enabled: customToken,
+      // contract: customTokenAddress,
+      // holder: customTokenOwner,
+      // TODO Hardcoded
+      contract: '0x6B3595068778DD592e39A122f4f5a5cF09C90fE2', // SUSHI
+      owner: '0xc2EdaD668740f1aA35E4D8f227fB8E17dcA888Cd',
+    };
+
     if (!currentChain || !solution) {
       toast.warning('Please select a chain and a solution');
       return;
@@ -60,6 +80,7 @@ const CostEstimation = () => {
         nativeTokenPrice,
         recipientsCount,
         { recipients: [], amounts: [], ids: [] },
+        customTokenParams,
       );
       setEstimation(est);
     } catch (error) {
@@ -71,18 +92,29 @@ const CostEstimation = () => {
 
   /* --------------------------------- effects -------------------------------- */
   useEffect(() => {
-    if (chainOption && tokenOption && methodOption) {
+    if (
+      gasFeesData?.nextBaseFeePerGas &&
+      chainOption &&
+      tokenOption &&
+      methodOption &&
+      recipientsCount > 0 &&
+      !loading
+    ) {
       setReady(true);
     } else {
       setReady(false);
     }
-  }, [chainOption, tokenOption, methodOption]);
+  }, [chainOption, tokenOption, methodOption, gasFeesData, recipientsCount, loading]);
 
   /* -------------------------------- component ------------------------------- */
   return (
     <div className="flex flex-col">
-      <TooltipConditional condition={!ready} tooltip="Please select a chain, a token and a method">
+      <TooltipConditional
+        condition={!ready && !loading}
+        tooltip="Please select a chain, a token and a method"
+      >
         <Button className="w-full" onClick={estimateCostForSolution} disabled={!ready}>
+          {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
           Estimate cost
         </Button>
       </TooltipConditional>

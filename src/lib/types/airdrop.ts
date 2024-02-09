@@ -17,10 +17,12 @@ export type AirdropMethod = {
   disabled?: boolean;
 };
 
+export type AirdropUniqueId = `${AirdropMethod['id']}-${Token['id']}`;
+
 export type AirdropSolution<
   TContract extends Contract<string, string[]> = Contract<string, string[]>,
 > = {
-  id: `${AirdropMethod['id']}-${Token['id']}`;
+  id: AirdropUniqueId;
   name: string;
   description: string;
   tokens: Token[];
@@ -44,4 +46,27 @@ export type AirdropData = {
   recipients: `0x${string}`[];
   amounts: string[];
   ids: string[]; // for ERC721 and ERC1155, empty if not relevant
+};
+
+/* ---------------------------------- ARGS ---------------------------------- */
+
+type AirdropParamsPushNative = {
+  totalAmount: string;
+  // [recipients, amounts]
+  args: [`0x${string}`[], string[]];
+};
+
+type AirdropParamsPushERC20 = {
+  tokenAddress: `0x${string}`;
+  tokenOwner: `0x${string}`;
+  // [token, recipients, amounts, totalAmount]
+  args: [`0x${string}`, `0x${string}`[], string[], string];
+};
+
+export type AirdropParams = {
+  [id in AirdropUniqueId]: id extends 'push-native'
+    ? AirdropParamsPushNative
+    : id extends 'push-ERC20'
+    ? AirdropParamsPushERC20
+    : never;
 };

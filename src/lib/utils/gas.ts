@@ -1,6 +1,8 @@
-import { GasFeesData } from '../types/estimate';
+import { FeeHistory } from 'viem';
 
-import { getClient } from '@/lib/constants/provider';
+import { ApiGasFees } from '@/lib/types/api';
+import { GasFeesData } from '@/lib/types/estimate';
+import { toastErrorWithContact } from '@/lib/utils';
 
 const FEES_DATA_BLOCK_COUNT = 1024;
 const FEES_DATA_LOWER_BOUND = 30;
@@ -27,16 +29,34 @@ type Accumulator = {
 // Here, we associate the base fee per gas of each block to the lower and upper bounds of the priority fee
 // to get an average ratio between the base fee and the priority fee (low and high).
 export const getGasFeesData = async (chainId: number): Promise<GasFeesData> => {
-  const client = getClient(chainId);
-  const feeHistory = await client.getFeeHistory({
-    blockCount: FEES_DATA_BLOCK_COUNT,
-    rewardPercentiles: [FEES_DATA_LOWER_BOUND, FEES_DATA_MIDDLE_BOUND, FEES_DATA_UPPER_BOUND],
+  const res = await fetch('/chain-query/gas-fees', {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: JSON.stringify({
+      chainId,
+      blockCount: FEES_DATA_BLOCK_COUNT,
+      rewardPercentiles: [FEES_DATA_LOWER_BOUND, FEES_DATA_MIDDLE_BOUND, FEES_DATA_UPPER_BOUND],
+    }),
   });
 
-  const nextBaseFeePerGas = feeHistory.baseFeePerGas[feeHistory.baseFeePerGas.length - 1];
+  const resJson: ApiGasFees = await res.json();
+  if (resJson.status !== 200) {
+    console.error(resJson.error);
+    toastErrorWithContact('Error', 'There was an error fetching gas fees history.');
+    return emptyGasFeesData();
+  }
+
+  const { feeHistory: feeHistoryStringified, hasChainPriorityFee, avgBlockTime } = resJson.data;
+  const feeHistory: FeeHistory = JSON.parse(feeHistoryStringified, (_, v) =>
+    typeof v === 'string' ? BigInt(v) : v,
+  );
+
+  const nextBaseFeePerGas = BigInt(feeHistory.baseFeePerGas[feeHistory.baseFeePerGas.length - 1]);
 
   // Calculate the average period of the calculation (we don't need anything too precise here)
-  const averageTimePerBlock: number = client.chain.custom.avgBlockTime || 0;
+  const averageTimePerBlock: number = avgBlockTime || 0;
   const analysisPeriod = averageTimePerBlock * FEES_DATA_BLOCK_COUNT;
 
   // If there is no reward history, we'll let the user know
@@ -51,7 +71,7 @@ export const getGasFeesData = async (chainId: number): Promise<GasFeesData> => {
       },
       totalFeePerGas: nextBaseFeePerGas,
       analysisPeriod,
-      hasChainPriorityFee: client.chain.custom.hasPriorityFee,
+      hasChainPriorityFee,
     };
   } else {
     // Calculate the average ratio baseFee => lower bound & upper bound priorityFee
@@ -69,9 +89,9 @@ export const getGasFeesData = async (chainId: number): Promise<GasFeesData> => {
 
           const reward = feeHistory.reward[index];
           // Calculate the ratio of priorityFee to baseFee for both lower and upper bounds
-          const lowerBoundRatio = (reward[0] * PRECISION) / baseFee;
-          const middleBoundRatio = (reward[1] * PRECISION) / baseFee;
-          const upperBoundRatio = (reward[2] * PRECISION) / baseFee;
+          const lowerBoundRatio = (BigInt(reward[0]) * PRECISION) / BigInt(baseFee);
+          const middleBoundRatio = (BigInt(reward[1]) * PRECISION) / BigInt(baseFee);
+          const upperBoundRatio = (BigInt(reward[2]) * PRECISION) / BigInt(baseFee);
 
           return {
             totalLowerBoundRatio: acc.totalLowerBoundRatio + lowerBoundRatio,
@@ -101,7 +121,7 @@ export const getGasFeesData = async (chainId: number): Promise<GasFeesData> => {
       },
       totalFeePerGas: nextBaseFeePerGas + (lowRatio * nextBaseFeePerGas) / PRECISION,
       analysisPeriod,
-      hasChainPriorityFee: client.chain.custom.hasPriorityFee,
+      hasChainPriorityFee,
     };
   }
 };
@@ -113,4 +133,20 @@ export const estimatePriorityFeesForBaseFee = (
   lowerBound: (averageBounds.lowRatio * baseFee) / PRECISION,
   middleBound: (averageBounds.middleRatio * baseFee) / PRECISION,
   upperBound: (averageBounds.highRatio * baseFee) / PRECISION,
+});
+
+/* -------------------------------------------------------------------------- */
+/*                                    UTILS                                   */
+/* -------------------------------------------------------------------------- */
+
+const emptyGasFeesData = (): GasFeesData => ({
+  nextBaseFeePerGas: BigInt(0),
+  baseFeeToPriorityFeeBounds: {
+    lowRatio: BigInt(0),
+    middleRatio: BigInt(0),
+    highRatio: BigInt(0),
+  },
+  totalFeePerGas: BigInt(0),
+  analysisPeriod: 0,
+  hasChainPriorityFee: false,
 });

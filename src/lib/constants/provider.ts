@@ -1,7 +1,7 @@
 import { createPublicClient, http, PublicClient } from 'viem';
 
 import { CHAINS } from '@/lib/constants/chains';
-import { Chain, ViemChain } from '@/lib/types/chains';
+import { Chain } from '@/lib/types/chains';
 
 type PublicClientCustomParams = PublicClient & {
   chain: {
@@ -9,7 +9,7 @@ type PublicClientCustomParams = PublicClient & {
   };
 };
 
-const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID || '';
+const alchemyId = process.env.ALCHEMY_ID || '';
 
 // Extend public client with chain.custom types
 const createViemClient = (chain: Chain): PublicClientCustomParams => {
