@@ -57,6 +57,22 @@ const config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        blue: {
+          DEFAULT: 'hsl(var(--blue))',
+          foreground: 'hsl(var(--blue-foreground))',
+        },
+        yellow: {
+          DEFAULT: 'hsl(var(--yellow))',
+          foreground: 'hsl(var(--yellow-foreground))',
+        },
+        green: {
+          DEFAULT: 'hsl(var(--green))',
+          foreground: 'hsl(var(--green-foreground))',
+        },
+        rose: {
+          DEFAULT: 'hsl(var(--rose))',
+          foreground: 'hsl(var(--rose-foreground))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
