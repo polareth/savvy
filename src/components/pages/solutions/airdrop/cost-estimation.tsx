@@ -21,14 +21,14 @@ const CostEstimation = () => {
   const [estimation, setEstimation] = useState<GasCostEstimation | null>(null);
 
   /* --------------------------------- stores --------------------------------- */
-  const { chainOption, getCurrentChain, gasFeesData, nativeTokenPrice } = useSelectionStore.global(
-    (state) => ({
+  const { chainOption, gasFeesData, nativeTokenPrice, setFormDisabled, getCurrentChain } =
+    useSelectionStore.global((state) => ({
       chainOption: state.chainOption,
-      getCurrentChain: state.getCurrentChain,
       gasFeesData: state.gasFeesData,
       nativeTokenPrice: state.nativeTokenPrice,
-    }),
-  );
+      setFormDisabled: state.setFormDisabled,
+      getCurrentChain: state.getCurrentChain,
+    }));
   const {
     tokenOption,
     methodOption,
@@ -56,7 +56,7 @@ const CostEstimation = () => {
       // contract: customTokenAddress,
       // holder: customTokenOwner,
       // TODO Hardcoded
-      contract: '0x6B3595068778DD592e39A122f4f5a5cF09C90fE2', // SUSHI
+      contract: '0x6B3595068778DD592e39A122f4f5a5cF09C90fE2', // SUSHI Ethereum
       owner: '0xc2EdaD668740f1aA35E4D8f227fB8E17dcA888Cd',
     };
 
@@ -71,6 +71,7 @@ const CostEstimation = () => {
     }
 
     setLoading(true);
+    setFormDisabled(true);
 
     try {
       const est = await estimateGasCostAirdrop(
@@ -88,6 +89,7 @@ const CostEstimation = () => {
     }
 
     setLoading(false);
+    setFormDisabled(false);
   };
 
   /* --------------------------------- effects -------------------------------- */

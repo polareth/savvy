@@ -22,16 +22,20 @@ const GasPriceSelection = () => {
   ]);
   const [selectedPriorityFee, setSelectedPriorityFee] = useState<'low' | 'mid' | 'high'>('low');
 
-  const { chain, gasFeesData, setGasFeesData } = useSelectionStore.global((state) => ({
-    chain: state.chainOption,
-    gasFeesData: state.gasFeesData,
-    setGasFeesData: state.setGasFeesData,
-  }));
+  const { chain, gasFeesData, formDisabled, setGasFeesData } = useSelectionStore.global(
+    (state) => ({
+      chain: state.chainOption,
+      gasFeesData: state.gasFeesData,
+      formDisabled: state.formDisabled,
+      setGasFeesData: state.setGasFeesData,
+    }),
+  );
 
   useEffect(() => {
     const fetchAndUpdateGasPrice = async (chainId: number) => {
       setLoading(true);
       const gasFeesData = await getGasFeesData(chainId);
+      console.log('gasFeesData', gasFeesData);
       setGasFeesData(gasFeesData);
       setLoading(false);
 
@@ -77,6 +81,7 @@ const GasPriceSelection = () => {
               ? setGasFeesData({ ...gasFeesData, nextBaseFeePerGas: BigInt(v[0]) })
               : null;
           }}
+          disabled={formDisabled}
         />
         {loading ? (
           <Skeleton className="h-4 w-24 rounded-md" />
@@ -107,6 +112,7 @@ const GasPriceSelection = () => {
               });
             }
           }}
+          disabled={formDisabled}
         >
           <ToggleGroupItem value="low" aria-label="Select low priority fee">
             Slow (

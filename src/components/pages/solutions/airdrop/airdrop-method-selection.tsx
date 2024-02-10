@@ -10,13 +10,20 @@ import ComboBoxResponsive from '@/components/templates/combobox-responsive';
 const items: ComboboxOption[] = AIRDROP_METHODS.map((method) => toMethodOption(method));
 
 const AirdropMethodSelection = () => {
+  const formDisabled = useSelectionStore.global((state) => state.formDisabled);
   const { method, setMethod } = useSelectionStore.airdrop((state) => ({
     method: state.methodOption,
     setMethod: state.setMethodOption,
   }));
 
   return (
-    <ComboBoxResponsive items={items} label="Method" selected={method} setSelected={setMethod} />
+    <ComboBoxResponsive
+      items={items}
+      label="Method"
+      selected={method}
+      setSelected={setMethod}
+      disabled={formDisabled}
+    />
   );
 };
 

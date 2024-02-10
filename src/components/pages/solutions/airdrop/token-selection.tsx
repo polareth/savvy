@@ -16,8 +16,9 @@ const TokenSelection = () => {
     setToken: state.setTokenOption,
   }));
 
-  const { chainOption, getCurrentChain } = useSelectionStore.global((state) => ({
+  const { chainOption, formDisabled, getCurrentChain } = useSelectionStore.global((state) => ({
     chainOption: state.chainOption,
+    formDisabled: state.formDisabled,
     getCurrentChain: state.getCurrentChain,
   }));
 
@@ -40,7 +41,15 @@ const TokenSelection = () => {
     [chainOption, getCurrentChain],
   );
 
-  return <ComboBoxResponsive items={items} label="Token" selected={token} setSelected={setToken} />;
+  return (
+    <ComboBoxResponsive
+      items={items}
+      label="Token"
+      selected={token}
+      setSelected={setToken}
+      disabled={formDisabled}
+    />
+  );
 };
 
 export default TokenSelection;

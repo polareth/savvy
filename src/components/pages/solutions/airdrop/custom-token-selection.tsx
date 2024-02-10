@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 
 const CustomTokenSelection = () => {
+  const formDisabled = useSelectionStore.global((state) => state.formDisabled);
   const {
     customToken,
     customTokenAddress,
@@ -58,6 +59,8 @@ const CustomTokenSelection = () => {
           id="custom-token"
           checked={customToken}
           onCheckedChange={toggleCustomToken}
+          // disabled={formDisabled}
+          // TODO Temp fully disabled
           disabled
         />
         <Label htmlFor="custom-token">Use a custom token</Label>
@@ -94,7 +97,7 @@ const CustomTokenSelection = () => {
             onChange={(e) =>
               checkAddressAndUpdate(e.target.value, setCustomTokenAddress, setInvalidToken)
             }
-            disabled={!customToken}
+            disabled={!customToken || formDisabled}
             placeholder="0x..."
             className={cn(invalidToken && 'border-destructive')}
           />
@@ -132,7 +135,7 @@ const CustomTokenSelection = () => {
             onChange={(e) =>
               checkAddressAndUpdate(e.target.value, setCustomTokenOwner, setInvalidHolder)
             }
-            disabled={!customToken}
+            disabled={!customToken || formDisabled}
             placeholder="0x..."
             className={cn(invalidHolder && 'border-destructive')}
           />

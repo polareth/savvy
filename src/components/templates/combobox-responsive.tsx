@@ -28,17 +28,18 @@ type ComboBoxResponsiveProps = {
   label: string;
   selected: ComboboxOption | null;
   setSelected: (item: ComboboxOption | null) => void;
+  disabled?: boolean;
 };
 
 const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
-  const { label, selected, setSelected } = props;
+  const { label, selected, disabled, setSelected } = props;
   const [open, setOpen] = useState(false);
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
   if (isDesktop) {
     return (
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
+        <PopoverTrigger asChild disabled={disabled}>
           <Button variant="outline" className="flex w-[250px] items-center justify-start">
             {selected ? (
               <>

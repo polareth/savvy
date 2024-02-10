@@ -8,6 +8,7 @@ import { Slider } from '@/components/ui/slider';
 const { count: defaultCount, min, max, step } = DEFAULTS.airdropRecipients;
 
 const RecipientsSelection = () => {
+  const formDisabled = useSelectionStore.global((state) => state.formDisabled);
   const { recipientsCount, setRecipientsCount } = useSelectionStore.airdrop((state) => ({
     recipientsCount: state.recipientsCount,
     setRecipientsCount: state.setRecipientsCount,
@@ -24,6 +25,7 @@ const RecipientsSelection = () => {
         value={[recipientsCount]}
         defaultValue={[defaultCount]}
         onValueChange={(v) => setRecipientsCount(v[0])}
+        disabled={formDisabled}
       />
     </div>
   );

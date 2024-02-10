@@ -11,9 +11,11 @@ type SelectionGlobal = {
   chainOption: ComboboxOption | null;
   gasFeesData: GasFeesData | null;
   nativeTokenPrice: number;
+  formDisabled: boolean;
   setChainOption: (chainOption: ComboboxOption | null) => void;
   setGasFeesData: (gasFeesData: GasFeesData) => void;
   setNativeTokenPrice: (nativeTokenPrice: number) => void;
+  setFormDisabled: (formDisabled: boolean) => void;
   getCurrentChain: () => Chain | null;
 };
 
@@ -23,12 +25,16 @@ export const useGlobalStore = create<SelectionGlobal>((set, get) => ({
   // Current options (selected by user or current onchain values)
   gasFeesData: null,
   nativeTokenPrice: 0,
+  // Form disabled (when loading data)
+  formDisabled: false,
 
   // Set options
   setChainOption: (chainOption) => set({ chainOption }),
   // Set options (onchain)
   setGasFeesData: (gasFeesData) => set({ gasFeesData }),
   setNativeTokenPrice: (nativeTokenPrice) => set({ nativeTokenPrice }),
+
+  setFormDisabled: (formDisabled) => set({ formDisabled }),
 
   // Get current chain
   getCurrentChain: () => {

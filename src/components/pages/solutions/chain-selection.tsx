@@ -11,12 +11,21 @@ import ComboBoxResponsive from '@/components/templates/combobox-responsive';
 const items: ComboboxOption[] = CHAINS.map((chain: Chain) => toChainOption(chain));
 
 const ChainSelection = () => {
-  const { chain, setChain } = useSelectionStore.global((state) => ({
+  const { chain, formDisabled, setChain } = useSelectionStore.global((state) => ({
     chain: state.chainOption,
+    formDisabled: state.formDisabled,
     setChain: state.setChainOption,
   }));
 
-  return <ComboBoxResponsive items={items} label="Chain" selected={chain} setSelected={setChain} />;
+  return (
+    <ComboBoxResponsive
+      items={items}
+      label="Chain"
+      selected={chain}
+      setSelected={setChain}
+      disabled={formDisabled}
+    />
+  );
 };
 
 export default ChainSelection;

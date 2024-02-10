@@ -10,11 +10,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const NativePriceSelection = () => {
   const [loading, setLoading] = useState(false);
-  const { chainOption, getCurrentChain, nativeTokenPrice, setNativeTokenPrice } =
+  const { chainOption, nativeTokenPrice, formDisabled, getCurrentChain, setNativeTokenPrice } =
     useSelectionStore.global((state) => ({
       chainOption: state.chainOption,
-      getCurrentChain: state.getCurrentChain,
       nativeTokenPrice: state.nativeTokenPrice,
+      formDisabled: state.formDisabled,
+      getCurrentChain: state.getCurrentChain,
       setNativeTokenPrice: state.setNativeTokenPrice,
     }));
 
@@ -45,6 +46,7 @@ const NativePriceSelection = () => {
             style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
             value={Number(nativeTokenPrice.toFixed(2))}
             onChange={(e) => setNativeTokenPrice(Number(e.target.value))}
+            disabled={formDisabled}
           />
           <span className="absolute left-3 top-[50%] translate-y-[-50%] text-sm text-muted-foreground">
             $
