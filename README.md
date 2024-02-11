@@ -15,6 +15,7 @@
   - We can't just return a l1Submission string/bigint to account for that, needs more complex logic
 - Put token above recipients, with a check "custom options" that opens a collapsible and sets some bool to true
 - Same with the recipients, with a custom option to use custom addresses/amounts/(ids)
+- Fix nextBaseFee => priority rations; really bad when the base fee starts very low, as it increases way too much
 
 ---
 
@@ -23,6 +24,18 @@
 - For ERC20, just fetch the owner of the token contract (if any), and either mint as them or as the contract itself
 - For ERC721, except if there is something better, crawl through the token IDS, see if there is an owner; if there is, impersonate them and send the token(s) to our caller, if not, mint them
 - For ERC1155, same as ERC721, but just mint the tokens for each id
+
+---
+
+## Error cases (to handle)
+
+Just search for anny "throw" and "console.error" in the code
+
+- revert in a Tevm call
+- provided arguments (addresses, amounts, ids) not valid
+- provided token not found/issue
+- provided owner/holder not able to mint, not holding enough tokens
+- provided token not mintable/transferrable (see call revert)
 
 ---
 

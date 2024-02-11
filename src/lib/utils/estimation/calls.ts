@@ -1,6 +1,7 @@
 import { Abi, CallResult, createMemoryClient, encodeFunctionData, TevmClient } from 'tevm';
 
-import { AirdropParams, AirdropUniqueId } from '@/lib/types/airdrop';
+import { MOCKS } from '@/lib/constants/solutions/airdrop/mocks';
+import { AirdropParams, AirdropUniqueId, Token } from '@/lib/types/airdrop';
 import { TxGasUsed } from '@/lib/types/estimate';
 import { calculate } from '@/lib/utils/estimation/calculate';
 
@@ -24,6 +25,7 @@ type CallToLocalChain_sub = (
   abi: Abi,
   functionName: string,
   params: AirdropParams[typeof id],
+  tokenAddress: `0x${string}`,
 ) => { value: bigint; encodedData: `0x${string}` };
 
 /* -------------------------------------------------------------------------- */
@@ -41,29 +43,37 @@ export const callToLocalChain: CallToLocalChain = async (
   params,
   hasCustomStack,
 ) => {
-  const tevm: TevmClient = await createMemoryClient({
+  let caller: `0x${string}` = `0x${'01'.repeat(20)}`;
+  let tokenAddress: `0x${string}` = '0x';
+  const tevm = await createMemoryClient({
     fork: {
       url: `${forkUrl}${alchemyId}`,
     },
   });
 
-  const caller = `0x${'01'.repeat(20)}` as const;
-  const { value, encodedData } = mapIdToData(id, abi, functionName, params);
+  // If it's a token we need to mint and approve
+  // If the user provided a token, and the owner (able to mint tokens), it will mint and approve
+  // If the user provided a token, and a holder, it will only approve
+  // If the user didn't provide a token, it will use a mock token and return its address
+  if (id === 'push-ERC20') {
+    const { args: prevArgs, ...custom } = params as AirdropParams['push-ERC20'];
+    // The returned token address is either the provided token or a mock token
+    // The returned caller is either the default (mock one) or the provided holder if any
+    [caller, tokenAddress] = await mintAndApprove(
+      'ERC20',
+      tevm,
+      caller,
+      contractAddress,
+      prevArgs[3], // totalAmount
+      custom.tokenAddress,
+      custom.tokenOwner,
+    );
+  }
+
+  const { value, encodedData } = mapIdToData(id, abi, functionName, params, tokenAddress);
 
   if (encodedData === '0x') {
     return emptyCallDataWithError('Failed to encode call data');
-  }
-
-  if (id === 'push-ERC20') {
-    const { args, ...custom } = params as AirdropParams['push-ERC20'];
-    await mintAndApprove(
-      tevm,
-      custom.tokenAddress,
-      custom.tokenOwner,
-      caller,
-      contractAddress,
-      args[3],
-    );
   }
 
   const callResult: CallResult = await tevm.call({
@@ -92,13 +102,8 @@ export const callToLocalChain: CallToLocalChain = async (
 /*                                    CALLS                                   */
 /* -------------------------------------------------------------------------- */
 
-const mapIdToData: CallToLocalChain_sub = (
-  id,
-  abi,
-  functionName,
-  params,
-): ReturnType<CallToLocalChain_sub> => {
-  const aggregate = [id, abi, functionName, params] as const;
+const mapIdToData: CallToLocalChain_sub = (id, abi, functionName, params, tokenAddress) => {
+  const aggregate = [id, abi, functionName, params, tokenAddress] as const;
 
   return id === 'push-native'
     ? airdropEthParams(...aggregate)
@@ -123,15 +128,16 @@ const airdropEthParams: CallToLocalChain_sub = (id, abi, functionName, params) =
   }
 };
 
-const airdropERC20Params: CallToLocalChain_sub = (id, abi, functionName, params) => {
+const airdropERC20Params: CallToLocalChain_sub = (id, abi, functionName, params, tokenAddress) => {
   const { args, ...custom } = params as AirdropParams['push-ERC20'];
   let encodedData = '0x' as `0x${string}`;
 
   try {
+    const token = custom.tokenAddress ?? tokenAddress;
     encodedData = encodeFunctionData({
       abi,
       functionName,
-      args: [custom.tokenAddress, args[1], args[2], args[3]],
+      args: [token, args[1], args[2], args[3]],
     });
 
     return { value: BigInt(0), encodedData };
@@ -154,76 +160,77 @@ const emptyCallDataWithError = (message: string): CallReturnData => ({
 });
 
 const mintAndApprove = async (
+  token: Token['id'],
   tevm: TevmClient,
-  tokenAddress: `0x${string}`,
-  tokenOwner: `0x${string}`,
-  caller: `0x${string}`,
+  mockCaller: `0x${string}`,
   spender: `0x${string}`,
   totalAmount: string,
-) => {
-  const mintResult: CallResult = await tevm.call({
-    caller: tokenOwner,
-    to: tokenAddress,
-    data: encodeFunctionData({
-      abi: [
-        {
-          constant: false,
-          inputs: [
-            {
-              name: 'to',
-              type: 'address',
-            },
-            {
-              name: 'value',
-              type: 'uint256',
-            },
-          ],
-          name: 'mint',
-          outputs: [],
-          payable: false,
-          stateMutability: 'nonpayable',
-          type: 'function',
-        },
-      ],
-      functionName: 'mint',
-      args: [caller, BigInt(totalAmount)],
-    }),
-  });
+  providedTokenAddress: `0x${string}`,
+  providedTokenOwner: `0x${string}`,
+): Promise<[`0x${string}`, `0x${string}`]> => {
+  // TODO Is it better to just use the mock if any of the actions on provided tokens fail,
+  // and tell the user? Or let them choose?
+  const tokenProvided = providedTokenAddress !== '0x' && providedTokenOwner !== '0x';
+  const tokenAddress = tokenProvided ? providedTokenAddress : MOCKS[token].sepoliaAddress;
+  const caller = tokenProvided ? providedTokenOwner : mockCaller;
+  let callerBalance = BigInt(0);
 
-  if (mintResult.errors) {
-    console.error(mintResult.errors);
-    throw new Error('Failed to mint tokens');
+  // If we're using a mock token, set its bytecode
+  if (!tokenProvided) {
+    await tevm.setAccount({
+      address: tokenAddress,
+      balance: BigInt(0),
+      deployedBytecode: MOCKS.ERC20.deployedBytcode,
+    });
   }
 
+  // If a token is provided, check the balance (to see if it's the owner or a holder,
+  // and at the same time if they have enough tokens)
+  if (tokenProvided) {
+    const balanceResult: CallResult = await tevm.call({
+      caller,
+      to: tokenAddress,
+      data: encodeFunctionData({
+        abi: MOCKS[token].abi,
+        functionName: 'balanceOf',
+        args: [caller],
+      }),
+    });
+
+    if (balanceResult.errors) {
+      console.error(balanceResult.errors);
+      throw new Error('Failed to check balance');
+    }
+
+    callerBalance = BigInt(balanceResult.rawData.toString());
+  }
+
+  // Try to mint tokens if the balance is not enough
+  // case 1: token not provided, so we're just minting tokens from the mock contract
+  // case 2: token provided, and the provided address was not a holder, so they might be able to mint tokens
+  if (callerBalance < BigInt(totalAmount)) {
+    const mintResult: CallResult = await tevm.call({
+      caller,
+      to: tokenAddress,
+      data: encodeFunctionData({
+        abi: MOCKS[token].abi,
+        functionName: 'mint',
+        args: [caller, BigInt(totalAmount) - callerBalance],
+      }),
+    });
+
+    if (mintResult.errors) {
+      console.error(mintResult.errors);
+      throw new Error('Failed to mint tokens');
+    }
+  }
+
+  // At this point the caller has the tokens, so they can approve the spender (GasliteDrop) to spend them
   const approveResult: CallResult = await tevm.call({
-    caller: caller,
+    caller,
     to: tokenAddress,
     data: encodeFunctionData({
-      abi: [
-        {
-          constant: false,
-          inputs: [
-            {
-              name: '_spender',
-              type: 'address',
-            },
-            {
-              name: '_value',
-              type: 'uint256',
-            },
-          ],
-          name: 'approve',
-          outputs: [
-            {
-              name: '',
-              type: 'bool',
-            },
-          ],
-          payable: false,
-          stateMutability: 'nonpayable',
-          type: 'function',
-        },
-      ],
+      abi: MOCKS.ERC20.abi,
       functionName: 'approve',
       args: [spender, BigInt(totalAmount)],
     }),
@@ -233,4 +240,6 @@ const mintAndApprove = async (
     console.error(approveResult.errors);
     throw new Error('Failed to approve tokens');
   }
+
+  return [caller, tokenAddress];
 };

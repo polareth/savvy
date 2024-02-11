@@ -7,8 +7,13 @@ export const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
 };
 
-export const toastErrorWithContact = (title: string, message: string) => {
+export const toastErrorWithContact = (
+  title: string,
+  message: string,
+  toastId?: string | number,
+) => {
   toast.error(title, {
+    id: toastId || undefined,
     description: `${message} Please let us know about this issue.`,
     action: {
       label: 'Contact',

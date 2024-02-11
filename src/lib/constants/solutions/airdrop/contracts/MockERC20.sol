@@ -4,7 +4,7 @@ pragma solidity 0.8.20;
 import {ERC20} from "solady/src/tokens/ERC20.sol";
 
 /// @dev An ultra-minimalistic ERC20 token implementation.
-contract Mock_ERC20 is ERC20 {
+contract MockERC20 is ERC20 {
     constructor() {}
 
     function mint(address _to, uint256 _amount) external {

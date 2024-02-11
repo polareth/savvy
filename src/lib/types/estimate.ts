@@ -42,4 +42,5 @@ export type GasCostEstimation = {
   };
   gasUsed: TxGasUsed;
   gasCostsUsd: TxGasCostsUsd;
+  error?: string;
 };

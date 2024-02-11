@@ -47,7 +47,7 @@ const Arbitrum: Chain = {
   //   step: parseGwei('0.1'),
   // },
   icon: Icons.arbitrum,
-  disabled: true,
+  disabled: false,
 };
 
 const Base: Chain = {
@@ -57,7 +57,7 @@ const Base: Chain = {
   avgBlockTime: 2000,
   rpcUrl: 'https://base-mainnet.g.alchemy.com/v2/',
   icon: Icons.base,
-  disabled: true,
+  disabled: false,
 };
 
 const Optimism: Chain = {
@@ -67,7 +67,7 @@ const Optimism: Chain = {
   avgBlockTime: 2000,
   rpcUrl: 'https://opt-mainnet.g.alchemy.com/v2/',
   icon: Icons.optimism,
-  disabled: true,
+  disabled: false,
 };
 
 const Polygon: Chain = {
@@ -81,7 +81,7 @@ const Polygon: Chain = {
   avgBlockTime: 2140,
   rpcUrl: 'https://polygon-mainnet.g.alchemy.com/v2/',
   icon: Icons.polygon,
-  disabled: true,
+  disabled: false,
 };
 
 export const CHAINS: Chain[] = [Ethereum, Arbitrum, Base, Optimism, Polygon];

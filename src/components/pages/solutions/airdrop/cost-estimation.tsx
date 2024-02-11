@@ -72,6 +72,9 @@ const CostEstimation = () => {
 
     setLoading(true);
     setFormDisabled(true);
+    const toastEstimating = toast.loading('Estimating costs...', {
+      description: 'This may take a few minutes.',
+    });
 
     try {
       const est = await estimateGasCostAirdrop(
@@ -84,8 +87,22 @@ const CostEstimation = () => {
         customTokenParams,
       );
       setEstimation(est);
+
+      if (est.error) {
+        toastErrorWithContact(est.error, '', toastEstimating);
+      } else {
+        toast.success('Estimation successful.', {
+          id: toastEstimating,
+          description: 'You can see the results in the table.',
+        });
+      }
     } catch (error) {
-      toast.error('There seems to be an issue estimating the cost.');
+      console.error(error);
+      toastErrorWithContact(
+        'There was an error estimating the costs.',
+        'See the console for more information',
+        toastEstimating,
+      );
     }
 
     setLoading(false);

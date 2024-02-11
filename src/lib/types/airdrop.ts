@@ -1,6 +1,6 @@
 import { Chain } from './chains';
 import { type Contract } from 'tevm';
-import { Address } from 'viem';
+import { Abi, Address } from 'viem';
 
 import { Icon } from '@/components/common/icons';
 
@@ -15,6 +15,13 @@ export type AirdropMethod = {
   label: string;
   icon?: Icon;
   disabled?: boolean;
+};
+
+export type MockContract = {
+  name: string;
+  sepoliaAddress: `0x${string}`;
+  deployedBytcode: `0x${string}`;
+  abi: Abi;
 };
 
 export type AirdropUniqueId = `${AirdropMethod['id']}-${Token['id']}`;

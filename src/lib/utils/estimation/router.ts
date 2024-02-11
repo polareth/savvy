@@ -65,10 +65,14 @@ export const estimateGasCostAirdrop: EstimateGasCostAirdrop = async (
   const callResJson: ApiTevmCall = await callRes.json();
 
   if (callResJson.errors.length > 0) {
-    toastErrorWithContact('Error estimating the gas cost.', 'See the console for more details.');
     console.error(callResJson.errors);
 
-    return emptyGasCostEstimation(currentChain, solution, gasFeesData);
+    return emptyGasCostEstimationWithError(
+      currentChain,
+      solution,
+      gasFeesData,
+      'Error estimating the gas costs',
+    );
   }
 
   /* ----------------------------- USD CALCULATION ---------------------------- */
@@ -180,10 +184,11 @@ const generateMerkleRoot = (recipients: string[], amounts: string[], ids?: strin
 /*                                    UTILS                                   */
 /* -------------------------------------------------------------------------- */
 
-const emptyGasCostEstimation = (
+const emptyGasCostEstimationWithError = (
   chain: Chain,
   solution: AirdropSolution,
   gasFeesData: GasFeesData,
+  error: string,
 ) => {
   return {
     config: {
@@ -200,5 +205,6 @@ const emptyGasCostEstimation = (
       deployment: { root: '0', l1submission: '0' },
       call: { root: '0', l1submission: '0' },
     },
+    error,
   };
 };
