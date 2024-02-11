@@ -16,13 +16,13 @@ type SelectionAirdrop = {
   recipientsCount: number;
   customToken: boolean;
   customTokenAddress: string;
-  customTokenOwner: string;
+  customTokenOwnerOrHolder: string;
   setTokenOption: (tokenOption: ComboboxOption | null) => void;
   setMethodOption: (methodOption: ComboboxOption | null) => void;
   setRecipientsCount: (recipientsCount: number) => void;
   toggleCustomToken: () => void;
   setCustomTokenAddress: (customTokenAddress: string) => void;
-  setCustomTokenOwner: (customTokenOwner: string) => void;
+  setcustomTokenOwnerOrHolder: (customTokenOwnerOrHolder: string) => void;
   getCurrent: () => {
     token: Token | null;
     method: AirdropMethod | null;
@@ -40,7 +40,8 @@ export const useAirdropStore = create<SelectionAirdrop>((set, get) => ({
   customToken: false,
   customTokenAddress: '',
   // The owner of the token (to mint the required amount for the airdrop)
-  customTokenOwner: '',
+  // or a holder with enough balance to cover the airdrop
+  customTokenOwnerOrHolder: '',
 
   // Set options
   setTokenOption: (tokenOption) => set({ tokenOption }),
@@ -48,7 +49,7 @@ export const useAirdropStore = create<SelectionAirdrop>((set, get) => ({
   setRecipientsCount: (recipientsCount) => set({ recipientsCount }),
   toggleCustomToken: () => set((state) => ({ customToken: !state.customToken })),
   setCustomTokenAddress: (customTokenAddress) => set({ customTokenAddress }),
-  setCustomTokenOwner: (customTokenOwner) => set({ customTokenOwner }),
+  setcustomTokenOwnerOrHolder: (customTokenOwnerOrHolder) => set({ customTokenOwnerOrHolder }),
 
   // Get current selection & solution
   getCurrent: () => {

@@ -35,12 +35,12 @@ const CostEstimation = () => {
     recipientsCount,
     customToken,
     customTokenAddress,
-    customTokenOwner,
+    customTokenOwnerOrHolder,
     getCurrentAirdropSelection,
   } = useSelectionStore.airdrop((state) => ({
     customToken: state.customToken,
     customTokenAddress: state.customTokenAddress,
-    customTokenOwner: state.customTokenOwner,
+    customTokenOwnerOrHolder: state.customTokenOwnerOrHolder,
     tokenOption: state.tokenOption,
     methodOption: state.methodOption,
     recipientsCount: state.recipientsCount,
@@ -54,7 +54,7 @@ const CostEstimation = () => {
     const customTokenParams = {
       enabled: customToken,
       // contract: customTokenAddress,
-      // holder: customTokenOwner,
+      // holder: customTokenOwnerOrHolder,
       // TODO Hardcoded
       contract: '0x6B3595068778DD592e39A122f4f5a5cF09C90fE2', // SUSHI Ethereum
       owner: '0xc2EdaD668740f1aA35E4D8f227fB8E17dcA888Cd',

@@ -18,17 +18,17 @@ const CustomTokenSelection = () => {
   const {
     customToken,
     customTokenAddress,
-    customTokenOwner,
+    customTokenOwnerOrHolder,
     toggleCustomToken,
     setCustomTokenAddress,
-    setCustomTokenOwner,
+    setcustomTokenOwnerOrHolder,
   } = useSelectionStore.airdrop((state) => ({
     customToken: state.customToken,
     customTokenAddress: state.customTokenAddress,
-    customTokenOwner: state.customTokenOwner,
+    customTokenOwnerOrHolder: state.customTokenOwnerOrHolder,
     toggleCustomToken: state.toggleCustomToken,
     setCustomTokenAddress: state.setCustomTokenAddress,
-    setCustomTokenOwner: state.setCustomTokenOwner,
+    setcustomTokenOwnerOrHolder: state.setcustomTokenOwnerOrHolder,
   }));
 
   const [invalidToken, setInvalidToken] = useState<boolean>(false);
@@ -104,16 +104,16 @@ const CustomTokenSelection = () => {
         </div>
         <div className="relative flex w-full flex-col gap-2">
           <Label
-            htmlFor="custom-token-owner"
+            htmlFor="custom-token-owner-holder"
             className={cn(
               'absolute left-0 top-[-1.2rem] flex w-full justify-between gap-2',
               !customToken && 'opacity-30',
             )}
           >
             <div className="flex items-center gap-2">
-              Owner address
+              Owner/Holder
               <TooltipInfo
-                content="The owner of the contract with the ability to mint tokens"
+                content="The owner of the contract with the ability to mint tokens or a holder with sufficient balance to cover the airdrop"
                 disabled={!customToken}
                 disableHoverable
               />
@@ -130,10 +130,10 @@ const CustomTokenSelection = () => {
             />
           </Label>
           <Input
-            id="custom-token-owner"
-            value={customTokenOwner}
+            id="custom-token-owner-holder"
+            value={customTokenOwnerOrHolder}
             onChange={(e) =>
-              checkAddressAndUpdate(e.target.value, setCustomTokenOwner, setInvalidHolder)
+              checkAddressAndUpdate(e.target.value, setcustomTokenOwnerOrHolder, setInvalidHolder)
             }
             disabled={!customToken || formDisabled}
             placeholder="0x..."

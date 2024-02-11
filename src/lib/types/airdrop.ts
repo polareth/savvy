@@ -65,7 +65,7 @@ type AirdropParamsPushNative = {
 
 type AirdropParamsPushERC20 = {
   tokenAddress: `0x${string}`;
-  tokenOwner: `0x${string}`;
+  tokenOwnerOrHolder: `0x${string}`;
   // [token, recipients, amounts, totalAmount]
   args: [`0x${string}`, `0x${string}`[], string[], string];
 };

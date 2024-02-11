@@ -66,7 +66,7 @@ export const callToLocalChain: CallToLocalChain = async (
       contractAddress,
       prevArgs[3], // totalAmount
       custom.tokenAddress,
-      custom.tokenOwner,
+      custom.tokenOwnerOrHolder,
     );
   }
 
@@ -166,13 +166,13 @@ const mintAndApprove = async (
   spender: `0x${string}`,
   totalAmount: string,
   providedTokenAddress: `0x${string}`,
-  providedTokenOwner: `0x${string}`,
+  providedtokenOwnerOrHolder: `0x${string}`,
 ): Promise<[`0x${string}`, `0x${string}`]> => {
   // TODO Is it better to just use the mock if any of the actions on provided tokens fail,
   // and tell the user? Or let them choose?
-  const tokenProvided = providedTokenAddress !== '0x' && providedTokenOwner !== '0x';
+  const tokenProvided = providedTokenAddress !== '0x' && providedtokenOwnerOrHolder !== '0x';
   const tokenAddress = tokenProvided ? providedTokenAddress : MOCKS[token].sepoliaAddress;
-  const caller = tokenProvided ? providedTokenOwner : mockCaller;
+  const caller = tokenProvided ? providedtokenOwnerOrHolder : mockCaller;
   let callerBalance = BigInt(0);
 
   // If we're using a mock token, set its bytecode

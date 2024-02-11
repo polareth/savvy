@@ -9,7 +9,7 @@ import { generateRandomAirdropData } from '@/lib/utils/estimation/random';
 type CustomTokenParams = {
   enabled: boolean;
   contract: string;
-  owner: string;
+  ownerOrHolder: string;
 };
 
 type EstimateGasCostAirdrop = (
@@ -143,15 +143,15 @@ const getAirdropParams = (
       // const tokenAddress = (
       //   customTokenParams.enabled ? customTokenParams.contract : '0x'
       // ) as `0x${string}`;
-      // const tokenOwner = (
+      // const tokenOwnerOrHolder = (
       //   customTokenParams.enabled ? customTokenParams.owner : '0x'
       // ) as `0x${string}`;
       const tokenAddress = customTokenParams.contract as `0x${string}`;
-      const tokenOwner = customTokenParams.owner as `0x${string}`;
+      const tokenOwnerOrHolder = customTokenParams.ownerOrHolder as `0x${string}`;
 
       return {
         tokenAddress: tokenAddress,
-        tokenOwner: tokenOwner,
+        tokenOwnerOrHolder: tokenOwnerOrHolder,
         args: [tokenAddress, recipients, amounts, totalAmount],
       } as AirdropParams['push-ERC20'];
     }
