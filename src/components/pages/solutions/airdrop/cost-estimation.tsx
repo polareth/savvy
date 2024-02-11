@@ -53,11 +53,8 @@ const CostEstimation = () => {
     const { solution } = getCurrentAirdropSelection();
     const customTokenParams = {
       enabled: customToken,
-      // contract: customTokenAddress,
-      // holder: customTokenOwnerOrHolder,
-      // TODO Hardcoded
-      contract: '0x6B3595068778DD592e39A122f4f5a5cF09C90fE2', // SUSHI Ethereum
-      owner: '0xc2EdaD668740f1aA35E4D8f227fB8E17dcA888Cd',
+      contract: customTokenAddress,
+      ownerOrHolder: customTokenOwnerOrHolder,
     };
 
     if (!currentChain || !solution) {
