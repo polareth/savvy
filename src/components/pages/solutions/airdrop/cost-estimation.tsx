@@ -71,6 +71,7 @@ const CostEstimation = () => {
     setFormDisabled(true);
     const toastEstimating = toast.loading('Estimating costs...', {
       description: 'This may take a few minutes.',
+      icon: <Loader2 className="mr-2 h-4 w-4 animate-spin" />,
     });
 
     try {
