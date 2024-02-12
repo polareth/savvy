@@ -47,6 +47,7 @@ const gasliteDrop = {
     137: '0x09350F89e2D7B6e96bA730783c2d76137B045FEF', // Polygon
     8453: '0x09350F89e2D7B6e96bA730783c2d76137B045FEF', // Base
     42161: '0x09350F89e2D7B6e96bA730783c2d76137B045FEF', // Arbitrum
+    11155111: '0x09350F89e2D7B6e96bA730783c2d76137B045FEF', // Ethereum Sepolia
   },
 } as const satisfies Omit<AirdropSolution, 'id' | 'functionName'>;
 

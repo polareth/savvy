@@ -16,6 +16,7 @@
 - Put token above recipients, with a check "custom options" that opens a collapsible and sets some bool to true
 - Same with the recipients, with a custom option to use custom addresses/amounts/(ids)
 - Fix nextBaseFee => priority rations; really bad when the base fee starts very low, as it increases way too much
+- Save results history in local storage, and let the user retrieve them
 
 ---
 

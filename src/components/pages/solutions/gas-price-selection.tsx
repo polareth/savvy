@@ -35,7 +35,6 @@ const GasPriceSelection = () => {
     const fetchAndUpdateGasPrice = async (chainId: number) => {
       setLoading(true);
       const gasFeesData = await getGasFeesData(chainId);
-      console.log('gasFeesData', gasFeesData);
       setGasFeesData(gasFeesData);
       setLoading(false);
 

@@ -59,9 +59,7 @@ const CustomTokenSelection = () => {
           id="custom-token"
           checked={customToken}
           onCheckedChange={toggleCustomToken}
-          // disabled={formDisabled}
-          // TODO Temp fully disabled
-          disabled
+          disabled={formDisabled}
         />
         <Label htmlFor="custom-token">Use a custom token</Label>
       </div>

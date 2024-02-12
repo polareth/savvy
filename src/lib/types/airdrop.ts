@@ -70,6 +70,8 @@ type AirdropParamsPushERC20 = {
   args: [`0x${string}`, `0x${string}`[], string[], string];
 };
 
+export type AirdropArgs = AirdropParamsPushNative['args'] | AirdropParamsPushERC20['args'] | [];
+
 export type AirdropParams = {
   [id in AirdropUniqueId]: id extends 'push-native'
     ? AirdropParamsPushNative

@@ -1,4 +1,4 @@
-import { arbitrum, base, mainnet, optimism, polygon } from 'viem/chains';
+import { arbitrum, base, mainnet, optimism, polygon, sepolia } from 'viem/chains';
 
 import { Chain, OPStackSupport } from '@/lib/types/chains';
 
@@ -32,6 +32,19 @@ const Ethereum: Chain = {
   //   max: parseGwei('1000'),
   //   step: parseGwei('1'),
   // },
+  icon: Icons.ethereum,
+};
+
+const EthereumSepolia: Chain = {
+  config: sepolia,
+  consensusMechanism: 'PoS',
+  nativeTokenSlug: 'ethereum',
+  evmCompatible: true,
+  layer: 1,
+  hasCustomStack: false,
+  hasPriorityFee: true,
+  avgBlockTime: 12080,
+  rpcUrl: 'https://eth-sepolia.g.alchemy.com/v2/',
   icon: Icons.ethereum,
 };
 
@@ -84,4 +97,4 @@ const Polygon: Chain = {
   disabled: false,
 };
 
-export const CHAINS: Chain[] = [Ethereum, Arbitrum, Base, Optimism, Polygon];
+export const CHAINS: Chain[] = [Ethereum, EthereumSepolia, Arbitrum, Base, Optimism, Polygon];

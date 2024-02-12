@@ -1,8 +1,9 @@
+import { isAddress } from 'viem';
+
 import { AirdropData, AirdropParams, AirdropSolution, AirdropUniqueId } from '@/lib/types/airdrop';
 import { ApiTevmCall } from '@/lib/types/api';
 import { Chain } from '@/lib/types/chains';
 import { GasCostEstimation, GasFeesData } from '@/lib/types/estimate';
-import { toastErrorWithContact } from '@/lib/utils';
 import { calculate } from '@/lib/utils/estimation/calculate';
 import { generateRandomAirdropData } from '@/lib/utils/estimation/random';
 
@@ -139,15 +140,16 @@ const getAirdropParams = (
     }
 
     case 'push-ERC20': {
-      // TODO Temp, always a non-custom token
-      // const tokenAddress = (
-      //   customTokenParams.enabled ? customTokenParams.contract : '0x'
-      // ) as `0x${string}`;
-      // const tokenOwnerOrHolder = (
-      //   customTokenParams.enabled ? customTokenParams.owner : '0x'
-      // ) as `0x${string}`;
-      const tokenAddress = customTokenParams.contract as `0x${string}`;
-      const tokenOwnerOrHolder = customTokenParams.ownerOrHolder as `0x${string}`;
+      const tokenAddress = (
+        customTokenParams.enabled && isAddress(customTokenParams.contract)
+          ? customTokenParams.contract
+          : '0x'
+      ) as `0x${string}`;
+      const tokenOwnerOrHolder = (
+        customTokenParams.enabled && isAddress(customTokenParams.ownerOrHolder)
+          ? customTokenParams.ownerOrHolder
+          : '0x'
+      ) as `0x${string}`;
 
       return {
         tokenAddress: tokenAddress,
