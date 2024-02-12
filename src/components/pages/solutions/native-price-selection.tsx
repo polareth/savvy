@@ -23,6 +23,7 @@ const NativePriceSelection = () => {
     const fetchAndUpdateNativeTokenPrice = async () => {
       setLoading(true);
       const currentChain = getCurrentChain();
+      // TODO Handle error, if no current chain, should never be null
       if (!currentChain) return;
 
       const price = await fetchNativeTokenPrice(currentChain.nativeTokenSlug);

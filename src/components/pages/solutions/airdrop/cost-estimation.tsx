@@ -33,17 +33,19 @@ const CostEstimation = () => {
     tokenOption,
     methodOption,
     recipientsCount,
+    customAirdropData,
     customToken,
     customTokenAddress,
     customTokenOwnerOrHolder,
     getCurrentAirdropSelection,
   } = useSelectionStore.airdrop((state) => ({
-    customToken: state.customToken,
-    customTokenAddress: state.customTokenAddress,
-    customTokenOwnerOrHolder: state.customTokenOwnerOrHolder,
     tokenOption: state.tokenOption,
     methodOption: state.methodOption,
     recipientsCount: state.recipientsCount,
+    customAirdropData: state.customAirdropData,
+    customToken: state.customToken,
+    customTokenAddress: state.customTokenAddress,
+    customTokenOwnerOrHolder: state.customTokenOwnerOrHolder,
     getCurrentAirdropSelection: state.getCurrent,
   }));
 
@@ -56,6 +58,13 @@ const CostEstimation = () => {
       contract: customTokenAddress,
       ownerOrHolder: customTokenOwnerOrHolder,
     };
+    const airdropData = customAirdropData.enabled
+      ? {
+          recipients: customAirdropData.recipients,
+          amounts: customAirdropData.amounts,
+          ids: customAirdropData.ids,
+        }
+      : { recipients: [], amounts: [], ids: [] };
 
     if (!currentChain || !solution) {
       toast.warning('Please select a chain and a solution');
@@ -81,7 +90,7 @@ const CostEstimation = () => {
         gasFeesData,
         nativeTokenPrice,
         recipientsCount,
-        { recipients: [], amounts: [], ids: [] },
+        airdropData,
         customTokenParams,
       );
       setEstimation(est);
@@ -92,6 +101,7 @@ const CostEstimation = () => {
         toast.success('Estimation successful.', {
           id: toastEstimating,
           description: 'You can see the results in the table.',
+          icon: null,
         });
       }
     } catch (error) {

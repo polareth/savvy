@@ -8,11 +8,11 @@ import { ComboboxOption } from '@/lib/types/templates';
 import { toChainOption } from '@/lib/utils/combobox';
 
 type SelectionGlobal = {
-  chainOption: ComboboxOption | null;
+  chainOption: ComboboxOption;
   gasFeesData: GasFeesData | null;
   nativeTokenPrice: number;
   formDisabled: boolean;
-  setChainOption: (chainOption: ComboboxOption | null) => void;
+  setChainOption: (chainOption: ComboboxOption) => void;
   setGasFeesData: (gasFeesData: GasFeesData) => void;
   setNativeTokenPrice: (nativeTokenPrice: number) => void;
   setFormDisabled: (formDisabled: boolean) => void;
@@ -41,6 +41,6 @@ export const useGlobalStore = create<SelectionGlobal>((set, get) => ({
     const { chainOption } = get();
     const chainId = chainOption ? chainOption.value : null;
 
-    return CHAINS.find((c) => c.config.id.toString() === chainId) || null;
+    return CHAINS.find((c) => c.config.id === chainId) || null;
   },
 }));

@@ -1,6 +1,7 @@
 ## TODO
 
-- More everything using alchemy id in an api route, pass the chainId, the method from the client (with the params) the params and return the data; for each call to the api, decode the params using a type for this specific call (considering what should be returned)
+- Add custom priority fee button, and actually move "low", "medium" and "high" to a more stealthy place like right below
+- Move everything using alchemy id in an api route, pass the chainId, the method from the client (with the params) the params and return the data; for each call to the api, decode the params using a type for this specific call (considering what should be returned)
 - Error handling: whenever an error occurs, the toast "contact" button should open a modal, with:
   - a code block with all the values for the stores in json that can be copy/pasted
   - a quick and a more long version of bug reporting: quick is just drop a dm with the logs, longer would be with some details, screenshots, etc
@@ -17,6 +18,7 @@
 - Same with the recipients, with a custom option to use custom addresses/amounts/(ids)
 - Fix nextBaseFee => priority rations; really bad when the base fee starts very low, as it increases way too much
 - Save results history in local storage, and let the user retrieve them
+- Handle issues in retrieving token price (coinmarketcap), and other api calls as well (gas fees) => if error, use a default value & let the user choose
 
 ---
 

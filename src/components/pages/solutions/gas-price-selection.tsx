@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { formatGwei, parseGwei } from 'viem';
 
 import { useSelectionStore } from '@/lib/store/use-selection';
-import { toastErrorWithContact } from '@/lib/utils';
+import { cn, toastErrorWithContact } from '@/lib/utils';
 import { estimatePriorityFeesForBaseFee, getGasFeesData } from '@/lib/utils/gas';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -67,7 +67,7 @@ const GasPriceSelection = () => {
   }, [gasFeesData]);
 
   return (
-    <div className="flex gap-4">
+    <div className={cn('flex flex-col gap-4', formDisabled && 'opacity-50')}>
       <div className="flex flex-col gap-2">
         Base fee (simulate network conditions)
         <Slider

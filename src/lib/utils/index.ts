@@ -3,9 +3,17 @@ import { type ClassValue, clsx } from 'clsx';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 
+/* -------------------------------------------------------------------------- */
+/*                                    LIBS                                    */
+/* -------------------------------------------------------------------------- */
+
 export const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
 };
+
+/* -------------------------------------------------------------------------- */
+/*                                     UI                                     */
+/* -------------------------------------------------------------------------- */
 
 export const toastErrorWithContact = (
   title: string,
@@ -21,5 +29,14 @@ export const toastErrorWithContact = (
         window.open(METADATA_EXTRA.links.twitter, '_blank');
       },
     },
+    icon: null,
   });
 };
+
+/* -------------------------------------------------------------------------- */
+/*                                    LOGIC                                   */
+/* -------------------------------------------------------------------------- */
+
+export const isValidUint256 = (amount: string) =>
+  BigInt(amount) >= BigInt(0) &&
+  BigInt(amount) <= BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');

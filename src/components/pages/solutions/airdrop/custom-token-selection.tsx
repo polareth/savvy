@@ -53,7 +53,12 @@ const CustomTokenSelection = () => {
   };
 
   return (
-    <div className="flex items-center justify-between gap-8">
+    <div
+      className={cn(
+        'flex items-center justify-between gap-8 transition-opacity',
+        formDisabled && 'opacity-50',
+      )}
+    >
       <div className="flex items-center space-x-2">
         <Switch
           id="custom-token"
@@ -61,14 +66,14 @@ const CustomTokenSelection = () => {
           onCheckedChange={toggleCustomToken}
           disabled={formDisabled}
         />
-        <Label htmlFor="custom-token">Use a custom token</Label>
+        <Label
+          htmlFor="custom-token"
+          className={cn('transition-opacity', !customToken && 'opacity-80')}
+        >
+          Use a custom token
+        </Label>
       </div>
-      <div
-        className={cn(
-          'flex grow justify-end gap-2 transition-opacity',
-          customToken ? '' : 'opacity-50',
-        )}
-      >
+      <div className="flex grow justify-end gap-2 transition-opacity">
         <div className="relative flex w-full flex-col gap-2">
           <Label
             htmlFor="custom-token-address"
@@ -97,7 +102,7 @@ const CustomTokenSelection = () => {
             }
             disabled={!customToken || formDisabled}
             placeholder="0x..."
-            className={cn(invalidToken && 'border-destructive')}
+            className={cn(invalidToken && customToken && 'border-destructive')}
           />
         </div>
         <div className="relative flex w-full flex-col gap-2">
@@ -135,7 +140,7 @@ const CustomTokenSelection = () => {
             }
             disabled={!customToken || formDisabled}
             placeholder="0x..."
-            className={cn(invalidHolder && 'border-destructive')}
+            className={cn(invalidHolder && customToken && 'border-destructive')}
           />
         </div>
       </div>

@@ -26,8 +26,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 type ComboBoxResponsiveProps = {
   items: ComboboxOption[];
   label: string;
-  selected: ComboboxOption | null;
-  setSelected: (item: ComboboxOption | null) => void;
+  selected: ComboboxOption;
+  setSelected: (item: ComboboxOption) => void;
   disabled?: boolean;
 };
 
@@ -103,7 +103,7 @@ type ItemListProps = {
   items: ComboboxOption[];
   label: string;
   setOpen: (open: boolean) => void;
-  setSelectedItem: (item: ComboboxOption | null) => void;
+  setSelectedItem: (item: ComboboxOption) => void;
 };
 
 const ItemList: FC<ItemListProps> = ({ items, label, setOpen, setSelectedItem }) => {
@@ -116,12 +116,13 @@ const ItemList: FC<ItemListProps> = ({ items, label, setOpen, setSelectedItem })
           {items.map((item) => (
             <CommandItem
               key={item.value}
-              value={item.value}
+              value={item.value.toString()}
               disabled={item.disabled}
               onSelect={(value) => {
                 setSelectedItem(
-                  items.find((priority) => priority.value.toLowerCase() === value.toLowerCase()) ||
-                    null,
+                  items.find(
+                    (priority) => priority.value.toString().toLowerCase() === value.toLowerCase(),
+                  ) || items[0],
                 );
                 setOpen(false);
               }}
