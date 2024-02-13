@@ -1,12 +1,12 @@
 'use client';
 
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { useSelectionStore } from '@/lib/store/use-selection';
-import { cn } from '@/lib/utils';
-import { fetchNativeTokenPrice } from '@/lib/utils/native-token';
+import { cn, toastErrorWithContact } from '@/lib/utils';
 
+import PopoverInfo from '@/components/common/popover-info';
 import TooltipInfo from '@/components/common/tooltip-info';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,32 +19,41 @@ type NativePriceSelectionProps = {
 const NativePriceSelection: FC<NativePriceSelectionProps> = ({ className }) => {
   const isDesktop = useMediaQuery('(min-width: 768px)'); // md
   const [nativeTokenName, setNativeTokenName] = useState<string>('Native token');
-  const [loading, setLoading] = useState(true);
 
-  const { chainOption, nativeTokenPrice, formDisabled, getCurrentChain, setNativeTokenPrice } =
-    useSelectionStore.global((state) => ({
-      chainOption: state.chainOption,
-      nativeTokenPrice: state.nativeTokenPrice,
-      formDisabled: state.formDisabled,
-      getCurrentChain: state.getCurrentChain,
-      setNativeTokenPrice: state.setNativeTokenPrice,
-    }));
-
-  const fetchAndUpdateNativeTokenPrice = useCallback(async () => {
-    setLoading(true);
-    const currentChain = getCurrentChain();
-    // TODO Handle error, if no current chain, should never be null
-    if (!currentChain) return;
-
-    const price = await fetchNativeTokenPrice(currentChain.nativeTokenSlug);
-    setNativeTokenPrice(price);
-    setLoading(false);
-    setNativeTokenName(currentChain.config.nativeCurrency.name);
-  }, [getCurrentChain, setNativeTokenPrice]);
+  const {
+    chain,
+    nativeTokenPrice,
+    formDisabled,
+    fetchingNativeTokenPrice,
+    getCurrentChain,
+    fetchAndUpdateNativeTokenPrice,
+    setNativeTokenPrice,
+  } = useSelectionStore.global((state) => ({
+    chain: state.chainOption,
+    nativeTokenPrice: state.nativeTokenPrice,
+    formDisabled: state.formDisabled,
+    fetchingNativeTokenPrice: state.fetchingNativeTokenPrice,
+    getCurrentChain: state.getCurrentChain,
+    fetchAndUpdateNativeTokenPrice: state.fetchAndUpdateNativeTokenPrice,
+    setNativeTokenPrice: state.setNativeTokenPrice,
+  }));
 
   useEffect(() => {
-    if (chainOption) fetchAndUpdateNativeTokenPrice();
-  }, [chainOption, fetchAndUpdateNativeTokenPrice]);
+    const init = async () => {
+      const currentChain = getCurrentChain();
+      if (currentChain) {
+        const { success, error } = await fetchAndUpdateNativeTokenPrice();
+        if (!success && error) toastErrorWithContact(error.title, error.message);
+        setNativeTokenName(currentChain.config.nativeCurrency.name || 'Native token');
+      }
+    };
+
+    init();
+  }, [chain, getCurrentChain, fetchAndUpdateNativeTokenPrice]);
+
+  useEffect(() => {
+    console.log('nativeTokenPrice', nativeTokenPrice);
+  }, [nativeTokenPrice]);
 
   // return price formatted in us dollars
   return (
@@ -64,7 +73,7 @@ const NativePriceSelection: FC<NativePriceSelectionProps> = ({ className }) => {
           </Button>
         </span>
       ) : null}
-      {loading ? (
+      {fetchingNativeTokenPrice ? (
         <Button variant="ghost" className="p-0">
           <Skeleton className="h-full w-full rounded-md" />
         </Button>
@@ -81,6 +90,12 @@ const NativePriceSelection: FC<NativePriceSelectionProps> = ({ className }) => {
           <span className="absolute left-3 top-[50%] translate-y-[-50%] text-sm text-muted-foreground">
             $
           </span>
+          {!isDesktop ? (
+            <PopoverInfo
+              content="Simulate a different price for the native token in USD"
+              classNameTrigger="absolute right-3 top-1/2 -translate-y-1/2 transform"
+            />
+          ) : null}
         </div>
       )}
     </div>

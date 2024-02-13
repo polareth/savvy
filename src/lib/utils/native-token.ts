@@ -42,14 +42,16 @@ type CoinmarketcapData = {
 export const fetchNativeTokenPrice = async (slug: string) /* : Promise<number> */ => {
   const response = await fetch('/token-price');
   if (!response.ok) {
-    throw new Error('Failed to fetch token price');
+    console.error('Failed to fetch token price');
+    return 0;
   }
 
   const data: CoinmarketcapData = await response.json();
   const token = data.data.find((entry) => entry.slug === slug);
 
   if (!token) {
-    throw new Error('Token not found');
+    console.error('Token not found');
+    return 0;
   }
 
   return token.quote.USD.price;
