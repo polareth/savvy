@@ -12,4 +12,5 @@ export const DEFAULTS = {
     step: 1,
   },
   gasLimit: BigInt(30_000_000), // 30M
+  maxGasDecimals: 9,
 };

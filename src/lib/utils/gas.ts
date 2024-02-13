@@ -48,7 +48,12 @@ export const getGasFeesData = async (chainId: number): Promise<GasFeesData> => {
     return emptyGasFeesData();
   }
 
-  const { feeHistory: feeHistoryStringified, hasChainPriorityFee, avgBlockTime } = resJson.data;
+  const {
+    feeHistory: feeHistoryStringified,
+    hasChainPriorityFee,
+    avgBlockTime,
+    gasControls,
+  } = resJson.data;
   const feeHistory: FeeHistory = JSON.parse(feeHistoryStringified, (_, v) =>
     typeof v === 'string' ? BigInt(v) : v,
   );
@@ -72,6 +77,7 @@ export const getGasFeesData = async (chainId: number): Promise<GasFeesData> => {
       totalFeePerGas: nextBaseFeePerGas,
       analysisPeriod,
       hasChainPriorityFee,
+      gasControls,
     };
   } else {
     // Calculate the average ratio baseFee => lower bound & upper bound priorityFee
@@ -122,6 +128,7 @@ export const getGasFeesData = async (chainId: number): Promise<GasFeesData> => {
       totalFeePerGas: nextBaseFeePerGas + (lowRatio * nextBaseFeePerGas) / PRECISION,
       analysisPeriod,
       hasChainPriorityFee,
+      gasControls,
     };
   }
 };
@@ -149,4 +156,10 @@ const emptyGasFeesData = (): GasFeesData => ({
   totalFeePerGas: BigInt(0),
   analysisPeriod: 0,
   hasChainPriorityFee: false,
+  gasControls: {
+    min: 0,
+    max: 1000,
+    step: 0.001,
+    gweiDecimals: 2,
+  },
 });

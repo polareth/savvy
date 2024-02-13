@@ -1,4 +1,4 @@
-import { TxGasUsed } from './estimate';
+import { GasControls, TxGasUsed } from '@/lib/types/estimate';
 
 export type ApiTevmCall = {
   status: number;
@@ -12,6 +12,7 @@ export type ApiGasFees = {
     feeHistory: string; // JSON stringified FeeHistory
     hasChainPriorityFee: boolean;
     avgBlockTime: number;
+    gasControls: GasControls;
   };
   error: string;
 };

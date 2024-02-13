@@ -2,9 +2,10 @@ import { AirdropSolution } from '@/lib/types/airdrop';
 import { Chain } from '@/lib/types/chains';
 
 export type GasControls = {
-  min: bigint;
-  max: bigint;
-  step: bigint;
+  min: number;
+  max: number;
+  step: number;
+  gweiDecimals: number;
 };
 
 export type GasFeesData = {
@@ -17,6 +18,7 @@ export type GasFeesData = {
   totalFeePerGas: bigint; // default: base fee + lower bound priority fee
   analysisPeriod: number; // Interval between the first and last block used for the analysis
   hasChainPriorityFee: boolean;
+  gasControls: GasControls;
 };
 
 type TxGasResult = {

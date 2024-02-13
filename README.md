@@ -19,6 +19,8 @@
 - Fix nextBaseFee => priority rations; really bad when the base fee starts very low, as it increases way too much
 - Save results history in local storage, and let the user retrieve them
 - Handle issues in retrieving token price (coinmarketcap), and other api calls as well (gas fees) => if error, use a default value & let the user choose
+- Add guides; e.g. on airdrop page, a button in the sidebar to go to a quick guide to use it
+- Add documentation (use vocs.dev) for both guides and breakdowns, how it works, calculations, contributing, roadmap, etc
 
 ---
 

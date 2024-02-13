@@ -1,3 +1,4 @@
+import { parseGwei } from 'viem';
 import { arbitrum, base, mainnet, optimism, polygon, sepolia } from 'viem/chains';
 
 import { Chain, OPStackSupport } from '@/lib/types/chains';
@@ -27,11 +28,12 @@ const Ethereum: Chain = {
   hasPriorityFee: true,
   avgBlockTime: 12080,
   rpcUrl: 'https://eth-mainnet.g.alchemy.com/v2/',
-  // gascontrols: {
-  //   min: parseGwei('1'),
-  //   max: parseGwei('1000'),
-  //   step: parseGwei('1'),
-  // },
+  gasControls: {
+    min: Number(parseGwei('1')),
+    max: Number(parseGwei('1000')),
+    step: Number(parseGwei('1')),
+    gweiDecimals: 2,
+  },
   icon: Icons.ethereum,
 };
 
@@ -45,6 +47,12 @@ const EthereumSepolia: Chain = {
   hasPriorityFee: true,
   avgBlockTime: 12080,
   rpcUrl: 'https://eth-sepolia.g.alchemy.com/v2/',
+  gasControls: {
+    min: Number(parseGwei('1')),
+    max: Number(parseGwei('1000')),
+    step: Number(parseGwei('1')),
+    gweiDecimals: 2,
+  },
   icon: Icons.ethereum,
 };
 
@@ -54,11 +62,12 @@ const Arbitrum: Chain = {
   hasPriorityFee: false,
   avgBlockTime: 260,
   rpcUrl: 'https://arb-mainnet.g.alchemy.com/v2/',
-  // gascontrols: {
-  //   min: parseGwei('0.1'),
-  //   max: parseGwei('1000'),
-  //   step: parseGwei('0.1'),
-  // },
+  gasControls: {
+    min: Number(parseGwei('0.1')),
+    max: Number(parseGwei('1000')),
+    step: Number(parseGwei('0.1')),
+    gweiDecimals: 1,
+  },
   icon: Icons.arbitrum,
   disabled: false,
 };
@@ -69,6 +78,12 @@ const Base: Chain = {
   hasPriorityFee: true,
   avgBlockTime: 2000,
   rpcUrl: 'https://base-mainnet.g.alchemy.com/v2/',
+  gasControls: {
+    min: Number(parseGwei('0.001')),
+    max: Number(parseGwei('500')),
+    step: Number(parseGwei('0.001')),
+    gweiDecimals: 4,
+  },
   icon: Icons.base,
   disabled: false,
 };
@@ -79,6 +94,12 @@ const Optimism: Chain = {
   hasPriorityFee: true,
   avgBlockTime: 2000,
   rpcUrl: 'https://opt-mainnet.g.alchemy.com/v2/',
+  gasControls: {
+    min: Number(parseGwei('0.001')),
+    max: Number(parseGwei('500')),
+    step: Number(parseGwei('0.001')),
+    gweiDecimals: 4,
+  },
   icon: Icons.optimism,
   disabled: false,
 };
@@ -93,6 +114,12 @@ const Polygon: Chain = {
   hasPriorityFee: true,
   avgBlockTime: 2140,
   rpcUrl: 'https://polygon-mainnet.g.alchemy.com/v2/',
+  gasControls: {
+    min: Number(parseGwei('0.001')),
+    max: Number(parseGwei('1000')),
+    step: Number(parseGwei('1')),
+    gweiDecimals: 4,
+  },
   icon: Icons.polygon,
   disabled: false,
 };

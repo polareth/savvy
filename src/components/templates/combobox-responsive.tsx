@@ -6,6 +6,7 @@ import { ChevronDownIcon } from 'lucide-react';
 
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { ComboboxOption } from '@/lib/types/templates';
+import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -28,13 +29,15 @@ type ComboBoxResponsiveProps = {
   label: string;
   selected: ComboboxOption;
   setSelected: (item: ComboboxOption) => void;
+  header?: string;
   disabled?: boolean;
+  minimalDisplay?: boolean;
 };
 
 const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
-  const { label, selected, disabled, setSelected } = props;
+  const { label, selected, disabled, header, minimalDisplay, setSelected } = props;
   const [open, setOpen] = useState(false);
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const isDesktop = useMediaQuery('(min-width: 768px)'); // md
 
   if (isDesktop) {
     return (
@@ -68,16 +71,21 @@ const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="outline" className="flex w-[150px] items-center justify-start">
+        <Button
+          variant="outline"
+          className={cn('flex items-center justify-start', !minimalDisplay && 'w-[250px]')}
+        >
           {selected ? (
             <>
               {selected.icon ? (
                 <selected.icon
-                  className="mr-2 h-4 w-4"
+                  className="h-4 w-4"
                   style={{ stroke: selected.iconColor || 'currentColor' }}
                 />
               ) : null}
-              {selected.label}
+              {minimalDisplay ? null : (
+                <span className={cn(selected.icon && 'ml-2')}>{selected.label}</span>
+              )}
             </>
           ) : (
             <>
@@ -87,6 +95,7 @@ const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
         </Button>
       </DrawerTrigger>
       <DrawerContent>
+        <span className="mt-2 text-center font-medium text-muted-foreground">{header}</span>
         <div className="mt-4 border-t">
           <ItemList setOpen={setOpen} setSelectedItem={setSelected} {...props} />
         </div>

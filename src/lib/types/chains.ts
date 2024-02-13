@@ -31,7 +31,7 @@ export type Chain = GasFeesModel & {
   rpcUrl: string;
   avgBlockTime: number;
 
-  gascontrols?: GasControls;
+  gasControls?: GasControls;
   icon?: Icon;
   disabled?: boolean;
 };
