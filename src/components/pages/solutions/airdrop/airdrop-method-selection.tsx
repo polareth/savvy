@@ -20,6 +20,7 @@ const AirdropMethodSelection = () => {
     <ComboBoxResponsive
       items={items}
       label="Method"
+      boxWidth="w-[250px]"
       selected={method}
       setSelected={setMethod}
       disabled={formDisabled}

@@ -44,7 +44,7 @@ const ConfigMenuMobile = () => {
   );
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background px-1 shadow-lg">
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background px-1 shadow-lg md:hidden">
       {/* Toggle Button */}
       <Button
         onClick={() => setOpen(!open)}
@@ -78,41 +78,10 @@ const ConfigMenuMobile = () => {
             Promise.all([fetchAndUpdateGasFeesData(), fetchAndUpdateNativeTokenPrice()]);
           }}
         >
-          Reset
+          use latest data
         </Button>
       </div>
     </div>
-    // <>
-    //   <div className="absolute bottom-0 flex">
-    //     <Button variant="ghost" size="sm" onClick={() => setOpen(!open)}>
-    //       icon
-    //       <span className="sr-only">Toggle</span>
-    //     </Button>
-    //     <Button
-    //       variant="ghost"
-    //       size="sm"
-    //       className={cn('absolute right-0 top-0')}
-    //       onClick={() =>
-    //         Promise.all([fetchAndUpdateGasFeesData(), fetchAndUpdateNativeTokenPrice()])
-    //       }
-    //     >
-    //       reset
-    //     </Button>
-    //   </div>
-
-    //   <div
-    //     className={cn(
-    //       'fixed inset-x-0 bottom-0 z-30 flex flex-col gap-2 bg-background p-4 shadow-lg transition-transform duration-500',
-    //       open ? 'translate-y-0' : 'translate-y-full',
-    //     )}
-    //   >
-    //     <div className="flex gap-2">
-    //       <ChainSelection />
-    //       <NativePriceSelection className="grow" />
-    //     </div>
-    //     <GasPriceSelection />
-    //   </div>
-    // </>
   );
 };
 

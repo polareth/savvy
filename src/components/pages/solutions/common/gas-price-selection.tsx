@@ -98,49 +98,47 @@ const GasPriceSelection: FC<GasPriceSelectionProps> = ({ className }) => {
             className="h-6 justify-end"
             onClick={fetchAndUpdateGasPrice}
           >
-            reset
+            latest
           </Button>
         </div>
       ) : null}
-      <div className="flex gap-2 md:flex-col">
-        {fetchingGasFeesData ? (
-          <>
-            <Button variant="ghost" className="w-full p-0">
-              <Skeleton className="h-full w-full rounded-md" />
-            </Button>
-            <Button variant="ghost" className="w-full p-0">
-              <Skeleton className="h-full w-full rounded-md" />
-            </Button>
-          </>
-        ) : (
-          <>
+      {fetchingGasFeesData ? (
+        <div className="flex gap-2 md:flex-col">
+          <Button variant="ghost" className="w-full p-0">
+            <Skeleton className="h-full w-full rounded-md" />
+          </Button>
+          <Button variant="ghost" className="w-full p-0">
+            <Skeleton className="h-full w-full rounded-md" />
+          </Button>
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-2 md:flex-col">
+          <TooltipConditional
+            condition={!formDisabled}
+            tooltip="Adjust the block base fee to simulate network congestion"
+          >
+            <BaseFeeButton
+              gasFeesData={gasFeesData}
+              formDisabled={formDisabled}
+              setGasFeesData={setGasFeesData}
+            />
+          </TooltipConditional>
+          {gasFeesData?.hasChainPriorityFee ? (
             <TooltipConditional
               condition={!formDisabled}
-              tooltip="Adjust the block base fee to simulate network congestion"
+              tooltip="Adjust the priority fee based on your rush preference"
             >
-              <BaseFeeButton
+              <PriorityFeeButton
                 gasFeesData={gasFeesData}
+                priorityFeeBounds={priorityFeeBounds}
                 formDisabled={formDisabled}
                 setGasFeesData={setGasFeesData}
+                setPriorityFeeBounds={setPriorityFeeBounds}
               />
             </TooltipConditional>
-            {gasFeesData?.hasChainPriorityFee ? (
-              <TooltipConditional
-                condition={!formDisabled}
-                tooltip="Adjust the priority fee based on your rush preference"
-              >
-                <PriorityFeeButton
-                  gasFeesData={gasFeesData}
-                  priorityFeeBounds={priorityFeeBounds}
-                  formDisabled={formDisabled}
-                  setGasFeesData={setGasFeesData}
-                  setPriorityFeeBounds={setPriorityFeeBounds}
-                />
-              </TooltipConditional>
-            ) : null}
-          </>
-        )}
-      </div>
+          ) : null}
+        </div>
+      )}
       <div className="flex gap-2 text-sm text-muted-foreground">
         <span>Total fee per gas:</span>
         {gasFeesData ? (
@@ -173,7 +171,7 @@ const BaseFeeButton: FC<BaseFeeButtonProps> = ({ gasFeesData, formDisabled, setG
     return (
       <Popover>
         <PopoverTrigger asChild disabled={formDisabled} className="w-full">
-          <Button className="text-sm" variant="secondary">
+          <Button className="text-sm" variant="outline">
             <pre>
               <GweiAmount amount={gasFeesData?.nextBaseFeePerGas || BigInt(0)} />
             </pre>
@@ -191,7 +189,7 @@ const BaseFeeButton: FC<BaseFeeButtonProps> = ({ gasFeesData, formDisabled, setG
 
   return (
     <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-      <DrawerTrigger className="w-full" asChild>
+      <DrawerTrigger className="grow" asChild>
         <Button className="text-sm" variant="outline">
           <pre>
             <GweiAmount amount={gasFeesData?.nextBaseFeePerGas || BigInt(0)} />
@@ -292,7 +290,7 @@ const PriorityFeeButton: FC<PriorityFeeButtonProps> = ({
     return (
       <Popover onOpenChange={(o) => checkCustomInput(o)}>
         <PopoverTrigger asChild disabled={formDisabled} className="w-full">
-          <Button className="text-sm" variant="secondary">
+          <Button className="text-sm" variant="outline">
             <pre>
               <GweiAmount amount={priorityFeeBounds[selectedPriorityFee]} />{' '}
               <span className="text-muted-foreground">
@@ -327,7 +325,7 @@ const PriorityFeeButton: FC<PriorityFeeButtonProps> = ({
 
   return (
     <Drawer open={drawerOpen} onOpenChange={(o) => checkCustomInput(o)}>
-      <DrawerTrigger className="w-full" asChild>
+      <DrawerTrigger className="grow" asChild>
         <Button className="text-sm" variant="outline">
           <pre>
             <GweiAmount amount={priorityFeeBounds[selectedPriorityFee]} />{' '}
@@ -336,7 +334,7 @@ const PriorityFeeButton: FC<PriorityFeeButtonProps> = ({
               {selectedPriorityFee === 'low'
                 ? 'slow'
                 : selectedPriorityFee === 'mid'
-                ? 'standard'
+                ? 'std'
                 : selectedPriorityFee === 'high'
                 ? 'fast'
                 : 'custom'}
@@ -390,7 +388,7 @@ const PriorityFeeContent: FC<
     <ToggleGroup
       type="single"
       value={selectedPriorityFee}
-      className="grid w-full grid-cols-3 gap-y-1"
+      className="flex w-full flex-wrap gap-y-1"
       onValueChange={(v) => {
         if (v) setSelectedPriorityFee(v as Priority);
         if (v && gasFeesData) {
@@ -405,7 +403,7 @@ const PriorityFeeContent: FC<
       <ToggleGroupItem
         value="low"
         aria-label="Select low priority fee"
-        className="flex w-full flex-col py-6"
+        className="flex grow flex-col py-6"
       >
         <span>slow</span>
         <pre className="text-muted-foreground">
@@ -415,7 +413,7 @@ const PriorityFeeContent: FC<
       <ToggleGroupItem
         value="mid"
         aria-label="Select standard priority fee"
-        className="flex w-full flex-col py-6"
+        className="flex grow flex-col py-6"
       >
         <span>standard</span>
         <pre className="text-muted-foreground">
@@ -425,7 +423,7 @@ const PriorityFeeContent: FC<
       <ToggleGroupItem
         value="high"
         aria-label="Select high priority fee"
-        className="flex w-full flex-col py-6"
+        className="flex grow flex-col py-6"
       >
         <span>fast</span>
         <pre className="text-muted-foreground">
@@ -435,7 +433,7 @@ const PriorityFeeContent: FC<
       <ToggleGroupItem
         value="custom"
         aria-label="Select custom priority fee"
-        className="col-span-3 flex w-full justify-between gap-4 py-6"
+        className="flex w-full grow justify-between gap-4 py-6"
       >
         <span
           className={cn(
@@ -452,7 +450,6 @@ const PriorityFeeContent: FC<
           style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
           value={customInput}
           onChange={(e) => {
-            console.log(e.target.value);
             if (!isNaN(Number(e.target.value.toString()))) {
               setCustomInput(e.target.value);
               setPriorityFeeBounds({

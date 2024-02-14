@@ -51,10 +51,6 @@ const NativePriceSelection: FC<NativePriceSelectionProps> = ({ className }) => {
     init();
   }, [chain, getCurrentChain, fetchAndUpdateNativeTokenPrice]);
 
-  useEffect(() => {
-    console.log('nativeTokenPrice', nativeTokenPrice);
-  }, [nativeTokenPrice]);
-
   // return price formatted in us dollars
   return (
     <div className={cn('flex flex-col gap-1', className)}>
@@ -69,7 +65,7 @@ const NativePriceSelection: FC<NativePriceSelectionProps> = ({ className }) => {
             className="h-6 justify-end"
             onClick={fetchAndUpdateNativeTokenPrice}
           >
-            reset
+            latest
           </Button>
         </span>
       ) : null}

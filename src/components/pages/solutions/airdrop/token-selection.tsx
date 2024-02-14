@@ -45,6 +45,7 @@ const TokenSelection = () => {
     <ComboBoxResponsive
       items={items}
       label="Token"
+      boxWidth="w-[250px]"
       selected={token}
       setSelected={setToken}
       disabled={formDisabled}

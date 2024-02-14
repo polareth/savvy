@@ -1,5 +1,8 @@
 ## TODO
 
+- Use some kind of toggle group for recipients amount/custom data
+  - when clicking on "mock" data, highlights input + slider, otherwise click on custom data (just the button like custom token but above the textarea on the left, and amount of recipients small on the right?) and highlight it and grey out the other
+  - Add accordion for example data
 - Add custom priority fee button, and actually move "low", "medium" and "high" to a more stealthy place like right below
 - Move everything using alchemy id in an api route, pass the chainId, the method from the client (with the params) the params and return the data; for each call to the api, decode the params using a type for this specific call (considering what should be returned)
 - Error handling: whenever an error occurs, the toast "contact" button should open a modal, with:

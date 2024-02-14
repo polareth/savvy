@@ -27,6 +27,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 type ComboBoxResponsiveProps = {
   items: ComboboxOption[];
   label: string;
+  boxWidth?: string;
   selected: ComboboxOption;
   setSelected: (item: ComboboxOption) => void;
   header?: string;
@@ -35,7 +36,7 @@ type ComboBoxResponsiveProps = {
 };
 
 const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
-  const { label, selected, disabled, header, minimalDisplay, setSelected } = props;
+  const { label, boxWidth, selected, disabled, header, minimalDisplay, setSelected } = props;
   const [open, setOpen] = useState(false);
   const isDesktop = useMediaQuery('(min-width: 768px)'); // md
 
@@ -43,7 +44,10 @@ const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
     return (
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild disabled={disabled}>
-          <Button variant="outline" className="flex w-[250px] items-center justify-start">
+          <Button
+            variant="outline"
+            className={cn('flex items-center justify-start', boxWidth || 'w-full')}
+          >
             {selected ? (
               <>
                 {selected.icon ? (

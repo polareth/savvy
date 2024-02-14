@@ -13,6 +13,7 @@ import {
 } from '@tanstack/react-table';
 import { Search } from 'lucide-react';
 
+import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { cn } from '@/lib/utils';
 
 import { ColumnDataType } from '@/components/pages/solutions/airdrop/recipients-selection';
@@ -30,9 +31,15 @@ import {
 type AirdropDataTableProps<TData> = {
   data: TData[];
   columns: ColumnDef<TData>[];
+  className?: string;
 };
 
-const AirdropDataTable: FC<AirdropDataTableProps<ColumnDataType>> = ({ data, columns }) => {
+const AirdropDataTable: FC<AirdropDataTableProps<ColumnDataType>> = ({
+  data,
+  columns,
+  className,
+}) => {
+  const isDesktop = useMediaQuery('(min-width: 768px)'); // md
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const table = useReactTable<ColumnDataType>({
@@ -48,15 +55,29 @@ const AirdropDataTable: FC<AirdropDataTableProps<ColumnDataType>> = ({ data, col
   });
 
   return (
-    <div className="flex flex-col gap-2 rounded-md pb-2">
-      <div className="flex items-center justify-between p-2">
-        <span className="font-medium text-muted-foreground">Airdrop data</span>
+    <div className={cn('flex flex-col gap-2 rounded-md pb-2', className)}>
+      <div className="flex items-center justify-between gap-4 p-2">
+        {isDesktop ? (
+          <>
+            <span className="font-medium">Airdrop data</span>
+            <span className="grow text-sm text-muted-foreground">
+              ({data.length} recipient{data.length > 1 && 's'})
+            </span>
+          </>
+        ) : (
+          <div className="flex flex-col whitespace-nowrap">
+            <span className="font-medium">Airdrop data</span>
+            <span className="grow text-sm text-muted-foreground">
+              ({data.length} recipient{data.length > 1 && 's'})
+            </span>
+          </div>
+        )}
         <div className="relative">
           <Input
             placeholder="Filter recipients..."
             value={(table.getColumn('recipient')?.getFilterValue() as string) ?? ''}
             onChange={(e) => table.getColumn('recipient')?.setFilterValue(e.target.value)}
-            className="max-w-sm pr-10"
+            className="max-w-[200px] pr-10 font-mono text-xs md:max-w-sm md:text-sm"
           />
           <Search
             className={cn(
@@ -87,7 +108,7 @@ const AirdropDataTable: FC<AirdropDataTableProps<ColumnDataType>> = ({ data, col
             table.getRowModel().rows.map((row) => (
               <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                  <TableCell key={cell.id} className="font-mono">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
