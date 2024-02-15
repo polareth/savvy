@@ -1,5 +1,5 @@
 import { isValidUint256 } from '.';
-import { isAddress, isHex } from 'viem';
+import { isAddress } from 'viem';
 
 import { AirdropData, Token } from '@/lib/types/airdrop';
 

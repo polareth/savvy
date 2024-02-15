@@ -13,7 +13,6 @@ import { estimateGasCostAirdrop } from '@/lib/utils/estimation/router';
 import TooltipConditional from '@/components/common/tooltip-conditional';
 import DataTableEstimation from '@/components/pages/solutions/airdrop/data-table-estimation';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 
 const CostEstimation = () => {
   const [loading, setLoading] = useState(false);

@@ -276,19 +276,13 @@ const CustomDataInput = ({
   const [customDataInput, setCustomDataInput] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
 
-  const {
-    customAirdropData,
-    recipientsCount,
-    tokenOption,
-    setCustomAirdropData,
-    setRecipientsCount,
-  } = useSelectionStore.airdrop((state) => ({
-    customAirdropData: state.customAirdropData,
-    recipientsCount: state.recipientsCount,
-    tokenOption: state.tokenOption,
-    setCustomAirdropData: state.setCustomAirdropData,
-    setRecipientsCount: state.setRecipientsCount,
-  }));
+  const { customAirdropData, tokenOption, setCustomAirdropData, setRecipientsCount } =
+    useSelectionStore.airdrop((state) => ({
+      customAirdropData: state.customAirdropData,
+      tokenOption: state.tokenOption,
+      setCustomAirdropData: state.setCustomAirdropData,
+      setRecipientsCount: state.setRecipientsCount,
+    }));
 
   useEffect(() => {
     if (customAirdropData.enabled && customDataInput !== '') {

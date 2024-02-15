@@ -1,4 +1,4 @@
-import { Abi, CallResult, createMemoryClient, encodeFunctionData, TevmClient } from 'tevm';
+import { Abi, createMemoryClient, TevmClient } from 'tevm';
 
 import { DEFAULTS } from '@/lib/constants/defaults';
 import { MOCKS } from '@/lib/constants/solutions/airdrop/mocks';

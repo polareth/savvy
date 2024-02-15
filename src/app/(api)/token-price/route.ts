@@ -1,9 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-
 const apiKey = process.env.COINMARKETCAP_API_KEY || '';
 const url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest';
 
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
+export async function GET() {
   try {
     const response = await fetch(url, {
       headers: {
