@@ -11,6 +11,7 @@ import { toastErrorWithContact } from '@/lib/utils';
 import { estimateGasCostAirdrop } from '@/lib/utils/estimation/router';
 
 import TooltipConditional from '@/components/common/tooltip-conditional';
+import DataTableEstimation from '@/components/pages/solutions/airdrop/data-table-estimation';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -124,14 +125,24 @@ const CostEstimation = () => {
       chainOption &&
       tokenOption &&
       methodOption &&
-      recipientsCount > 0 &&
+      ((!customAirdropData.enabled && recipientsCount > 0) ||
+        (customAirdropData.enabled && customAirdropData.recipients.length > 0)) &&
       !loading
     ) {
       setReady(true);
     } else {
       setReady(false);
     }
-  }, [chainOption, tokenOption, methodOption, gasFeesData, recipientsCount, loading]);
+  }, [
+    chainOption,
+    tokenOption,
+    methodOption,
+    gasFeesData,
+    recipientsCount,
+    loading,
+    customAirdropData.enabled,
+    customAirdropData.recipients.length,
+  ]);
 
   /* -------------------------------- component ------------------------------- */
   return (
@@ -146,31 +157,7 @@ const CostEstimation = () => {
         </Button>
       </TooltipConditional>
       <div className="mt-4">
-        {loading ? (
-          <Skeleton className="h-8 w-full rounded-md" />
-        ) : estimation?.gasUsed && estimation.gasCostsUsd ? (
-          <div className="flex flex-col">
-            <span className="font-medium">Deployment</span>
-            <span>
-              Gas used: {estimation.gasUsed.deployment.root} +{' '}
-              {estimation.gasUsed.deployment.l1submission}
-            </span>
-            <span>
-              Cost in USD: {estimation.gasCostsUsd.deployment.root} +{' '}
-              {estimation.gasCostsUsd.deployment.l1submission}
-            </span>
-            <span className="mt-4 font-medium">Call</span>
-            <span>
-              Gas used: {estimation.gasUsed.call.root} + {estimation.gasUsed.call.l1submission}
-            </span>
-            <span>
-              Cost in USD: {estimation.gasCostsUsd.call.root} +{' '}
-              {estimation.gasCostsUsd.call.l1submission}
-            </span>
-          </div>
-        ) : (
-          'no estimation yet'
-        )}
+        {estimation || loading ? <DataTableEstimation data={estimation} loading={loading} /> : null}
       </div>
     </div>
   );

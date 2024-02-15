@@ -1,9 +1,7 @@
 import CostEstimation from '@/components/pages/solutions/airdrop/cost-estimation';
-import CustomTokenSelection from '@/components/pages/solutions/airdrop/custom-token-selection';
 import Header from '@/components/pages/solutions/airdrop/header';
-import RecipientsSelection from '@/components/pages/solutions/airdrop/recipients-selection';
+import AirdropParameters from '@/components/pages/solutions/airdrop/parameters';
 import ConfigMenu from '@/components/pages/solutions/common/config-menu';
-import { Separator } from '@/components/ui/separator';
 
 const Airdrop = () => {
   return (
@@ -11,11 +9,7 @@ const Airdrop = () => {
       <ConfigMenu />
       <div className="flex w-full flex-col">
         <Header />
-        <Separator className="mb-0 mt-4 md:mb-8" />
-        <CustomTokenSelection />
-        <Separator className="mb-4 md:my-8" />
-        <RecipientsSelection />
-        <Separator className="my-8" />
+        <AirdropParameters />
         <CostEstimation />
       </div>
     </div>

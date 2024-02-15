@@ -1,15 +1,13 @@
 import { FC, useEffect, useState } from 'react';
 
-// Assume formatGwei is a function that formats wei amounts into Gwei for display
-import { formatGwei } from 'viem';
-
 import { useSelectionStore } from '@/lib/store/use-selection';
 
 type GweiAmountProps = {
   amount: string | number | bigint;
+  noUnit?: boolean;
 };
 
-const GweiAmount: FC<GweiAmountProps> = ({ amount }) => {
+const GweiAmount: FC<GweiAmountProps> = ({ amount, noUnit = false }) => {
   const [displayed, setDisplayed] = useState<string>(amount.toString());
   const getCurrentChain = useSelectionStore.global((state) => state.getCurrentChain);
 
@@ -41,7 +39,12 @@ const GweiAmount: FC<GweiAmountProps> = ({ amount }) => {
     setDisplayed(formatted);
   }, [amount, getCurrentChain]);
 
-  return <>{displayed} Gwei</>;
+  return (
+    <>
+      {displayed}
+      {noUnit ? '' : ' Gwei'}
+    </>
+  );
 };
 
 export default GweiAmount;

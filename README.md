@@ -24,6 +24,7 @@
 - Handle issues in retrieving token price (coinmarketcap), and other api calls as well (gas fees) => if error, use a default value & let the user choose
 - Add guides; e.g. on airdrop page, a button in the sidebar to go to a quick guide to use it
 - Add documentation (use vocs.dev) for both guides and breakdowns, how it works, calculations, contributing, roadmap, etc
+- Button "share results" to export them (md? pdf? json?); probably a table as well as all the details in a concise document
 
 ---
 

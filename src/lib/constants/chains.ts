@@ -28,6 +28,7 @@ const Ethereum: Chain = {
   hasPriorityFee: true,
   avgBlockTime: 12080,
   rpcUrl: 'https://eth-mainnet.g.alchemy.com/v2/',
+  explorerUrl: 'https://etherscan.io/',
   gasControls: {
     min: Number(parseGwei('1')),
     max: Number(parseGwei('1000')),
@@ -47,6 +48,7 @@ const EthereumSepolia: Chain = {
   hasPriorityFee: true,
   avgBlockTime: 12080,
   rpcUrl: 'https://eth-sepolia.g.alchemy.com/v2/',
+  explorerUrl: 'https://sepolia.etherscan.io/',
   gasControls: {
     min: Number(parseGwei('1')),
     max: Number(parseGwei('1000')),
@@ -62,6 +64,7 @@ const Arbitrum: Chain = {
   hasPriorityFee: false,
   avgBlockTime: 260,
   rpcUrl: 'https://arb-mainnet.g.alchemy.com/v2/',
+  explorerUrl: 'https://arbiscan.io/',
   gasControls: {
     min: Number(parseGwei('0.1')),
     max: Number(parseGwei('1000')),
@@ -78,6 +81,7 @@ const Base: Chain = {
   hasPriorityFee: true,
   avgBlockTime: 2000,
   rpcUrl: 'https://base-mainnet.g.alchemy.com/v2/',
+  explorerUrl: 'https://basescan.org/',
   gasControls: {
     min: Number(parseGwei('0.001')),
     max: Number(parseGwei('500')),
@@ -94,6 +98,7 @@ const Optimism: Chain = {
   hasPriorityFee: true,
   avgBlockTime: 2000,
   rpcUrl: 'https://opt-mainnet.g.alchemy.com/v2/',
+  explorerUrl: 'https://optimistic.etherscan.io/',
   gasControls: {
     min: Number(parseGwei('0.001')),
     max: Number(parseGwei('500')),
@@ -114,6 +119,7 @@ const Polygon: Chain = {
   hasPriorityFee: true,
   avgBlockTime: 2140,
   rpcUrl: 'https://polygon-mainnet.g.alchemy.com/v2/',
+  explorerUrl: 'https://polygonscan.com/',
   gasControls: {
     min: Number(parseGwei('0.001')),
     max: Number(parseGwei('1000')),

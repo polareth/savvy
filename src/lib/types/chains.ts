@@ -29,6 +29,7 @@ type GasFeesModel = OPStackSupport & {
 export type Chain = GasFeesModel & {
   config: ViemChain;
   rpcUrl: string;
+  explorerUrl: string;
   avgBlockTime: number;
 
   gasControls?: GasControls;

@@ -24,16 +24,17 @@ export type GasFeesData = {
 type TxGasResult = {
   deployment: {
     root: string;
-    l1submission?: string;
+    l1submission: string;
   };
   call: {
     root: string;
-    l1submission?: string;
+    l1submission: string;
   };
 };
 
 export type TxGasUsed = TxGasResult;
 export type TxGasCostsUsd = TxGasResult;
+export type TxGasCostsNative = TxGasResult;
 
 export type GasCostEstimation = {
   config: {
@@ -44,5 +45,6 @@ export type GasCostEstimation = {
   };
   gasUsed: TxGasUsed;
   gasCostsUsd: TxGasCostsUsd;
+  gasCostsNative: TxGasCostsNative;
   error?: string;
 };

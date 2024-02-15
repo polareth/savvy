@@ -11,7 +11,7 @@ const Header = () => {
   const tokenOption = useSelectionStore.airdrop((state) => state.tokenOption);
 
   return (
-    <div className="flex flex-col justify-between gap-2 md:flex-row">
+    <div className="flex flex-col justify-between gap-2 bg-[var(--background)] md:flex-row">
       <div className="flex grow flex-wrap items-end gap-x-1 gap-y-1">
         <span className="text-xl font-semibold tracking-wide">Airdrop</span>
         <span className="mb-[2px] text-sm text-muted-foreground">{tokenOption.label}</span>

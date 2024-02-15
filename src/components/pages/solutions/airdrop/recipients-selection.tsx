@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
+import DataTableRecipients from './data-table-recipients';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
 
 import { DEFAULTS } from '@/lib/constants/defaults';
@@ -12,7 +13,6 @@ import { cn } from '@/lib/utils';
 import { parseAirdropInput } from '@/lib/utils/parse';
 
 import TooltipAlert from '@/components/common/tooltip-alert';
-import AirdropDataTable from '@/components/templates/table/data-table';
 import {
   Accordion,
   AccordionContent,
@@ -23,14 +23,10 @@ import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/components/ui/drawer';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-
-export type ColumnDataType = { recipient: string; amount?: string; tokenId?: string };
 
 /* -------------------------------------------------------------------------- */
 /*                                    BASE                                    */
@@ -294,31 +290,6 @@ const CustomDataInput = ({
     setRecipientsCount: state.setRecipientsCount,
   }));
 
-  const columns = useMemo(
-    () =>
-      exampleValues[0].map((value) => ({
-        accessorKey: value,
-        header: () => (
-          <span className="font-semibold">{value.charAt(0).toUpperCase() + value.slice(1)}</span>
-        ),
-      })),
-    [exampleValues],
-  );
-
-  const table = useMemo(
-    () => ({
-      data: customAirdropData.recipients.map((recipient, i) => {
-        return {
-          recipient,
-          tokenId: customAirdropData.ids[i] || '',
-          amount: customAirdropData.amounts[i] || '',
-        };
-      }),
-      columns,
-    }),
-    [customAirdropData, columns],
-  );
-
   useEffect(() => {
     if (customAirdropData.enabled && customDataInput !== '') {
       const { data, errors } = parseAirdropInput(customDataInput, tokenOption.value as Token['id']);
@@ -387,11 +358,7 @@ const CustomDataInput = ({
         </div>
       ) : null}
       {customAirdropData.enabled ? (
-        <AirdropDataTable
-          data={table.data}
-          columns={table.columns}
-          className="rounded-md border-x border-primary px-2"
-        />
+        <DataTableRecipients data={customAirdropData} keys={exampleValues[0]} />
       ) : null}
     </div>
   );

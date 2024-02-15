@@ -1,10 +1,9 @@
 import { FC, ReactNode } from 'react';
 
 import { InfoCircledIcon } from '@radix-ui/react-icons';
-import { PopoverContent } from '@radix-ui/react-popover';
 
 import { Icon as IconType } from '@/components/common/icons';
-import { Popover, PopoverTrigger } from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 type PopoverInfoProps = {
   content: string | ReactNode;

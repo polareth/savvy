@@ -3,7 +3,7 @@ import { isAddress } from 'viem';
 import { AirdropData, AirdropParams, AirdropSolution, AirdropUniqueId } from '@/lib/types/airdrop';
 import { ApiTevmCall } from '@/lib/types/api';
 import { Chain } from '@/lib/types/chains';
-import { GasCostEstimation, GasFeesData } from '@/lib/types/estimate';
+import { GasCostEstimation, GasFeesData, TxGasUsed } from '@/lib/types/estimate';
 import { calculate } from '@/lib/utils/estimation/calculate';
 import { generateRandomAirdropData } from '@/lib/utils/estimation/random';
 
@@ -82,27 +82,13 @@ export const estimateGasCostAirdrop: EstimateGasCostAirdrop = async (
     ? gasFeesData.totalFeePerGas
     : gasFeesData.nextBaseFeePerGas;
 
-  // Calculate costs in USD
-  const costs = {
-    deployment: {
-      root: calculate.gasUsedAndFeeToUsd(
-        Number(feePerGas),
-        Number(callResJson.data.gasUsed.deployment.root),
-        currentChain.config.nativeCurrency.decimals,
-        nativeTokenPrice,
-      ),
-      l1submission: '0',
-    },
-    call: {
-      root: calculate.gasUsedAndFeeToUsd(
-        Number(feePerGas),
-        Number(callResJson.data.gasUsed.call.root),
-        currentChain.config.nativeCurrency.decimals,
-        nativeTokenPrice,
-      ),
-      l1submission: '0',
-    },
-  };
+  // Calculate costs
+  const { gasCostsUsd, gasCostsNative } = getCosts(
+    Number(feePerGas),
+    callResJson.data.gasUsed,
+    currentChain.config.nativeCurrency.decimals,
+    nativeTokenPrice,
+  );
 
   return {
     config: {
@@ -112,9 +98,48 @@ export const estimateGasCostAirdrop: EstimateGasCostAirdrop = async (
       nativeTokenPrice,
     },
     gasUsed: callResJson.data.gasUsed,
-    gasCostsUsd: costs,
+    gasCostsUsd,
+    gasCostsNative,
   };
 };
+
+const getCosts = (
+  feePerGas: number,
+  gasUsed: TxGasUsed,
+  decimals: number,
+  nativeTokenPrice: number,
+) => ({
+  gasCostsUsd: {
+    deployment: {
+      root: calculate.gasUsedAndFeeToUsd(
+        feePerGas,
+        Number(gasUsed.deployment.root),
+        decimals,
+        nativeTokenPrice,
+      ),
+      l1submission: '0',
+    },
+    call: {
+      root: calculate.gasUsedAndFeeToUsd(
+        feePerGas,
+        Number(gasUsed.call.root),
+        decimals,
+        nativeTokenPrice,
+      ),
+      l1submission: '0',
+    },
+  },
+  gasCostsNative: {
+    deployment: {
+      root: calculate.gasUsedAndFeeToNative(feePerGas, Number(gasUsed.deployment.root), decimals),
+      l1submission: '0',
+    },
+    call: {
+      root: calculate.gasUsedAndFeeToNative(feePerGas, Number(gasUsed.call.root), decimals),
+      l1submission: '0',
+    },
+  },
+});
 
 /* -------------------------------------------------------------------------- */
 /*                              FORMATTING PARAMS                             */
@@ -204,6 +229,10 @@ const emptyGasCostEstimationWithError = (
       call: { root: '0', l1submission: '0' },
     },
     gasCostsUsd: {
+      deployment: { root: '0', l1submission: '0' },
+      call: { root: '0', l1submission: '0' },
+    },
+    gasCostsNative: {
       deployment: { root: '0', l1submission: '0' },
       call: { root: '0', l1submission: '0' },
     },

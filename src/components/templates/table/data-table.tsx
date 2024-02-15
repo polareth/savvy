@@ -1,24 +1,12 @@
 'use client';
 
-import { FC, useState } from 'react';
+import { ReactNode } from 'react';
 
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
-import { Search } from 'lucide-react';
+import { flexRender, Table as TableInterface } from '@tanstack/react-table';
 
-import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { cn } from '@/lib/utils';
 
-import { ColumnDataType } from '@/components/pages/solutions/airdrop/recipients-selection';
 import DataTablePagination from '@/components/templates/table/pagination';
-import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -28,65 +16,22 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-type AirdropDataTableProps<TData> = {
-  data: TData[];
-  columns: ColumnDef<TData>[];
+type DataTableProps<TData> = {
+  table: TableInterface<TData>;
+  header: ReactNode;
+  pagination?: boolean;
   className?: string;
 };
 
-const AirdropDataTable: FC<AirdropDataTableProps<ColumnDataType>> = ({
-  data,
-  columns,
+const DataTable = <TData,>({
+  table,
+  header,
+  pagination = false,
   className,
-}) => {
-  const isDesktop = useMediaQuery('(min-width: 768px)'); // md
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-
-  const table = useReactTable<ColumnDataType>({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      columnFilters,
-    },
-  });
-
+}: DataTableProps<TData>) => {
   return (
     <div className={cn('flex flex-col gap-2 rounded-md pb-2', className)}>
-      <div className="flex items-center justify-between gap-4 p-2">
-        {isDesktop ? (
-          <>
-            <span className="font-medium">Airdrop data</span>
-            <span className="grow text-sm text-muted-foreground">
-              ({data.length} recipient{data.length > 1 && 's'})
-            </span>
-          </>
-        ) : (
-          <div className="flex flex-col whitespace-nowrap">
-            <span className="font-medium">Airdrop data</span>
-            <span className="grow text-sm text-muted-foreground">
-              ({data.length} recipient{data.length > 1 && 's'})
-            </span>
-          </div>
-        )}
-        <div className="relative">
-          <Input
-            placeholder="Filter recipients..."
-            value={(table.getColumn('recipient')?.getFilterValue() as string) ?? ''}
-            onChange={(e) => table.getColumn('recipient')?.setFilterValue(e.target.value)}
-            className="max-w-[200px] pr-10 font-mono text-xs md:max-w-sm md:text-sm"
-          />
-          <Search
-            className={cn(
-              'absolute right-2 top-1/2 -translate-y-1/2 transform opacity-70 transition-opacity',
-              !table.getColumn('recipient')?.getFilterValue() && 'opacity-50',
-            )}
-          />
-        </div>
-      </div>
+      <div className="flex items-center justify-between gap-4 p-2">{header}</div>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -116,16 +61,56 @@ const AirdropDataTable: FC<AirdropDataTableProps<ColumnDataType>> = ({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
+              <TableCell colSpan={table.getAllColumns().length} className="h-24 text-center">
                 No results.
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
-      <DataTablePagination table={table} />
+      {pagination ? <DataTablePagination table={table} /> : null}
     </div>
   );
 };
 
-export default AirdropDataTable;
+// type DataTableSkeletonProps = {
+//   columns: ColumnDef<>[];
+//   rows: number;
+//   className?: string;
+// };
+
+// export const DataTableSkeleton = ({ columns, rows, className }: DataTableSkeletonProps) => {
+//   return (
+//     <div className={cn('flex flex-col gap-2 rounded-md pb-2', className)}>
+//       <div className="flex items-center justify-between gap-4 p-2">
+//         {columns.map((column) => (
+//           <Skeleton key={column.id} className="h-8 w-full" />
+//         ))}
+//       </div>
+//       <Table>
+//         <TableHeader>
+//           <TableRow>
+//             {columns.map((column) => (
+//               <TableHead key={column.id}>
+//                 <Skeleton className="h-8 w-full" />
+//               </TableHead>
+//             ))}
+//           </TableRow>
+//         </TableHeader>
+//         <TableBody>
+//           {Array.from({ length: rows }).map((_, index) => (
+//             <TableRow key={index}>
+//               {columns.map((column) => (
+//                 <TableCell key={column.id} className="h-8">
+//                   <Skeleton className="h-8 w-full" />
+//                 </TableCell>
+//               ))}
+//             </TableRow>
+//           ))}
+//         </TableBody>
+//       </Table>
+//     </div>
+//   );
+// };
+
+export default DataTable;
