@@ -5,7 +5,7 @@ import { MetadataExtra, Page } from '@/lib/types/site';
 const title = 'savvy';
 const description = 'savvy description';
 const authorUrl = 'https://twitter.com/0xpolarzero';
-const websiteUrl = 'https://savvy.polarzero.xyz';
+const websiteUrl = 'https://savvy.sh';
 
 /* -------------------------------------------------------------------------- */
 /*                                  METADATA                                  */

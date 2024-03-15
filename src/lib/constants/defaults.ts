@@ -2,10 +2,6 @@ import { parseGwei } from 'tevm';
 import { extractChain } from 'viem';
 
 import { CHAINS } from '@/lib/constants/providers';
-import {
-  AIRDROP_METHODS,
-  AIRDROP_TOKENS,
-} from '@/lib/constants/solutions/airdrop';
 
 /* -------------------------------------------------------------------------- */
 /*                                  DEFAULTS                                  */
@@ -31,17 +27,6 @@ export const DEFAULTS = {
   },
   // The default caller for any calls
   caller: `0x${'1'.repeat(40)}` as const,
-  /* -------------------------------- SOLUTIONS ------------------------------- */
-  airdropToken:
-    AIRDROP_TOKENS.find((t) => t.id === 'ERC20') || AIRDROP_TOKENS[0],
-  airdropMethod:
-    AIRDROP_METHODS.find((m) => m.id === 'push') || AIRDROP_METHODS[0],
-  airdropRecipients: {
-    count: 1,
-    min: 1,
-    max: 1000,
-    step: 1,
-  },
 };
 
 /* -------------------------------------------------------------------------- */

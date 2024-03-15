@@ -53,16 +53,16 @@ const ElapsedTime: FC<ElapsedTimeProps> = ({ start, end, prefix, suffix }) => {
       {years > 0
         ? `${years} year${years > 1 ? 's' : ''}`
         : months > 0
-        ? `${months} month${months > 1 ? 's' : ''}`
-        : days > 0
-        ? `${days} day${days > 1 ? 's' : ''}`
-        : hours > 0
-        ? `${hours} hour${hours > 1 ? 's' : ''}`
-        : minutes > 0
-        ? `${minutes} minute${minutes > 1 ? 's' : ''}`
-        : seconds > 10
-        ? `${seconds} second${seconds > 1 ? 's' : ''}`
-        : 'a few seconds'}
+          ? `${months} month${months > 1 ? 's' : ''}`
+          : days > 0
+            ? `${days} day${days > 1 ? 's' : ''}`
+            : hours > 0
+              ? `${hours} hour${hours > 1 ? 's' : ''}`
+              : minutes > 0
+                ? `${minutes} minute${minutes > 1 ? 's' : ''}`
+                : seconds > 10
+                  ? `${seconds} second${seconds > 1 ? 's' : ''}`
+                  : 'a few seconds'}
       {suffix ? ` ${suffix}` : ''}
     </>
   );
