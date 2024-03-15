@@ -163,6 +163,7 @@ export const CHAINS: Chain[] = [
         nativeTokenSlug: 'ethereum',
         // TODO: Add gas controls
         icon: Icons.arbitrum,
+        disabled: true,
       },
     },
   },
