@@ -6,7 +6,7 @@ const title = 'savvy';
 const description =
   'An interface for the EVM on the browser, to simulate & visualize onchain activity.';
 const authorUrl = 'https://twitter.com/0xpolarzero';
-const websiteUrl = 'https://savvy.sh';
+const websiteUrl = 'https://svvy.sh';
 
 /* -------------------------------------------------------------------------- */
 /*                                  METADATA                                  */
