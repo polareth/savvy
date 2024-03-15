@@ -5,9 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  '@tevm/opstack@1.0.0-next.43':
-    hash: 6iyt7dwhgswxuhpyu774nzbg4y
-    path: patches/@tevm__opstack@1.0.0-next.43.patch
   viem@2.8.6:
     hash: ikyo3yb3pdfgmgaffnyv2oza3a
     path: patches/viem@2.8.6.patch
@@ -81,7 +78,7 @@ dependencies:
     version: 1.0.0-next.28(fast-check@3.15.1)(typescript@5.0.4)(webpack@5.90.1)
   '@tevm/opstack':
     specifier: 1.0.0-next.43
-    version: 1.0.0-next.43(patch_hash=6iyt7dwhgswxuhpyu774nzbg4y)(typescript@5.0.4)(viem@2.8.6)
+    version: 1.0.0-next.43(typescript@5.0.4)(viem@2.8.6)
   '@vercel/analytics':
     specifier: ^1.1.2
     version: 1.1.2
@@ -2440,7 +2437,7 @@ packages:
       - zod
     dev: false
 
-  /@tevm/opstack@1.0.0-next.43(patch_hash=6iyt7dwhgswxuhpyu774nzbg4y)(typescript@5.0.4)(viem@2.8.6):
+  /@tevm/opstack@1.0.0-next.43(typescript@5.0.4)(viem@2.8.6):
     resolution: {integrity: sha512-oveDKNxCrAbDlchDCL2IVohuHqSQ5Vzpz5D/b0cIscmBUIV2ow7qYVH2q6iQEPYYVgnciAAAOjomyxxQrl8Geg==}
     peerDependencies:
       viem: 2.x.x
@@ -2459,7 +2456,6 @@ packages:
       - utf-8-validate
       - zod
     dev: false
-    patched: true
 
   /@tevm/precompiles@1.0.0-next.40(typescript@5.0.4):
     resolution: {integrity: sha512-ZT0qEK2s3yT2b8vs3OrrzFAlpKWkG3zeZgQ43WMOpeq5OqYqysrRcm0TFJCbH8s2fawMkRt9Nf4HQb88BsXTxg==}
