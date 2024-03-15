@@ -82,7 +82,8 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "viem@2.8.6": "patches/viem@2.8.6.patch"
+      "viem@2.8.6": "patches/viem@2.8.6.patch",
+      "@ethereumjs/common@4.1.0": "patches/@ethereumjs__common@4.1.0.patch"
     }
   }
 }
