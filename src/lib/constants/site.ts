@@ -3,7 +3,8 @@ import type { Metadata } from 'next';
 import { MetadataExtra, Page } from '@/lib/types/site';
 
 const title = 'savvy';
-const description = 'savvy description';
+const description =
+  'An interface for the EVM on the browser, to simulate & visualize onchain activity.';
 const authorUrl = 'https://twitter.com/0xpolarzero';
 const websiteUrl = 'https://savvy.sh';
 
@@ -32,7 +33,7 @@ export const METADATA_BASE: Metadata = {
     emails: ['contact@polarzero.xyz'],
     images: [
       {
-        url: `${websiteUrl}/static/og/home.png`,
+        url: `${websiteUrl}/og/home.png`,
         width: 1200,
         height: 630,
         alt: `${title} open-graph image`,
