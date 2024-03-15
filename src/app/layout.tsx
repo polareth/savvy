@@ -1,18 +1,21 @@
 import { Viewport } from 'next';
 import { Fira_Code as FontMono, Inter as FontSans } from 'next/font/google';
 
-import '@/styles/globals.css';
-
 import { METADATA_BASE } from '@/lib/constants/site';
 import { cn } from '@/lib/utils';
-
+import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { Analytics } from '@/components/config/analytics';
-import { ThemeProvider } from '@/components/config/providers';
+import { ThemeProvider } from '@/components/config/theme-provider';
 import { ThemeSwitcher } from '@/components/config/theme-switcher';
 import BaseLayout from '@/components/layouts/base';
 import ContainerLayout from '@/components/layouts/container';
-import { Toaster } from '@/components/ui/sonner';
 
+import '@/styles/globals.css';
+
+import { Icons } from '@/components/common/icons';
+
+/* -------------------------------- METADATA -------------------------------- */
 export const metadata = METADATA_BASE;
 
 export const viewport: Viewport = {
@@ -22,6 +25,7 @@ export const viewport: Viewport = {
   ],
 };
 
+/* ---------------------------------- FONTS --------------------------------- */
 export const fontSans = FontSans({
   subsets: ['latin'],
   variable: '--font-sans',
@@ -32,6 +36,10 @@ export const fontMono = FontMono({
   variable: '--font-mono',
 });
 
+/* ---------------------------------- ROOT ---------------------------------- */
+/**
+ * @notice The root layout for the entire application
+ */
 const RootLayout = ({
   children,
 }: Readonly<{
@@ -52,12 +60,18 @@ const RootLayout = ({
           enableSystem
           disableTransitionOnChange
         >
-          <BaseLayout>
-            <ContainerLayout>{children}</ContainerLayout>
-          </BaseLayout>
-          <ThemeSwitcher />
-          <Analytics />
-          <Toaster />
+          <TooltipProvider>
+            <BaseLayout>
+              <ContainerLayout>{children}</ContainerLayout>
+            </BaseLayout>
+            <ThemeSwitcher />
+            <Analytics />
+            <Toaster
+              closeButton
+              position="bottom-left"
+              icons={{ loading: <Icons.loading /> }}
+            />
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

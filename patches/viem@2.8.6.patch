@@ -1,0 +1,982 @@
+diff --git a/clients/decorators/public.ts b/clients/decorators/public.ts
+index c238c15d1f3152a656de3627afd6c3e2a8f6ccb2..e080892288cc1b16b6710560c573935846b3ef11 100644
+--- a/clients/decorators/public.ts
++++ b/clients/decorators/public.ts
+@@ -1,251 +1,255 @@
+-import type { Abi, AbiEvent, Address } from 'abitype'
++import type { Abi, AbiEvent, Address } from 'abitype';
+ 
+ import {
+   type GetEnsAddressParameters,
+   type GetEnsAddressReturnType,
+   getEnsAddress,
+-} from '../../actions/ens/getEnsAddress.js'
++} from '../../actions/ens/getEnsAddress.js';
+ import {
+   type GetEnsAvatarParameters,
+   type GetEnsAvatarReturnType,
+   getEnsAvatar,
+-} from '../../actions/ens/getEnsAvatar.js'
++} from '../../actions/ens/getEnsAvatar.js';
+ import {
+   type GetEnsNameParameters,
+   type GetEnsNameReturnType,
+   getEnsName,
+-} from '../../actions/ens/getEnsName.js'
++} from '../../actions/ens/getEnsName.js';
+ import {
+   type GetEnsResolverParameters,
+   type GetEnsResolverReturnType,
+   getEnsResolver,
+-} from '../../actions/ens/getEnsResolver.js'
++} from '../../actions/ens/getEnsResolver.js';
+ import {
+   type GetEnsTextParameters,
+   type GetEnsTextReturnType,
+   getEnsText,
+-} from '../../actions/ens/getEnsText.js'
++} from '../../actions/ens/getEnsText.js';
+ import {
+   type CallParameters,
+   type CallReturnType,
+   call,
+-} from '../../actions/public/call.js'
++} from '../../actions/public/call.js';
+ import {
+   type CreateBlockFilterReturnType,
+   createBlockFilter,
+-} from '../../actions/public/createBlockFilter.js'
++} from '../../actions/public/createBlockFilter.js';
+ import {
+   type CreateContractEventFilterParameters,
+   type CreateContractEventFilterReturnType,
+   createContractEventFilter,
+-} from '../../actions/public/createContractEventFilter.js'
++} from '../../actions/public/createContractEventFilter.js';
+ import {
+   type CreateEventFilterParameters,
+   type CreateEventFilterReturnType,
+   createEventFilter,
+-} from '../../actions/public/createEventFilter.js'
++} from '../../actions/public/createEventFilter.js';
+ import {
+   type CreatePendingTransactionFilterReturnType,
+   createPendingTransactionFilter,
+-} from '../../actions/public/createPendingTransactionFilter.js'
++} from '../../actions/public/createPendingTransactionFilter.js';
+ import {
+   type EstimateContractGasParameters,
+   type EstimateContractGasReturnType,
+   estimateContractGas,
+-} from '../../actions/public/estimateContractGas.js'
++} from '../../actions/public/estimateContractGas.js';
+ import {
+   type EstimateFeesPerGasParameters,
+   type EstimateFeesPerGasReturnType,
+   estimateFeesPerGas,
+-} from '../../actions/public/estimateFeesPerGas.js'
++} from '../../actions/public/estimateFeesPerGas.js';
+ import {
+   type EstimateGasParameters,
+   type EstimateGasReturnType,
+   estimateGas,
+-} from '../../actions/public/estimateGas.js'
++} from '../../actions/public/estimateGas.js';
+ import {
+   type EstimateMaxPriorityFeePerGasParameters,
+   type EstimateMaxPriorityFeePerGasReturnType,
+   estimateMaxPriorityFeePerGas,
+-} from '../../actions/public/estimateMaxPriorityFeePerGas.js'
++} from '../../actions/public/estimateMaxPriorityFeePerGas.js';
+ import {
+   type GetBalanceParameters,
+   type GetBalanceReturnType,
+   getBalance,
+-} from '../../actions/public/getBalance.js'
++} from '../../actions/public/getBalance.js';
++import {
++  type GetBlobBaseFeeReturnType,
++  getBlobBaseFee,
++} from '../../actions/public/getBlobBaseFee.js';
+ import {
+   type GetBlockParameters,
+   type GetBlockReturnType,
+   getBlock,
+-} from '../../actions/public/getBlock.js'
++} from '../../actions/public/getBlock.js';
+ import {
+   type GetBlockNumberParameters,
+   type GetBlockNumberReturnType,
+   getBlockNumber,
+-} from '../../actions/public/getBlockNumber.js'
++} from '../../actions/public/getBlockNumber.js';
+ import {
+   type GetBlockTransactionCountParameters,
+   type GetBlockTransactionCountReturnType,
+   getBlockTransactionCount,
+-} from '../../actions/public/getBlockTransactionCount.js'
++} from '../../actions/public/getBlockTransactionCount.js';
+ import {
+   type GetBytecodeParameters,
+   type GetBytecodeReturnType,
+   getBytecode,
+-} from '../../actions/public/getBytecode.js'
++} from '../../actions/public/getBytecode.js';
+ import {
+   type GetChainIdReturnType,
+   getChainId,
+-} from '../../actions/public/getChainId.js'
++} from '../../actions/public/getChainId.js';
+ import {
+   type GetContractEventsParameters,
+   type GetContractEventsReturnType,
+   getContractEvents,
+-} from '../../actions/public/getContractEvents.js'
++} from '../../actions/public/getContractEvents.js';
+ import {
+   type GetFeeHistoryParameters,
+   type GetFeeHistoryReturnType,
+   getFeeHistory,
+-} from '../../actions/public/getFeeHistory.js'
++} from '../../actions/public/getFeeHistory.js';
+ import {
+   type GetFilterChangesParameters,
+   type GetFilterChangesReturnType,
+   getFilterChanges,
+-} from '../../actions/public/getFilterChanges.js'
++} from '../../actions/public/getFilterChanges.js';
+ import {
+   type GetFilterLogsParameters,
+   type GetFilterLogsReturnType,
+   getFilterLogs,
+-} from '../../actions/public/getFilterLogs.js'
++} from '../../actions/public/getFilterLogs.js';
+ import {
+   type GetGasPriceReturnType,
+   getGasPrice,
+-} from '../../actions/public/getGasPrice.js'
++} from '../../actions/public/getGasPrice.js';
+ import {
+   type GetLogsParameters,
+   type GetLogsReturnType,
+   getLogs,
+-} from '../../actions/public/getLogs.js'
++} from '../../actions/public/getLogs.js';
+ import {
+   type GetProofParameters,
+   type GetProofReturnType,
+   getProof,
+-} from '../../actions/public/getProof.js'
++} from '../../actions/public/getProof.js';
+ import {
+   type GetStorageAtParameters,
+   type GetStorageAtReturnType,
+   getStorageAt,
+-} from '../../actions/public/getStorageAt.js'
++} from '../../actions/public/getStorageAt.js';
+ import {
+   type GetTransactionParameters,
+   type GetTransactionReturnType,
+   getTransaction,
+-} from '../../actions/public/getTransaction.js'
++} from '../../actions/public/getTransaction.js';
+ import {
+   type GetTransactionConfirmationsParameters,
+   type GetTransactionConfirmationsReturnType,
+   getTransactionConfirmations,
+-} from '../../actions/public/getTransactionConfirmations.js'
++} from '../../actions/public/getTransactionConfirmations.js';
+ import {
+   type GetTransactionCountParameters,
+   type GetTransactionCountReturnType,
+   getTransactionCount,
+-} from '../../actions/public/getTransactionCount.js'
++} from '../../actions/public/getTransactionCount.js';
+ import {
+   type GetTransactionReceiptParameters,
+   type GetTransactionReceiptReturnType,
+   getTransactionReceipt,
+-} from '../../actions/public/getTransactionReceipt.js'
++} from '../../actions/public/getTransactionReceipt.js';
+ import {
+   type MulticallParameters,
+   type MulticallReturnType,
+   multicall,
+-} from '../../actions/public/multicall.js'
++} from '../../actions/public/multicall.js';
+ import {
+   type ReadContractParameters,
+   type ReadContractReturnType,
+   readContract,
+-} from '../../actions/public/readContract.js'
++} from '../../actions/public/readContract.js';
+ import {
+   type SimulateContractParameters,
+   type SimulateContractReturnType,
+   simulateContract,
+-} from '../../actions/public/simulateContract.js'
++} from '../../actions/public/simulateContract.js';
+ import {
+   type UninstallFilterParameters,
+   type UninstallFilterReturnType,
+   uninstallFilter,
+-} from '../../actions/public/uninstallFilter.js'
++} from '../../actions/public/uninstallFilter.js';
+ import {
+   type VerifyMessageParameters,
+   type VerifyMessageReturnType,
+   verifyMessage,
+-} from '../../actions/public/verifyMessage.js'
++} from '../../actions/public/verifyMessage.js';
+ import {
+   type VerifyTypedDataParameters,
+   type VerifyTypedDataReturnType,
+   verifyTypedData,
+-} from '../../actions/public/verifyTypedData.js'
++} from '../../actions/public/verifyTypedData.js';
+ import {
+   type WaitForTransactionReceiptParameters,
+   type WaitForTransactionReceiptReturnType,
+   waitForTransactionReceipt,
+-} from '../../actions/public/waitForTransactionReceipt.js'
++} from '../../actions/public/waitForTransactionReceipt.js';
+ import {
+   type WatchBlockNumberParameters,
+   type WatchBlockNumberReturnType,
+   watchBlockNumber,
+-} from '../../actions/public/watchBlockNumber.js'
++} from '../../actions/public/watchBlockNumber.js';
+ import {
+   type WatchBlocksParameters,
+   type WatchBlocksReturnType,
+   watchBlocks,
+-} from '../../actions/public/watchBlocks.js'
++} from '../../actions/public/watchBlocks.js';
+ import {
+   type WatchContractEventParameters,
+   type WatchContractEventReturnType,
+   watchContractEvent,
+-} from '../../actions/public/watchContractEvent.js'
++} from '../../actions/public/watchContractEvent.js';
+ import {
+   type WatchEventParameters,
+   type WatchEventReturnType,
+   watchEvent,
+-} from '../../actions/public/watchEvent.js'
++} from '../../actions/public/watchEvent.js';
+ import {
+   type WatchPendingTransactionsParameters,
+   type WatchPendingTransactionsReturnType,
+   watchPendingTransactions,
+-} from '../../actions/public/watchPendingTransactions.js'
++} from '../../actions/public/watchPendingTransactions.js';
+ import {
+   type PrepareTransactionRequestParameters,
+   type PrepareTransactionRequestRequest,
+   type PrepareTransactionRequestReturnType,
+   prepareTransactionRequest,
+-} from '../../actions/wallet/prepareTransactionRequest.js'
++} from '../../actions/wallet/prepareTransactionRequest.js';
+ import {
+   type SendRawTransactionParameters,
+   type SendRawTransactionReturnType,
+   sendRawTransaction,
+-} from '../../actions/wallet/sendRawTransaction.js'
+-import type { Account } from '../../types/account.js'
+-import type { BlockNumber, BlockTag } from '../../types/block.js'
+-import type { Chain } from '../../types/chain.js'
++} from '../../actions/wallet/sendRawTransaction.js';
++import type { Account } from '../../types/account.js';
++import type { BlockNumber, BlockTag } from '../../types/block.js';
++import type { Chain } from '../../types/chain.js';
+ import type {
+   ContractEventName,
+   ContractFunctionArgs,
+   ContractFunctionName,
+   MaybeAbiEventName,
+   MaybeExtractEventArgsFromAbi,
+-} from '../../types/contract.js'
+-import type { FeeValuesType } from '../../types/fee.js'
+-import type { FilterType } from '../../types/filter.js'
+-import type { Client } from '../createClient.js'
+-import type { Transport } from '../transports/createTransport.js'
++} from '../../types/contract.js';
++import type { FeeValuesType } from '../../types/fee.js';
++import type { FilterType } from '../../types/filter.js';
++import type { Client } from '../createClient.js';
++import type { Transport } from '../transports/createTransport.js';
+ 
+ export type PublicActions<
+   TTransport extends Transport = Transport,
+   TChain extends Chain | undefined = Chain | undefined,
+-  TAccount extends Account | undefined = Account | undefined,
++  TAccount extends Account | undefined = Account | undefined
+ > = {
+   /**
+    * Executes a new message call immediately without submitting a transaction to the network.
+@@ -270,7 +274,7 @@ export type PublicActions<
+    *   to: '0x70997970c51812dc3a010c7d01b50e0d17dc79c8',
+    * })
+    */
+-  call: (parameters: CallParameters<TChain>) => Promise<CallReturnType>
++  call: (parameters: CallParameters<TChain>) => Promise<CallReturnType>;
+   /**
+    * Creates a Filter to listen for new block hashes that can be used with [`getFilterChanges`](https://viem.sh/docs/actions/public/getFilterChanges).
+    *
+@@ -290,7 +294,7 @@ export type PublicActions<
+    * const filter = await createBlockFilter(client)
+    * // { id: "0x345a6572337856574a76364e457a4366", type: 'block' }
+    */
+-  createBlockFilter: () => Promise<CreateBlockFilterReturnType>
++  createBlockFilter: () => Promise<CreateBlockFilterReturnType>;
+   /**
+    * Creates a Filter to retrieve event logs that can be used with [`getFilterChanges`](https://viem.sh/docs/actions/public/getFilterChanges) or [`getFilterLogs`](https://viem.sh/docs/actions/public/getFilterLogs).
+    *
+@@ -317,7 +321,7 @@ export type PublicActions<
+     TArgs extends MaybeExtractEventArgsFromAbi<TAbi, TEventName> | undefined,
+     TStrict extends boolean | undefined = undefined,
+     TFromBlock extends BlockNumber | BlockTag | undefined = undefined,
+-    TToBlock extends BlockNumber | BlockTag | undefined = undefined,
++    TToBlock extends BlockNumber | BlockTag | undefined = undefined
+   >(
+     args: CreateContractEventFilterParameters<
+       TAbi,
+@@ -326,7 +330,7 @@ export type PublicActions<
+       TStrict,
+       TFromBlock,
+       TToBlock
+-    >,
++    >
+   ) => Promise<
+     CreateContractEventFilterReturnType<
+       TAbi,
+@@ -336,7 +340,7 @@ export type PublicActions<
+       TFromBlock,
+       TToBlock
+     >
+-  >
++  >;
+   /**
+    * Creates a [`Filter`](https://viem.sh/docs/glossary/types#filter) to listen for new events that can be used with [`getFilterChanges`](https://viem.sh/docs/actions/public/getFilterChanges).
+    *
+@@ -370,7 +374,7 @@ export type PublicActions<
+     _EventName extends string | undefined = MaybeAbiEventName<TAbiEvent>,
+     _Args extends
+       | MaybeExtractEventArgsFromAbi<TAbiEvents, _EventName>
+-      | undefined = undefined,
++      | undefined = undefined
+   >(
+     args?: CreateEventFilterParameters<
+       TAbiEvent,
+@@ -380,7 +384,7 @@ export type PublicActions<
+       TToBlock,
+       _EventName,
+       _Args
+-    >,
++    >
+   ) => Promise<
+     CreateEventFilterReturnType<
+       TAbiEvent,
+@@ -391,7 +395,7 @@ export type PublicActions<
+       _EventName,
+       _Args
+     >
+-  >
++  >;
+   /**
+    * Creates a Filter to listen for new pending transaction hashes that can be used with [`getFilterChanges`](https://viem.sh/docs/actions/public/getFilterChanges).
+    *
+@@ -411,7 +415,7 @@ export type PublicActions<
+    * const filter = await client.createPendingTransactionFilter()
+    * // { id: "0x345a6572337856574a76364e457a4366", type: 'transaction' }
+    */
+-  createPendingTransactionFilter: () => Promise<CreatePendingTransactionFilterReturnType>
++  createPendingTransactionFilter: () => Promise<CreatePendingTransactionFilterReturnType>;
+   /**
+    * Estimates the gas required to successfully execute a contract write function call.
+    *
+@@ -446,10 +450,10 @@ export type PublicActions<
+       abi,
+       'nonpayable' | 'payable',
+       functionName
+-    >,
++    >
+   >(
+-    args: EstimateContractGasParameters<abi, functionName, args, TChain>,
+-  ) => Promise<EstimateContractGasReturnType>
++    args: EstimateContractGasParameters<abi, functionName, args, TChain>
++  ) => Promise<EstimateContractGasReturnType>;
+   /**
+    * Estimates the gas necessary to complete a transaction without submitting it to the network.
+    *
+@@ -474,8 +478,8 @@ export type PublicActions<
+    * })
+    */
+   estimateGas: (
+-    args: EstimateGasParameters<TChain>,
+-  ) => Promise<EstimateGasReturnType>
++    args: EstimateGasParameters<TChain>
++  ) => Promise<EstimateGasReturnType>;
+   /**
+    * Returns the balance of an address in wei.
+    *
+@@ -510,7 +514,28 @@ export type PublicActions<
+    * })
+    * // 10000000000000000000000n (wei)
+    */
+-  getBalance: (args: GetBalanceParameters) => Promise<GetBalanceReturnType>
++  getBalance: (args: GetBalanceParameters) => Promise<GetBalanceReturnType>;
++  /**
++   * Returns the base fee per blob gas in wei.
++   *
++   * - Docs: https://viem.sh/docs/actions/public/getBlobBaseFee
++   * - JSON-RPC Methods: [`eth_blobBaseFee`](https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_blobBaseFee)
++   *
++   * @param client - Client to use
++   * @returns The blob base fee (in wei). {@link GetBlobBaseFeeReturnType}
++   *
++   * @example
++   * import { createPublicClient, http } from 'viem'
++   * import { mainnet } from 'viem/chains'
++   * import { getBlobBaseFee } from 'viem/public'
++   *
++   * const client = createPublicClient({
++   *   chain: mainnet,
++   *   transport: http(),
++   * })
++   * const blobBaseFee = await client.getBlobBaseFee()
++   */
++  getBlobBaseFee: () => Promise<GetBlobBaseFeeReturnType>;
+   /**
+    * Returns information about a block at a block number, hash, or tag.
+    *
+@@ -535,10 +560,10 @@ export type PublicActions<
+    */
+   getBlock: <
+     TIncludeTransactions extends boolean = false,
+-    TBlockTag extends BlockTag = 'latest',
++    TBlockTag extends BlockTag = 'latest'
+   >(
+-    args?: GetBlockParameters<TIncludeTransactions, TBlockTag>,
+-  ) => Promise<GetBlockReturnType<TChain, TIncludeTransactions, TBlockTag>>
++    args?: GetBlockParameters<TIncludeTransactions, TBlockTag>
++  ) => Promise<GetBlockReturnType<TChain, TIncludeTransactions, TBlockTag>>;
+   /**
+    * Returns the number of the most recent block seen.
+    *
+@@ -561,8 +586,8 @@ export type PublicActions<
+    * // 69420n
+    */
+   getBlockNumber: (
+-    args?: GetBlockNumberParameters,
+-  ) => Promise<GetBlockNumberReturnType>
++    args?: GetBlockNumberParameters
++  ) => Promise<GetBlockNumberReturnType>;
+   /**
+    * Returns the number of Transactions at a block number, hash, or tag.
+    *
+@@ -585,8 +610,8 @@ export type PublicActions<
+    * const count = await client.getBlockTransactionCount()
+    */
+   getBlockTransactionCount: (
+-    args?: GetBlockTransactionCountParameters,
+-  ) => Promise<GetBlockTransactionCountReturnType>
++    args?: GetBlockTransactionCountParameters
++  ) => Promise<GetBlockTransactionCountReturnType>;
+   /**
+    * Retrieves the bytecode at an address.
+    *
+@@ -608,7 +633,7 @@ export type PublicActions<
+    *   address: '0xFBA3912Ca04dd458c843e2EE08967fC04f3579c2',
+    * })
+    */
+-  getBytecode: (args: GetBytecodeParameters) => Promise<GetBytecodeReturnType>
++  getBytecode: (args: GetBytecodeParameters) => Promise<GetBytecodeReturnType>;
+   /**
+    * Returns the chain ID associated with the current network.
+    *
+@@ -628,7 +653,7 @@ export type PublicActions<
+    * const chainId = await client.getChainId()
+    * // 1
+    */
+-  getChainId: () => Promise<GetChainIdReturnType>
++  getChainId: () => Promise<GetChainIdReturnType>;
+   /**
+    * Returns a list of event logs emitted by a contract.
+    *
+@@ -659,7 +684,7 @@ export type PublicActions<
+     eventName extends ContractEventName<abi> | undefined = undefined,
+     strict extends boolean | undefined = undefined,
+     fromBlock extends BlockNumber | BlockTag | undefined = undefined,
+-    toBlock extends BlockNumber | BlockTag | undefined = undefined,
++    toBlock extends BlockNumber | BlockTag | undefined = undefined
+   >(
+     args: GetContractEventsParameters<
+       abi,
+@@ -667,10 +692,10 @@ export type PublicActions<
+       strict,
+       fromBlock,
+       toBlock
+-    >,
++    >
+   ) => Promise<
+     GetContractEventsReturnType<abi, eventName, strict, fromBlock, toBlock>
+-  >
++  >;
+   /**
+    * Gets address for ENS name.
+    *
+@@ -700,8 +725,8 @@ export type PublicActions<
+    * // '0xd2135CfB216b74109775236E36d4b433F1DF507B'
+    */
+   getEnsAddress: (
+-    args: GetEnsAddressParameters,
+-  ) => Promise<GetEnsAddressReturnType>
++    args: GetEnsAddressParameters
++  ) => Promise<GetEnsAddressReturnType>;
+   /**
+    * Gets the avatar of an ENS name.
+    *
+@@ -731,8 +756,8 @@ export type PublicActions<
+    * // 'https://ipfs.io/ipfs/Qma8mnp6xV3J2cRNf3mTth5C8nV11CAnceVinc3y8jSbio'
+    */
+   getEnsAvatar: (
+-    args: GetEnsAvatarParameters,
+-  ) => Promise<GetEnsAvatarReturnType>
++    args: GetEnsAvatarParameters
++  ) => Promise<GetEnsAvatarReturnType>;
+   /**
+    * Gets primary name for specified address.
+    *
+@@ -758,7 +783,7 @@ export type PublicActions<
+    * })
+    * // 'wevm.eth'
+    */
+-  getEnsName: (args: GetEnsNameParameters) => Promise<GetEnsNameReturnType>
++  getEnsName: (args: GetEnsNameParameters) => Promise<GetEnsNameReturnType>;
+   /**
+    * Gets resolver for ENS name.
+    *
+@@ -788,8 +813,8 @@ export type PublicActions<
+    * // '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41'
+    */
+   getEnsResolver: (
+-    args: GetEnsResolverParameters,
+-  ) => Promise<GetEnsResolverReturnType>
++    args: GetEnsResolverParameters
++  ) => Promise<GetEnsResolverReturnType>;
+   /**
+    * Gets a text record for specified ENS name.
+    *
+@@ -819,7 +844,7 @@ export type PublicActions<
+    * })
+    * // 'wagmi_sh'
+    */
+-  getEnsText: (args: GetEnsTextParameters) => Promise<GetEnsTextReturnType>
++  getEnsText: (args: GetEnsTextParameters) => Promise<GetEnsTextReturnType>;
+   /**
+    * Returns a collection of historical gas information.
+    *
+@@ -843,8 +868,8 @@ export type PublicActions<
+    * })
+    */
+   getFeeHistory: (
+-    args: GetFeeHistoryParameters,
+-  ) => Promise<GetFeeHistoryReturnType>
++    args: GetFeeHistoryParameters
++  ) => Promise<GetFeeHistoryReturnType>;
+   /**
+    * Returns an estimate for the fees per gas for a transaction to be included
+    * in the next block.
+@@ -868,10 +893,10 @@ export type PublicActions<
+    */
+   estimateFeesPerGas: <
+     TChainOverride extends Chain | undefined = undefined,
+-    TType extends FeeValuesType = 'eip1559',
++    TType extends FeeValuesType = 'eip1559'
+   >(
+-    args?: EstimateFeesPerGasParameters<TChain, TChainOverride, TType>,
+-  ) => Promise<EstimateFeesPerGasReturnType>
++    args?: EstimateFeesPerGasParameters<TChain, TChainOverride, TType>
++  ) => Promise<EstimateFeesPerGasReturnType>;
+   /**
+    * Returns a list of logs or hashes based on a [Filter](/docs/glossary/terms#filter) since the last time it was called.
+    *
+@@ -956,7 +981,7 @@ export type PublicActions<
+     TEventName extends string | undefined,
+     TStrict extends boolean | undefined = undefined,
+     TFromBlock extends BlockNumber | BlockTag | undefined = undefined,
+-    TToBlock extends BlockNumber | BlockTag | undefined = undefined,
++    TToBlock extends BlockNumber | BlockTag | undefined = undefined
+   >(
+     args: GetFilterChangesParameters<
+       TFilterType,
+@@ -965,7 +990,7 @@ export type PublicActions<
+       TStrict,
+       TFromBlock,
+       TToBlock
+-    >,
++    >
+   ) => Promise<
+     GetFilterChangesReturnType<
+       TFilterType,
+@@ -975,7 +1000,7 @@ export type PublicActions<
+       TFromBlock,
+       TToBlock
+     >
+-  >
++  >;
+   /**
+    * Returns a list of event logs since the filter was created.
+    *
+@@ -1007,7 +1032,7 @@ export type PublicActions<
+     TEventName extends string | undefined,
+     TStrict extends boolean | undefined = undefined,
+     TFromBlock extends BlockNumber | BlockTag | undefined = undefined,
+-    TToBlock extends BlockNumber | BlockTag | undefined = undefined,
++    TToBlock extends BlockNumber | BlockTag | undefined = undefined
+   >(
+     args: GetFilterLogsParameters<
+       TAbi,
+@@ -1015,10 +1040,10 @@ export type PublicActions<
+       TStrict,
+       TFromBlock,
+       TToBlock
+-    >,
++    >
+   ) => Promise<
+     GetFilterLogsReturnType<TAbi, TEventName, TStrict, TFromBlock, TToBlock>
+-  >
++  >;
+   /**
+    * Returns the current price of gas (in wei).
+    *
+@@ -1037,7 +1062,7 @@ export type PublicActions<
+    * })
+    * const gasPrice = await client.getGasPrice()
+    */
+-  getGasPrice: () => Promise<GetGasPriceReturnType>
++  getGasPrice: () => Promise<GetGasPriceReturnType>;
+   /**
+    * Returns a list of event logs matching the provided parameters.
+    *
+@@ -1066,7 +1091,7 @@ export type PublicActions<
+       | undefined = TAbiEvent extends AbiEvent ? [TAbiEvent] : undefined,
+     TStrict extends boolean | undefined = undefined,
+     TFromBlock extends BlockNumber | BlockTag | undefined = undefined,
+-    TToBlock extends BlockNumber | BlockTag | undefined = undefined,
++    TToBlock extends BlockNumber | BlockTag | undefined = undefined
+   >(
+     args?: GetLogsParameters<
+       TAbiEvent,
+@@ -1074,10 +1099,10 @@ export type PublicActions<
+       TStrict,
+       TFromBlock,
+       TToBlock
+-    >,
++    >
+   ) => Promise<
+     GetLogsReturnType<TAbiEvent, TAbiEvents, TStrict, TFromBlock, TToBlock>
+-  >
++  >;
+   /**
+    * Returns the account and storage values of the specified account including the Merkle-proof.
+    *
+@@ -1102,7 +1127,7 @@ export type PublicActions<
+    *  storageKeys: ['0x...'],
+    * })
+    */
+-  getProof: (args: GetProofParameters) => Promise<GetProofReturnType>
++  getProof: (args: GetProofParameters) => Promise<GetProofReturnType>;
+   /**
+    * Returns an estimate for the max priority fee per gas (in wei) for a transaction
+    * to be included in the next block.
+@@ -1124,10 +1149,10 @@ export type PublicActions<
+    * // 10000000n
+    */
+   estimateMaxPriorityFeePerGas: <
+-    TChainOverride extends Chain | undefined = undefined,
++    TChainOverride extends Chain | undefined = undefined
+   >(
+-    args?: EstimateMaxPriorityFeePerGasParameters<TChain, TChainOverride>,
+-  ) => Promise<EstimateMaxPriorityFeePerGasReturnType>
++    args?: EstimateMaxPriorityFeePerGasParameters<TChain, TChainOverride>
++  ) => Promise<EstimateMaxPriorityFeePerGasReturnType>;
+   /**
+    * Returns the value from a storage slot at a given address.
+    *
+@@ -1152,8 +1177,8 @@ export type PublicActions<
+    * })
+    */
+   getStorageAt: (
+-    args: GetStorageAtParameters,
+-  ) => Promise<GetStorageAtReturnType>
++    args: GetStorageAtParameters
++  ) => Promise<GetStorageAtReturnType>;
+   /**
+    * Returns information about a [Transaction](https://viem.sh/docs/glossary/terms#transaction) given a hash or block identifier.
+    *
+@@ -1177,8 +1202,8 @@ export type PublicActions<
+    * })
+    */
+   getTransaction: <TBlockTag extends BlockTag = 'latest'>(
+-    args: GetTransactionParameters<TBlockTag>,
+-  ) => Promise<GetTransactionReturnType<TChain, TBlockTag>>
++    args: GetTransactionParameters<TBlockTag>
++  ) => Promise<GetTransactionReturnType<TChain, TBlockTag>>;
+   /**
+    * Returns the number of blocks passed (confirmations) since the transaction was processed on a block.
+    *
+@@ -1202,8 +1227,8 @@ export type PublicActions<
+    * })
+    */
+   getTransactionConfirmations: (
+-    args: GetTransactionConfirmationsParameters<TChain>,
+-  ) => Promise<GetTransactionConfirmationsReturnType>
++    args: GetTransactionConfirmationsParameters<TChain>
++  ) => Promise<GetTransactionConfirmationsReturnType>;
+   /**
+    * Returns the number of [Transactions](https://viem.sh/docs/glossary/terms#transaction) an Account has broadcast / sent.
+    *
+@@ -1226,8 +1251,8 @@ export type PublicActions<
+    * })
+    */
+   getTransactionCount: (
+-    args: GetTransactionCountParameters,
+-  ) => Promise<GetTransactionCountReturnType>
++    args: GetTransactionCountParameters
++  ) => Promise<GetTransactionCountReturnType>;
+   /**
+    * Returns the [Transaction Receipt](https://viem.sh/docs/glossary/terms#transaction-receipt) given a [Transaction](https://viem.sh/docs/glossary/terms#transaction) hash.
+    *
+@@ -1251,8 +1276,8 @@ export type PublicActions<
+    * })
+    */
+   getTransactionReceipt: (
+-    args: GetTransactionReceiptParameters,
+-  ) => Promise<GetTransactionReceiptReturnType<TChain>>
++    args: GetTransactionReceiptParameters
++  ) => Promise<GetTransactionReceiptReturnType<TChain>>;
+   /**
+    * Similar to [`readContract`](https://viem.sh/docs/contract/readContract), but batches up multiple functions on a contract in a single RPC call via the [`multicall3` contract](https://github.com/mds1/multicall).
+    *
+@@ -1292,10 +1317,10 @@ export type PublicActions<
+    */
+   multicall: <
+     const contracts extends readonly unknown[],
+-    allowFailure extends boolean = true,
++    allowFailure extends boolean = true
+   >(
+-    args: MulticallParameters<contracts, allowFailure>,
+-  ) => Promise<MulticallReturnType<contracts, allowFailure>>
++    args: MulticallParameters<contracts, allowFailure>
++  ) => Promise<MulticallReturnType<contracts, allowFailure>>;
+   /**
+    * Prepares a transaction request for signing.
+    *
+@@ -1340,7 +1365,7 @@ export type PublicActions<
+       TChainOverride
+     >,
+     TChainOverride extends Chain | undefined = undefined,
+-    TAccountOverride extends Account | Address | undefined = undefined,
++    TAccountOverride extends Account | Address | undefined = undefined
+   >(
+     args: PrepareTransactionRequestParameters<
+       TChain,
+@@ -1348,7 +1373,7 @@ export type PublicActions<
+       TChainOverride,
+       TAccountOverride,
+       TRequest
+-    >,
++    >
+   ) => Promise<
+     PrepareTransactionRequestReturnType<
+       Chain,
+@@ -1358,7 +1383,7 @@ export type PublicActions<
+       // @ts-expect-error
+       TRequest
+     >
+-  >
++  >;
+   /**
+    * Calls a read-only function on a contract, and returns the response.
+    *
+@@ -1393,10 +1418,10 @@ export type PublicActions<
+   readContract: <
+     const abi extends Abi | readonly unknown[],
+     functionName extends ContractFunctionName<abi, 'pure' | 'view'>,
+-    args extends ContractFunctionArgs<abi, 'pure' | 'view', functionName>,
++    args extends ContractFunctionArgs<abi, 'pure' | 'view', functionName>
+   >(
+-    args: ReadContractParameters<abi, functionName, args>,
+-  ) => Promise<ReadContractReturnType<abi, functionName, args>>
++    args: ReadContractParameters<abi, functionName, args>
++  ) => Promise<ReadContractReturnType<abi, functionName, args>>;
+   /**
+    * Sends a **signed** transaction to the network
+    *
+@@ -1422,8 +1447,8 @@ export type PublicActions<
+    * })
+    */
+   sendRawTransaction: (
+-    args: SendRawTransactionParameters,
+-  ) => Promise<SendRawTransactionReturnType>
++    args: SendRawTransactionParameters
++  ) => Promise<SendRawTransactionReturnType>;
+   /**
+    * Simulates/validates a contract interaction. This is useful for retrieving **return data** and **revert reasons** of contract write functions.
+    *
+@@ -1463,7 +1488,7 @@ export type PublicActions<
+       functionName
+     >,
+     chainOverride extends Chain | undefined,
+-    accountOverride extends Account | Address | undefined = undefined,
++    accountOverride extends Account | Address | undefined = undefined
+   >(
+     args: SimulateContractParameters<
+       abi,
+@@ -1472,7 +1497,7 @@ export type PublicActions<
+       TChain,
+       chainOverride,
+       accountOverride
+-    >,
++    >
+   ) => Promise<
+     SimulateContractReturnType<
+       abi,
+@@ -1483,13 +1508,13 @@ export type PublicActions<
+       chainOverride,
+       accountOverride
+     >
+-  >
++  >;
+   verifyMessage: (
+-    args: VerifyMessageParameters,
+-  ) => Promise<VerifyMessageReturnType>
++    args: VerifyMessageParameters
++  ) => Promise<VerifyMessageReturnType>;
+   verifyTypedData: (
+-    args: VerifyTypedDataParameters,
+-  ) => Promise<VerifyTypedDataReturnType>
++    args: VerifyTypedDataParameters
++  ) => Promise<VerifyTypedDataReturnType>;
+   /**
+    * Destroys a Filter that was created from one of the following Actions:
+    *
+@@ -1513,8 +1538,8 @@ export type PublicActions<
+    * // true
+    */
+   uninstallFilter: (
+-    args: UninstallFilterParameters,
+-  ) => Promise<UninstallFilterReturnType>
++    args: UninstallFilterParameters
++  ) => Promise<UninstallFilterReturnType>;
+   /**
+    * Waits for the [Transaction](https://viem.sh/docs/glossary/terms#transaction) to be included on a [Block](https://viem.sh/docs/glossary/terms#block) (one confirmation), and then returns the [Transaction Receipt](https://viem.sh/docs/glossary/terms#transaction-receipt). If the Transaction reverts, then the action will throw an error.
+    *
+@@ -1554,8 +1579,8 @@ export type PublicActions<
+    * })
+    */
+   waitForTransactionReceipt: (
+-    args: WaitForTransactionReceiptParameters<TChain>,
+-  ) => Promise<WaitForTransactionReceiptReturnType<TChain>>
++    args: WaitForTransactionReceiptParameters<TChain>
++  ) => Promise<WaitForTransactionReceiptReturnType<TChain>>;
+   /**
+    * Watches and returns incoming block numbers.
+    *
+@@ -1581,8 +1606,8 @@ export type PublicActions<
+    * })
+    */
+   watchBlockNumber: (
+-    args: WatchBlockNumberParameters,
+-  ) => WatchBlockNumberReturnType
++    args: WatchBlockNumberParameters
++  ) => WatchBlockNumberReturnType;
+   /**
+    * Watches and returns information for incoming blocks.
+    *
+@@ -1609,15 +1634,15 @@ export type PublicActions<
+    */
+   watchBlocks: <
+     TIncludeTransactions extends boolean = false,
+-    TBlockTag extends BlockTag = 'latest',
++    TBlockTag extends BlockTag = 'latest'
+   >(
+     args: WatchBlocksParameters<
+       TTransport,
+       TChain,
+       TIncludeTransactions,
+       TBlockTag
+-    >,
+-  ) => WatchBlocksReturnType
++    >
++  ) => WatchBlocksReturnType;
+   /**
+    * Watches and returns emitted contract event logs.
+    *
+@@ -1650,10 +1675,10 @@ export type PublicActions<
+   watchContractEvent: <
+     const TAbi extends Abi | readonly unknown[],
+     TEventName extends ContractEventName<TAbi>,
+-    TStrict extends boolean | undefined = undefined,
++    TStrict extends boolean | undefined = undefined
+   >(
+-    args: WatchContractEventParameters<TAbi, TEventName, TStrict, TTransport>,
+-  ) => WatchContractEventReturnType
++    args: WatchContractEventParameters<TAbi, TEventName, TStrict, TTransport>
++  ) => WatchContractEventReturnType;
+   /**
+    * Watches and returns emitted [Event Logs](https://viem.sh/docs/glossary/terms#event-log).
+    *
+@@ -1691,10 +1716,10 @@ export type PublicActions<
+       | readonly AbiEvent[]
+       | readonly unknown[]
+       | undefined = TAbiEvent extends AbiEvent ? [TAbiEvent] : undefined,
+-    TStrict extends boolean | undefined = undefined,
++    TStrict extends boolean | undefined = undefined
+   >(
+-    args: WatchEventParameters<TAbiEvent, TAbiEvents, TStrict, TTransport>,
+-  ) => WatchEventReturnType
++    args: WatchEventParameters<TAbiEvent, TAbiEvents, TStrict, TTransport>
++  ) => WatchEventReturnType;
+   /**
+    * Watches and returns pending transaction hashes.
+    *
+@@ -1724,16 +1749,16 @@ export type PublicActions<
+    * })
+    */
+   watchPendingTransactions: (
+-    args: WatchPendingTransactionsParameters<TTransport>,
+-  ) => WatchPendingTransactionsReturnType
+-}
++    args: WatchPendingTransactionsParameters<TTransport>
++  ) => WatchPendingTransactionsReturnType;
++};
+ 
+ export function publicActions<
+   TTransport extends Transport = Transport,
+   TChain extends Chain | undefined = Chain | undefined,
+-  TAccount extends Account | undefined = Account | undefined,
++  TAccount extends Account | undefined = Account | undefined
+ >(
+-  client: Client<TTransport, TChain, TAccount>,
++  client: Client<TTransport, TChain, TAccount>
+ ): PublicActions<TTransport, TChain, TAccount> {
+   return {
+     call: (args) => call(client, args),
+@@ -1746,6 +1771,7 @@ export function publicActions<
+     estimateContractGas: (args) => estimateContractGas(client, args as any),
+     estimateGas: (args) => estimateGas(client, args),
+     getBalance: (args) => getBalance(client, args),
++    getBlobBaseFee: () => getBlobBaseFee(client),
+     getBlock: (args) => getBlock(client, args),
+     getBlockNumber: (args) => getBlockNumber(client, args),
+     getBlockTransactionCount: (args) => getBlockTransactionCount(client, args),
+@@ -1788,5 +1814,5 @@ export function publicActions<
+     watchContractEvent: (args) => watchContractEvent(client, args),
+     watchEvent: (args) => watchEvent(client, args),
+     watchPendingTransactions: (args) => watchPendingTransactions(client, args),
+-  }
++  };
+ }

@@ -7,7 +7,6 @@ import {
 import { Table } from '@tanstack/react-table';
 
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
-
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -21,7 +20,18 @@ interface DataTablePaginationProps<TData> {
   table: Table<TData>;
 }
 
-const DataTablePagination = <TData,>({ table }: DataTablePaginationProps<TData>) => {
+/* --------------------------------- PARENT --------------------------------- */
+/**
+ * @notice A pagination component for the DataTable
+ * @dev This component is meant to be displayed alongside the DataTable with the same
+ * table instance
+ * @param table The table instance from tanstack react-table
+ * @dev Modified from shadcn/ui
+ * @see https://ui.shadcn.com/docs/components/data-table
+ */
+const DataTablePagination = <TData,>({
+  table,
+}: DataTablePaginationProps<TData>) => {
   const isDesktop = useMediaQuery('(min-width: 768px)'); // md
 
   return (
@@ -41,7 +51,10 @@ const DataTablePagination = <TData,>({ table }: DataTablePaginationProps<TData>)
   );
 };
 
-const RowsPerPageControls = <TData,>({ table }: DataTablePaginationProps<TData>) => {
+/* ------------------------- ROWS PER PAGE CONTROLS ------------------------- */
+const RowsPerPageControls = <TData,>({
+  table,
+}: DataTablePaginationProps<TData>) => {
   return (
     <div className="flex w-full items-center justify-between gap-4">
       <p className="text-sm font-medium text-muted-foreground">Rows per page</p>
@@ -55,7 +68,7 @@ const RowsPerPageControls = <TData,>({ table }: DataTablePaginationProps<TData>)
           <SelectValue placeholder={table.getState().pagination.pageSize} />
         </SelectTrigger>
         <SelectContent side="top">
-          {[10, 20, 30, 40, 50].map((pageSize) => (
+          {[5, 10, 20, 30, 40, 50].map((pageSize) => (
             <SelectItem key={pageSize} value={`${pageSize}`}>
               {pageSize}
             </SelectItem>
@@ -66,11 +79,15 @@ const RowsPerPageControls = <TData,>({ table }: DataTablePaginationProps<TData>)
   );
 };
 
-const NavigationControls = <TData,>({ table }: DataTablePaginationProps<TData>) => {
+/* ------------------------ NAVIGATION CONTROLS ------------------------ */
+const NavigationControls = <TData,>({
+  table,
+}: DataTablePaginationProps<TData>) => {
   return (
     <div className="flex w-full items-center justify-between gap-4">
       <div className="flex items-center justify-center text-sm font-medium text-muted-foreground">
-        Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+        Page {table.getState().pagination.pageIndex + 1} of{' '}
+        {table.getPageCount()}
       </div>
       <div className="flex items-center space-x-2">
         <Button

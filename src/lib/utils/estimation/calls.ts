@@ -1,10 +1,17 @@
 import { Abi, createMemoryClient, TevmClient } from 'tevm';
+import { ContractError } from 'tevm/errors';
+import { encodeFunctionData, serializeTransaction } from 'viem';
 
+import { CustomStackSupport } from '@/lib/types/chains';
+import { TxGasUsed } from '@/lib/types/gas';
+import {
+  AirdropArgs,
+  AirdropParams,
+  AirdropUniqueId,
+  Token,
+} from '@/lib/types/solutions/airdrop';
 import { DEFAULTS } from '@/lib/constants/defaults';
 import { MOCKS } from '@/lib/constants/solutions/airdrop/mocks';
-import { AirdropArgs, AirdropParams, AirdropUniqueId, Token } from '@/lib/types/airdrop';
-import { TxGasUsed } from '@/lib/types/estimate';
-import { calculate } from '@/lib/utils/estimation/calculate';
 
 type CallReturnData = {
   gasUsed: TxGasUsed;
@@ -18,7 +25,7 @@ export type CallToLocalChain = (
   abi: Abi,
   functionName: string,
   params: AirdropParams[typeof id],
-  hasCustomStack: boolean,
+  customStack: CustomStackSupport | undefined,
 ) => Promise<CallReturnData>;
 
 type CallToLocalChain_sub = (
@@ -42,15 +49,17 @@ export const callToLocalChain: CallToLocalChain = async (
   abi,
   functionName,
   params,
-  hasCustomStack,
+  customStack,
 ) => {
-  let caller: `0x${string}` = `0x${'01'.repeat(20)}`;
-  let tokenAddress: `0x${string}` = '0x';
+  const errors: ContractError[] = [];
   const tevm = await createMemoryClient({
     fork: {
       url: `${forkUrl}${alchemyId}`,
     },
   });
+
+  let caller: `0x${string}` = `0x${'01'.repeat(20)}`;
+  let tokenAddress: `0x${string}` = '0x';
 
   // If it's a token we need to mint and approve
   // If the user provided a token, and the owner (able to mint tokens), it will mint and approve
@@ -71,8 +80,18 @@ export const callToLocalChain: CallToLocalChain = async (
     );
   }
 
-  const { value, args } = mapIdToArgs(id, abi, functionName, params, tokenAddress);
-  const { executionGasUsed, errors } = await tevm.contract({
+  const { value, args } = mapIdToArgs(
+    id,
+    abi,
+    functionName,
+    params,
+    tokenAddress,
+  );
+  const {
+    executionGasUsed,
+    errors: txErrors,
+    logs,
+  } = await tevm.contract({
     caller,
     to: contractAddress,
     value,
@@ -82,16 +101,51 @@ export const callToLocalChain: CallToLocalChain = async (
     gas: DEFAULTS.gasLimit,
     createTransaction: true,
   });
+  if (txErrors) errors.push(...txErrors);
 
-  const submissionCost = hasCustomStack
-    ? // TODO Calculate L1 submission cost
-      calculate.l1SubmissionCost()
-    : { deployment: '0', call: '0' };
+  let submissionCost = { deployment: '0', call: '0' };
+  if (customStack && customStack.oracle) {
+    const { rawData: l1submissionGasUsed, errors: l1submissionErrors } =
+      await tevm.contract({
+        caller,
+        to: customStack.oracle,
+        value: BigInt(0),
+        abi: [
+          {
+            inputs: [{ internalType: 'bytes', name: '_data', type: 'bytes' }],
+            name: 'getL1GasUsed',
+            outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+        ],
+        functionName: 'getL1GasUsed',
+        args: [
+          serializeTransaction({
+            data: encodeFunctionData({ abi, functionName, args }),
+            type: 'eip1559',
+          }),
+        ],
+        gas: DEFAULTS.gasLimit,
+      });
+
+    submissionCost = {
+      deployment: '0', // TODO Not implemented yet
+      call: l1submissionGasUsed.toString(),
+    };
+
+    if (l1submissionErrors) errors.push(...l1submissionErrors);
+  } else if (customStack) {
+    // Handle calculation without needing to call the oracle
+  }
 
   return {
     gasUsed: {
-      deployment: { root: '0', l1submission: submissionCost.deployment },
-      call: { root: executionGasUsed.toString(), l1submission: submissionCost.call },
+      deployment: { root: '0', l1Submission: '0' }, // TODO Not implemented yet
+      call: {
+        root: executionGasUsed.toString(),
+        l1Submission: submissionCost.call,
+      },
     },
     errors: errors?.map((e) => e.message) || [],
   };
@@ -101,13 +155,22 @@ export const callToLocalChain: CallToLocalChain = async (
 /*                                    CALLS                                   */
 /* -------------------------------------------------------------------------- */
 
-const mapIdToArgs: CallToLocalChain_sub = (id, abi, functionName, params, tokenAddress) => {
+const mapIdToArgs: CallToLocalChain_sub = (
+  id,
+  abi,
+  functionName,
+  params,
+  tokenAddress,
+) => {
   if (id === 'push-native') {
     const p = params as AirdropParams['push-native'];
     return { value: BigInt(p.totalAmount || '0'), args: p.args };
   } else if (id == 'push-ERC20') {
     const { args: prevArgs } = params as AirdropParams['push-ERC20'];
-    return { value: BigInt(0), args: [tokenAddress, prevArgs[1], prevArgs[2], prevArgs[3]] };
+    return {
+      value: BigInt(0),
+      args: [tokenAddress, prevArgs[1], prevArgs[2], prevArgs[3]],
+    };
   } else {
     return { value: BigInt(0), args: [] };
   }
@@ -128,8 +191,11 @@ const mintAndApprove = async (
 ): Promise<[`0x${string}`, `0x${string}`]> => {
   // TODO Is it better to just use the mock if any of the actions on provided tokens fail,
   // and tell the user? Or let them choose?
-  const tokenProvided = providedTokenAddress !== '0x' && providedtokenOwnerOrHolder !== '0x';
-  const tokenAddress = tokenProvided ? providedTokenAddress : MOCKS[token].sepoliaAddress;
+  const tokenProvided =
+    providedTokenAddress !== '0x' && providedtokenOwnerOrHolder !== '0x';
+  const tokenAddress = tokenProvided
+    ? providedTokenAddress
+    : MOCKS[token].sepoliaAddress;
   const caller = tokenProvided ? providedtokenOwnerOrHolder : mockCaller;
   let callerBalance = BigInt(0);
 
@@ -138,7 +204,7 @@ const mintAndApprove = async (
     // TODO Handle errors
     const { errors } = await tevm.setAccount({
       address: tokenAddress,
-      deployedBytecode: MOCKS.ERC20.deployedBytcode,
+      deployedBytecode: MOCKS.ERC20.deployedBytecode,
     });
   }
 
@@ -207,8 +273,8 @@ const mintAndApprove = async (
 
 const emptyCallDataWithError = (message: string): CallReturnData => ({
   gasUsed: {
-    deployment: { root: '0', l1submission: '0' },
-    call: { root: '0', l1submission: '0' },
+    deployment: { root: '0', l1Submission: '0' },
+    call: { root: '0', l1Submission: '0' },
   },
   errors: [message],
 });

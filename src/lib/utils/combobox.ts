@@ -1,9 +1,8 @@
 import { Coins } from 'lucide-react';
 
-import { AirdropMethod, Token } from '@/lib/types/airdrop';
 import { Chain } from '@/lib/types/chains';
+import { AirdropMethod, Token } from '@/lib/types/solutions/airdrop';
 import { ComboboxOption } from '@/lib/types/templates';
-
 import { Icon } from '@/components/common/icons';
 
 export const toChainOption = (chain: Chain): ComboboxOption => ({

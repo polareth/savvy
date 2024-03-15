@@ -1,5 +1,4 @@
 import type { FC, ReactNode } from 'react';
-
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -7,11 +6,21 @@ type ContainerLayoutProps = JSX.IntrinsicElements['div'] & {
   children?: ReactNode;
 };
 
-const ContainerLayout: FC<ContainerLayoutProps> = ({ className, children, ...rest }) => {
+/**
+ * @notice The container layout component for all pages
+ */
+const ContainerLayout: FC<ContainerLayoutProps> = ({
+  className,
+  children,
+  ...rest
+}) => {
   return (
     <div
       className={twMerge(
-        clsx('mx-auto w-full max-w-screen-2xl grow p-4 md:px-8 md:py-10', className),
+        clsx(
+          'mx-auto flex w-full max-w-screen-2xl grow flex-col p-4 md:px-8 md:py-10',
+          className,
+        ),
       )}
       {...rest}
     >

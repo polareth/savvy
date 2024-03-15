@@ -1,7 +1,7 @@
+import ConfigMenu from '@/components/core/selection/config-menu';
 import CostEstimation from '@/components/pages/solutions/airdrop/cost-estimation';
 import Header from '@/components/pages/solutions/airdrop/header';
 import AirdropParameters from '@/components/pages/solutions/airdrop/parameters';
-import ConfigMenu from '@/components/pages/solutions/common/config-menu';
 
 const Airdrop = () => {
   return (

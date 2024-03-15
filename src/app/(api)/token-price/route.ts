@@ -1,5 +1,6 @@
 const apiKey = process.env.COINMARKETCAP_API_KEY || '';
-const url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest';
+const url =
+  'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest';
 
 export async function GET() {
   try {

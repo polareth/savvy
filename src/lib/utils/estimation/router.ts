@@ -1,9 +1,14 @@
 import { isAddress } from 'viem';
 
-import { AirdropData, AirdropParams, AirdropSolution, AirdropUniqueId } from '@/lib/types/airdrop';
 import { ApiTevmCall } from '@/lib/types/api';
-import { Chain } from '@/lib/types/chains';
-import { GasCostEstimation, GasFeesData, TxGasUsed } from '@/lib/types/estimate';
+import { Chain, CustomStackSupport } from '@/lib/types/chains';
+import { GasCostEstimation, GasFeesConfig, TxGasUsed } from '@/lib/types/gas';
+import {
+  AirdropData,
+  AirdropParams,
+  AirdropSolution,
+  AirdropUniqueId,
+} from '@/lib/types/solutions/airdrop';
 import { calculate } from '@/lib/utils/estimation/calculate';
 import { generateRandomAirdropData } from '@/lib/utils/estimation/random';
 
@@ -16,7 +21,7 @@ type CustomTokenParams = {
 type EstimateGasCostAirdrop = (
   currentChain: Chain,
   solution: AirdropSolution,
-  gasFeesData: GasFeesData,
+  gasFeesData: GasFeesConfig,
   nativeTokenPrice: number,
   recipientCount: number,
   airdropData: AirdropData,
@@ -37,14 +42,19 @@ export const estimateGasCostAirdrop: EstimateGasCostAirdrop = async (
   customTokenParams,
 ) => {
   const { contract, deployments, id, functionName } = solution;
-  const { hasCustomStack } = currentChain;
+  const { customStack } = currentChain;
 
   /* ---------------------------------- CALL ---------------------------------- */
   // Prepare data for the call
   const forkUrl = currentChain.rpcUrl;
   const contractAddress = deployments[currentChain.config.id];
   const abi = contract.abi;
-  const params = getAirdropParams(id, recipientCount, airdropData, customTokenParams);
+  const params = getAirdropParams(
+    id,
+    recipientCount,
+    airdropData,
+    customTokenParams,
+  );
 
   // Call the local chain
   const callRes = await fetch('/local-chain-estimate', {
@@ -59,7 +69,7 @@ export const estimateGasCostAirdrop: EstimateGasCostAirdrop = async (
       abi,
       functionName,
       params,
-      hasCustomStack,
+      customStack,
     }),
   });
 
@@ -79,7 +89,7 @@ export const estimateGasCostAirdrop: EstimateGasCostAirdrop = async (
   /* ----------------------------- USD CALCULATION ---------------------------- */
   // Total fee per gas would be only the base fee for a chain with no priority fee (e.g. Arbitrum One)
   const feePerGas = gasFeesData.hasChainPriorityFee
-    ? gasFeesData.totalFeePerGas
+    ? gasFeesData.nextBaseFeePerGas + gasFeesData.priorityFeePerGas
     : gasFeesData.nextBaseFeePerGas;
 
   // Calculate costs
@@ -88,6 +98,7 @@ export const estimateGasCostAirdrop: EstimateGasCostAirdrop = async (
     callResJson.data.gasUsed,
     currentChain.config.nativeCurrency.decimals,
     nativeTokenPrice,
+    customStack,
   );
 
   return {
@@ -108,6 +119,7 @@ const getCosts = (
   gasUsed: TxGasUsed,
   decimals: number,
   nativeTokenPrice: number,
+  customStack: CustomStackSupport | undefined,
 ) => ({
   gasCostsUsd: {
     deployment: {
@@ -117,7 +129,14 @@ const getCosts = (
         decimals,
         nativeTokenPrice,
       ),
-      l1submission: '0',
+      l1Submission: customStack
+        ? calculate[customStack.model].l1SubmissionGasUsedAndFeeToUsd(
+            Number(30000000000), // TODO Implement base fee for the underlying as well
+            Number(gasUsed.deployment.l1Submission),
+            decimals,
+            nativeTokenPrice,
+          )
+        : '0',
     },
     call: {
       root: calculate.gasUsedAndFeeToUsd(
@@ -126,17 +145,44 @@ const getCosts = (
         decimals,
         nativeTokenPrice,
       ),
-      l1submission: '0',
+      l1Submission: customStack
+        ? calculate[customStack.model].l1SubmissionGasUsedAndFeeToUsd(
+            Number(30000000000), // TODO Implement base fee for the underlying as well
+            Number(gasUsed.call.l1Submission),
+            decimals,
+            nativeTokenPrice,
+          )
+        : '0',
     },
   },
   gasCostsNative: {
     deployment: {
-      root: calculate.gasUsedAndFeeToNative(feePerGas, Number(gasUsed.deployment.root), decimals),
-      l1submission: '0',
+      root: calculate.gasUsedAndFeeToNative(
+        feePerGas,
+        Number(gasUsed.deployment.root),
+        decimals,
+      ),
+      l1Submission: customStack
+        ? calculate[customStack.model].l1SubmissionGasUsedAndFeeToNative(
+            Number(30000000000), // TODO Implement base fee for the underlying as well
+            Number(gasUsed.deployment.l1Submission),
+            decimals,
+          )
+        : '0',
     },
     call: {
-      root: calculate.gasUsedAndFeeToNative(feePerGas, Number(gasUsed.call.root), decimals),
-      l1submission: '0',
+      root: calculate.gasUsedAndFeeToNative(
+        feePerGas,
+        Number(gasUsed.call.root),
+        decimals,
+      ),
+      l1Submission: customStack
+        ? calculate[customStack.model].l1SubmissionGasUsedAndFeeToNative(
+            Number(30000000000), // TODO Implement base fee for the underlying as well
+            Number(gasUsed.call.l1Submission),
+            decimals,
+          )
+        : '0',
     },
   },
 });
@@ -188,7 +234,10 @@ const getAirdropParams = (
   }
 };
 
-const extractOrRandomAirdropData = (recipientCount: number, airdropData: AirdropData) => {
+const extractOrRandomAirdropData = (
+  recipientCount: number,
+  airdropData: AirdropData,
+) => {
   // we already made sure recipients.length === amounts.length
   if (airdropData.recipients.length > 0) {
     const { recipients, amounts, ids } = airdropData;
@@ -196,14 +245,20 @@ const extractOrRandomAirdropData = (recipientCount: number, airdropData: Airdrop
       recipients,
       amounts,
       ids,
-      totalAmount: amounts.reduce((acc, amount) => acc + BigInt(amount), BigInt(0)).toString(),
+      totalAmount: amounts
+        .reduce((acc, amount) => acc + BigInt(amount), BigInt(0))
+        .toString(),
     };
   }
 
   return generateRandomAirdropData(recipientCount);
 };
 
-const generateMerkleRoot = (recipients: string[], amounts: string[], ids?: string[]) => {
+const generateMerkleRoot = (
+  recipients: string[],
+  amounts: string[],
+  ids?: string[],
+) => {
   return '';
 };
 
@@ -214,7 +269,7 @@ const generateMerkleRoot = (recipients: string[], amounts: string[], ids?: strin
 const emptyGasCostEstimationWithError = (
   chain: Chain,
   solution: AirdropSolution,
-  gasFeesData: GasFeesData,
+  gasFeesData: GasFeesConfig,
   error: string,
 ) => {
   return {
@@ -225,16 +280,16 @@ const emptyGasCostEstimationWithError = (
       nativeTokenPrice: 0,
     },
     gasUsed: {
-      deployment: { root: '0', l1submission: '0' },
-      call: { root: '0', l1submission: '0' },
+      deployment: { root: '0', l1Submission: '0' },
+      call: { root: '0', l1Submission: '0' },
     },
     gasCostsUsd: {
-      deployment: { root: '0', l1submission: '0' },
-      call: { root: '0', l1submission: '0' },
+      deployment: { root: '0', l1Submission: '0' },
+      call: { root: '0', l1Submission: '0' },
     },
     gasCostsNative: {
-      deployment: { root: '0', l1submission: '0' },
-      call: { root: '0', l1submission: '0' },
+      deployment: { root: '0', l1Submission: '0' },
+      call: { root: '0', l1Submission: '0' },
     },
     error,
   };

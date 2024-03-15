@@ -1,18 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { GasCostEstimation } from '@/lib/types/gas';
 import { useSelectionStore } from '@/lib/store/use-selection';
-import { GasCostEstimation } from '@/lib/types/estimate';
 import { toastErrorWithContact } from '@/lib/utils';
 import { estimateGasCostAirdrop } from '@/lib/utils/estimation/router';
-
-import TooltipConditional from '@/components/common/tooltip-conditional';
-import DataTableEstimation from '@/components/pages/solutions/airdrop/data-table-estimation';
 import { Button } from '@/components/ui/button';
+import TooltipResponsive from '@/components/common/tooltip-responsive';
+import DataTableEstimation from '@/components/pages/solutions/airdrop/data-table-estimation';
 
 const CostEstimation = () => {
   const [loading, setLoading] = useState(false);
@@ -21,14 +19,19 @@ const CostEstimation = () => {
   const [estimation, setEstimation] = useState<GasCostEstimation | null>(null);
 
   /* --------------------------------- stores --------------------------------- */
-  const { chainOption, gasFeesData, nativeTokenPrice, setFormDisabled, getCurrentChain } =
-    useSelectionStore.global((state) => ({
-      chainOption: state.chainOption,
-      gasFeesData: state.gasFeesData,
-      nativeTokenPrice: state.nativeTokenPrice,
-      setFormDisabled: state.setFormDisabled,
-      getCurrentChain: state.getCurrentChain,
-    }));
+  const {
+    chainOption,
+    gasFeesData,
+    nativeTokenPrice,
+    setSelectionDisabled,
+    getCurrentChain,
+  } = useSelectionStore.global((state) => ({
+    chainOption: state.chainOption,
+    gasFeesData: state.gasFeesData,
+    nativeTokenPrice: state.nativeTokenPrice,
+    setSelectionDisabled: state.setSelectionDisabled,
+    getCurrentChain: state.getCurrentChain,
+  }));
   const {
     tokenOption,
     methodOption,
@@ -77,7 +80,7 @@ const CostEstimation = () => {
     }
 
     setLoading(true);
-    setFormDisabled(true);
+    setSelectionDisabled(true);
     const toastEstimating = toast.loading('Estimating costs...', {
       description: 'This may take a few minutes.',
       icon: <Loader2 className="mr-2 h-4 w-4 animate-spin" />,
@@ -94,6 +97,7 @@ const CostEstimation = () => {
         customTokenParams,
       );
       setEstimation(est);
+      console.log(est);
 
       if (est.error) {
         toastErrorWithContact(est.error, '', toastEstimating);
@@ -114,7 +118,7 @@ const CostEstimation = () => {
     }
 
     setLoading(false);
-    setFormDisabled(false);
+    setSelectionDisabled(false);
   };
 
   /* --------------------------------- effects -------------------------------- */
@@ -125,7 +129,8 @@ const CostEstimation = () => {
       tokenOption &&
       methodOption &&
       ((!customAirdropData.enabled && recipientsCount > 0) ||
-        (customAirdropData.enabled && customAirdropData.recipients.length > 0)) &&
+        (customAirdropData.enabled &&
+          customAirdropData.recipients.length > 0)) &&
       !loading
     ) {
       setReady(true);
@@ -146,17 +151,24 @@ const CostEstimation = () => {
   /* -------------------------------- component ------------------------------- */
   return (
     <div className="flex flex-col">
-      <TooltipConditional
-        condition={!ready && !loading}
-        tooltip="Please select a chain, a token and a method"
-      >
-        <Button className="w-full" onClick={estimateCostForSolution} disabled={!ready}>
-          {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-          Estimate cost
-        </Button>
-      </TooltipConditional>
+      <TooltipResponsive
+        trigger={
+          <Button
+            className="w-full"
+            onClick={estimateCostForSolution}
+            disabled={!ready}
+          >
+            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Estimate cost
+          </Button>
+        }
+        content="Please select a chain, a token and a method"
+        disabled={ready || loading}
+      />
       <div className="mt-4">
-        {estimation || loading ? <DataTableEstimation data={estimation} loading={loading} /> : null}
+        {estimation || loading ? (
+          <DataTableEstimation data={estimation} loading={loading} />
+        ) : null}
       </div>
     </div>
   );

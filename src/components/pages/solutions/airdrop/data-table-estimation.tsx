@@ -1,21 +1,22 @@
 'use client';
 
-import Link from 'next/link';
 import { FC, Fragment, useMemo } from 'react';
-
+import Link from 'next/link';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
 
+import { GasCostEstimation } from '@/lib/types/gas';
+import {
+  EstimationConfigDataType,
+  EstimationCostsDataType,
+} from '@/lib/types/templates';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
-import { GasCostEstimation } from '@/lib/types/estimate';
-import { EstimationConfigDataType, EstimationCostsDataType } from '@/lib/types/templates';
 import { cn } from '@/lib/utils';
-
-import CurrencyAmount from '@/components/common/currency-amount';
-import GweiAmount from '@/components/common/gwei-amount';
-import { Icons } from '@/components/common/icons';
-import InfoResponsive from '@/components/common/info-responsive';
-import DataTable from '@/components/templates/table/data-table';
 import {
   Accordion,
   AccordionContent,
@@ -24,6 +25,11 @@ import {
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import CurrencyAmount from '@/components/common/currency-amount';
+import GweiAmount from '@/components/common/gwei-amount';
+import { Icons } from '@/components/common/icons';
+import TooltipResponsive from '@/components/common/tooltip-responsive';
+import DataTable from '@/components/templates/table/data-table';
 
 type DataTableEstimationProps = {
   data: GasCostEstimation | null;
@@ -32,7 +38,10 @@ type DataTableEstimationProps = {
 
 const SkeletonCell = () => <Skeleton className="h-4 w-16" />;
 
-const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) => {
+const DataTableEstimation: FC<DataTableEstimationProps> = ({
+  data,
+  loading,
+}) => {
   const isLargeScreen = useMediaQuery('(min-width: 1400px)');
 
   /* -------------------------------------------------------------------------- */
@@ -51,8 +60,11 @@ const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) =>
         header: () => (
           <div className="flex items-center gap-2">
             Gas used{' '}
-            {data?.config.chain.hasCustomStack ? (
-              <InfoResponsive content="Greyed out: tx gas + submission to L1 gas" />
+            {data?.config.chain.customStack ? (
+              <TooltipResponsive
+                trigger="info"
+                content="Greyed out: tx gas + submission to L1 gas"
+              />
             ) : null}
           </div>
         ),
@@ -61,11 +73,13 @@ const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) =>
           return (
             <div className="flex flex-col gap-1">
               <span>
-                {Number(row.original.gasUsed.root) + Number(row.original.gasUsed.l1submission || 0)}
+                {Number(row.original.gasUsed.root) +
+                  Number(row.original.gasUsed.l1Submission || 0)}
               </span>
-              {row.original.gasUsed.l1submission !== '0' ? (
+              {row.original.gasUsed.l1Submission !== '0' ? (
                 <span className="text-muted-foreground">
-                  {row.original.gasUsed.root} + {row.original.gasUsed.l1submission}
+                  {row.original.gasUsed.root} +{' '}
+                  {row.original.gasUsed.l1Submission}
                 </span>
               ) : null}
             </div>
@@ -76,9 +90,13 @@ const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) =>
         accessorKey: 'costNative',
         header: () => (
           <div className="flex items-center gap-2">
-            Cost ({data?.config.chain.config.nativeCurrency.symbol || 'Native token'})
-            {data?.config.chain.hasCustomStack ? (
-              <InfoResponsive content="Greyed out: tx cost + submission to L1 cost" />
+            Cost (
+            {data?.config.chain.config.nativeCurrency.symbol || 'Native token'})
+            {data?.config.chain.customStack ? (
+              <TooltipResponsive
+                trigger="info"
+                content="Greyed out: tx cost + submission to L1 cost"
+              />
             ) : null}
           </div>
         ),
@@ -90,23 +108,32 @@ const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) =>
                 <CurrencyAmount
                   amount={
                     Number(row.original.costNative.root) +
-                    Number(row.original.costNative.l1submission || 0)
+                    Number(row.original.costNative.l1Submission || 0)
                   }
-                  symbol={data?.config.chain.config.nativeCurrency.symbol || 'Native token'}
+                  symbol={
+                    data?.config.chain.config.nativeCurrency.symbol ||
+                    'Native token'
+                  }
                 />
               </span>
-              {row.original.costNative.l1submission !== '0' ? (
+              {row.original.costNative.l1Submission !== '0' ? (
                 <span className="text-muted-foreground">
                   <CurrencyAmount
                     amount={Number(row.original.costNative.root)}
-                    symbol={data?.config.chain.config.nativeCurrency.symbol || 'Native token'}
-                    noIcon
+                    symbol={
+                      data?.config.chain.config.nativeCurrency.symbol ||
+                      'Native token'
+                    }
+                    icon={false}
                   />{' '}
                   +{' '}
                   <CurrencyAmount
-                    amount={Number(row.original.costNative.l1submission || 0)}
-                    symbol={data?.config.chain.config.nativeCurrency.symbol || 'Native token'}
-                    noIcon
+                    amount={Number(row.original.costNative.l1Submission || 0)}
+                    symbol={
+                      data?.config.chain.config.nativeCurrency.symbol ||
+                      'Native token'
+                    }
+                    icon={false}
                   />
                 </span>
               ) : null}
@@ -119,8 +146,11 @@ const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) =>
         header: () => (
           <div className="flex items-center gap-2">
             Cost (USD)
-            {data?.config.chain.hasCustomStack ? (
-              <InfoResponsive content="Greyed out: tx cost + submission to L1 cost" />
+            {data?.config.chain.customStack ? (
+              <TooltipResponsive
+                trigger="info"
+                content="Greyed out: tx cost + submission to L1 cost"
+              />
             ) : null}
           </div>
         ),
@@ -132,16 +162,20 @@ const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) =>
                 <CurrencyAmount
                   amount={
                     Number(row.original.costUsd.root) +
-                    Number(row.original.costUsd.l1submission || 0)
+                    Number(row.original.costUsd.l1Submission || 0)
                   }
                   symbol="USD"
                 />
               </span>
-              {row.original.costUsd.l1submission !== '0' ? (
+              {row.original.costUsd.l1Submission !== '0' ? (
                 <span className="text-muted-foreground">
-                  <CurrencyAmount amount={Number(row.original.costUsd.root)} symbol="USD" /> +{' '}
                   <CurrencyAmount
-                    amount={Number(row.original.costUsd.l1submission || 0)}
+                    amount={Number(row.original.costUsd.root)}
+                    symbol="USD"
+                  />{' '}
+                  +{' '}
+                  <CurrencyAmount
+                    amount={Number(row.original.costUsd.l1Submission || 0)}
                     symbol="USD"
                   />
                 </span>
@@ -164,15 +198,15 @@ const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) =>
         name: 'Deployment',
         gasUsed: {
           root: data.gasUsed.deployment.root,
-          l1submission: data.gasUsed.deployment.l1submission,
+          l1Submission: data.gasUsed.deployment.l1Submission,
         },
         costNative: {
           root: data.gasCostsNative.deployment.root,
-          l1submission: data.gasCostsNative.deployment.l1submission,
+          l1Submission: data.gasCostsNative.deployment.l1Submission,
         },
         costUsd: {
           root: data.gasCostsUsd.deployment.root,
-          l1submission: data.gasCostsUsd.deployment.l1submission,
+          l1Submission: data.gasCostsUsd.deployment.l1Submission,
         },
       });
     }
@@ -181,15 +215,15 @@ const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) =>
       name: 'Call',
       gasUsed: {
         root: data.gasUsed.call.root,
-        l1submission: data.gasUsed.call.l1submission,
+        l1Submission: data.gasUsed.call.l1Submission,
       },
       costNative: {
         root: data.gasCostsNative.call.root,
-        l1submission: data.gasCostsNative.call.l1submission,
+        l1Submission: data.gasCostsNative.call.l1Submission,
       },
       costUsd: {
         root: data.gasCostsUsd.call.root,
-        l1submission: data.gasCostsUsd.call.l1submission,
+        l1Submission: data.gasCostsUsd.call.l1Submission,
       },
     });
 
@@ -211,7 +245,8 @@ const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) =>
       {
         accessorKey: 'chainName',
         header: 'Chain',
-        cell: ({ row }) => (loading ? <SkeletonCell /> : row.original.chainName),
+        cell: ({ row }) =>
+          loading ? <SkeletonCell /> : row.original.chainName,
       },
       {
         accessorKey: 'feePerGas',
@@ -219,18 +254,29 @@ const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) =>
         cell: ({ row }) => {
           if (loading) return <SkeletonCell />;
           return (
-            <span className={cn('flex gap-2', isLargeScreen && 'flex-col gap-1')}>
+            <span
+              className={cn('flex gap-2', isLargeScreen && 'flex-col gap-1')}
+            >
               {data?.config.gasFeesData.hasChainPriorityFee ? (
                 <>
                   <span className="whitespace-nowrap">
                     <GweiAmount
-                      amount={row.original.baseFeePerGas + row.original.priorityFeePerGas}
+                      amount={
+                        row.original.baseFeePerGas +
+                        row.original.priorityFeePerGas
+                      }
                     />
                   </span>
                   <span className="text-muted-foreground">
                     {isLargeScreen ? '' : '('}
-                    <GweiAmount amount={row.original.baseFeePerGas} noUnit /> +{' '}
-                    <GweiAmount amount={row.original.priorityFeePerGas} noUnit />
+                    <GweiAmount
+                      amount={row.original.baseFeePerGas}
+                      noUnit
+                    /> +{' '}
+                    <GweiAmount
+                      amount={row.original.priorityFeePerGas}
+                      noUnit
+                    />
                     {isLargeScreen ? '' : ')'}
                   </span>
                 </>
@@ -243,12 +289,17 @@ const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) =>
       },
       {
         accessorKey: 'nativeTokenPrice',
-        header: `${data?.config.chain.config.nativeCurrency.symbol || 'Native token'} price`,
+        header: `${
+          data?.config.chain.config.nativeCurrency.symbol || 'Native token'
+        } price`,
         cell: ({ row }) =>
           loading ? (
             <SkeletonCell />
           ) : (
-            <CurrencyAmount amount={row.original.nativeTokenPrice} symbol="USD" />
+            <CurrencyAmount
+              amount={row.original.nativeTokenPrice}
+              symbol="USD"
+            />
           ),
       },
       {
@@ -260,12 +311,20 @@ const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) =>
             <div className="flex items-center gap-1">
               {row.original.contractName}
               <Button variant="ghost" size="icon" asChild>
-                <Link href={row.original.githubLink} rel="noopener noreferrer" target="_blank">
+                <Link
+                  href={row.original.githubLink}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
                   <Icons.gitHub className="h-4 w-4" />
                 </Link>
               </Button>
               <Button variant="ghost" size="icon" asChild>
-                <Link href={row.original.explorerLink} rel="noopener noreferrer" target="_blank">
+                <Link
+                  href={row.original.explorerLink}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
                   <Icons.explorer className="h-4 w-4" />
                 </Link>
               </Button>
@@ -276,7 +335,8 @@ const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) =>
       {
         accessorKey: 'functionName',
         header: 'Function',
-        cell: ({ row }) => (loading ? <SkeletonCell /> : <pre>{row.original.functionName}</pre>),
+        cell: ({ row }) =>
+          loading ? <SkeletonCell /> : <pre>{row.original.functionName}</pre>,
       },
       {
         accessorKey: 'website',
@@ -307,9 +367,7 @@ const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) =>
       {
         chainName: data.config.chain.config.name,
         baseFeePerGas: Number(data.config.gasFeesData.nextBaseFeePerGas),
-        priorityFeePerGas: Number(
-          data.config.gasFeesData.totalFeePerGas - data.config.gasFeesData.nextBaseFeePerGas,
-        ),
+        priorityFeePerGas: Number(data.config.gasFeesData.priorityFeePerGas),
         nativeTokenPrice: data.config.nativeTokenPrice,
         contractName: data.config.solution.contract.name,
         functionName: data.config.solution.functionName,
@@ -358,7 +416,10 @@ const DataTableEstimation: FC<DataTableEstimationProps> = ({ data, loading }) =>
                       <span className="font-medium text-muted-foreground">
                         {flexRender<any>(cell.column.columnDef.header, {})}
                       </span>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </Fragment>
                   ))}
                 </div>

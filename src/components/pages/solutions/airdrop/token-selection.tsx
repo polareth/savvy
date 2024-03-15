@@ -2,11 +2,10 @@
 
 import { useMemo } from 'react';
 
+import { ComboboxOption } from '@/lib/types/templates';
 import { AIRDROP_TOKENS } from '@/lib/constants/solutions/airdrop';
 import { useSelectionStore } from '@/lib/store/use-selection';
-import { ComboboxOption } from '@/lib/types/templates';
 import { toTokenOption } from '@/lib/utils/combobox';
-
 import { Icon, Icons } from '@/components/common/icons';
 import ComboBoxResponsive from '@/components/templates/combobox-responsive';
 
@@ -16,11 +15,13 @@ const TokenSelection = () => {
     setToken: state.setTokenOption,
   }));
 
-  const { chainOption, formDisabled, getCurrentChain } = useSelectionStore.global((state) => ({
-    chainOption: state.chainOption,
-    formDisabled: state.formDisabled,
-    getCurrentChain: state.getCurrentChain,
-  }));
+  const { chainOption, loadingAny, getCurrentChain } = useSelectionStore.global(
+    (state) => ({
+      chainOption: state.chainOption,
+      loadingAny: state.loadingAny,
+      getCurrentChain: state.getCurrentChain,
+    }),
+  );
 
   const items: ComboboxOption[] = useMemo(
     () =>
@@ -31,7 +32,9 @@ const TokenSelection = () => {
             return {
               label: `${chain.config.nativeCurrency.symbol} (native)`,
               value: token.id,
-              icon: Icons[chain.config.name.toLowerCase() as keyof typeof Icons] as Icon,
+              icon: Icons[
+                chain.config.name.toLowerCase() as keyof typeof Icons
+              ] as Icon,
             };
           }
         }
@@ -48,7 +51,7 @@ const TokenSelection = () => {
       boxWidth="w-[250px]"
       selected={token}
       setSelected={setToken}
-      disabled={formDisabled}
+      disabled={loadingAny}
     />
   );
 };

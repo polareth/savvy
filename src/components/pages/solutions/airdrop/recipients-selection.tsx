@@ -1,18 +1,14 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-
-import DataTableRecipients from './data-table-recipients';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
 
+import { Token } from '@/lib/types/solutions/airdrop';
 import { DEFAULTS } from '@/lib/constants/defaults';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { useSelectionStore } from '@/lib/store/use-selection';
-import { Token } from '@/lib/types/airdrop';
 import { cn } from '@/lib/utils';
 import { parseAirdropInput } from '@/lib/utils/parse';
-
-import TooltipAlert from '@/components/common/tooltip-alert';
 import {
   Accordion,
   AccordionContent,
@@ -20,13 +16,29 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/components/ui/drawer';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import TooltipResponsive from '@/components/common/tooltip-responsive';
+
+import DataTableRecipients from './data-table-recipients';
 
 /* -------------------------------------------------------------------------- */
 /*                                    BASE                                    */
@@ -36,7 +48,8 @@ const { count: defaultCount, min, max, step } = DEFAULTS.airdropRecipients;
 
 const RecipientsSelection = () => {
   const isDesktop = useMediaQuery('(min-width: 768px)'); // md
-  const formDisabled = useSelectionStore.global((state) => state.formDisabled);
+  const [customInput, setCustomInput] = useState('0');
+  const loadingAny = useSelectionStore.global((state) => state.loadingAny);
   const {
     customAirdropData,
     recipientsCount,
@@ -61,8 +74,16 @@ const RecipientsSelection = () => {
     } else if (tokenOption?.value === 'ERC1155') {
       return [
         ['recipient', 'tokenId', 'amount'],
-        ['0xAD285b5dF24BDE77A8391924569AF2AD2D4eE4A7', '1', '10000000000000000000'],
-        ['0xc06d127E504a944f63Bc750D8F512556c576F3EF', '2', '10000000000000000000'],
+        [
+          '0xAD285b5dF24BDE77A8391924569AF2AD2D4eE4A7',
+          '1',
+          '10000000000000000000',
+        ],
+        [
+          '0xc06d127E504a944f63Bc750D8F512556c576F3EF',
+          '2',
+          '10000000000000000000',
+        ],
       ];
     }
 
@@ -74,21 +95,31 @@ const RecipientsSelection = () => {
   }, [tokenOption]);
 
   const toggleCustomData = () => {
-    setCustomAirdropData({ ...customAirdropData, enabled: !customAirdropData.enabled });
+    setCustomAirdropData({
+      ...customAirdropData,
+      enabled: !customAirdropData.enabled,
+    });
   };
 
   return (
-    <div className={cn('flex flex-col gap-2', formDisabled && 'opacity-50')}>
-      <RecipientsAmountButton formDisabled={formDisabled} />
+    <div className={cn('flex flex-col gap-2', loadingAny && 'opacity-50')}>
+      <RecipientsAmountButton
+        loadingAny={loadingAny}
+        customInput={customInput}
+        setCustomInput={setCustomInput}
+      />
       <Slider
-        className={cn('my-2 transition-opacity md:mb-4', customAirdropData.enabled && 'opacity-50')}
+        className={cn(
+          'my-2 transition-opacity md:mb-4',
+          customAirdropData.enabled && 'opacity-50',
+        )}
         min={min}
         max={max}
         step={step}
         value={[recipientsCount]}
         defaultValue={[defaultCount]}
         onValueChange={(v) => setRecipientsCount(v[0])}
-        disabled={formDisabled || customAirdropData.enabled}
+        disabled={loadingAny || customAirdropData.enabled}
       />
 
       {isDesktop ? (
@@ -101,13 +132,16 @@ const RecipientsSelection = () => {
                 !customAirdropData.enabled && 'opacity-80',
               )}
               onClick={toggleCustomData}
-              disabled={formDisabled}
+              disabled={loadingAny}
             >
               Custom airdrop data
             </Button>
             <HoverCard>
               <HoverCardTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2 text-xs">
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-2 text-xs"
+                >
                   <InfoCircledIcon /> Supported formats
                 </Button>
               </HoverCardTrigger>
@@ -116,7 +150,10 @@ const RecipientsSelection = () => {
               </HoverCardContent>
             </HoverCard>
           </div>
-          <CustomDataInput formDisabled={formDisabled} exampleValues={exampleValues} />
+          <CustomDataInput
+            loadingAny={loadingAny}
+            exampleValues={exampleValues}
+          />
         </>
       ) : (
         <Accordion
@@ -130,11 +167,15 @@ const RecipientsSelection = () => {
         >
           <AccordionItem value="custom-data" className="border-none">
             <div className="mb-2 grid grid-cols-[1fr,min-content]">
-              <AccordionTrigger disabled={formDisabled} className="hover:no-underline" asChild>
+              <AccordionTrigger
+                disabled={loadingAny}
+                className="hover:no-underline"
+                asChild
+              >
                 <Button
                   variant={customAirdropData.enabled ? 'default' : 'secondary'}
                   className={cn(
-                    'justify-center transition-colors transition-opacity',
+                    'justify-center transition-colors',
                     !customAirdropData.enabled && 'opacity-80',
                   )}
                 >
@@ -147,14 +188,20 @@ const RecipientsSelection = () => {
                     <InfoCircledIcon />
                   </Button>
                 </DrawerTrigger>
-                <DrawerContent onClick={(e) => e.stopPropagation()} className="mb-8 px-2">
+                <DrawerContent
+                  onClick={(e) => e.stopPropagation()}
+                  className="mb-8 px-2"
+                >
                   <DrawerHeader>Supported formats</DrawerHeader>
                   <SupportedFormats exampleValues={exampleValues} />
                 </DrawerContent>
               </Drawer>
             </div>
             <AccordionContent>
-              <CustomDataInput formDisabled={formDisabled} exampleValues={exampleValues} />
+              <CustomDataInput
+                loadingAny={loadingAny}
+                exampleValues={exampleValues}
+              />
             </AccordionContent>
           </AccordionItem>
         </Accordion>
@@ -167,40 +214,53 @@ const RecipientsSelection = () => {
 /*                              RECIPIENTS AMOUNT                             */
 /* -------------------------------------------------------------------------- */
 
-const RecipientsAmountButton = ({ formDisabled }: { formDisabled: boolean }) => {
+type RecipientsAmountButtonProps = {
+  customInput: string;
+  setCustomInput: (v: string) => void;
+  loadingAny: boolean;
+};
+
+const RecipientsAmountButton: FC<RecipientsAmountButtonProps> = ({
+  customInput,
+  setCustomInput,
+  loadingAny,
+}) => {
   const isDesktop = useMediaQuery('(min-width: 768px)'); // md
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [customInput, setCustomInput] = useState('0');
 
-  const { recipientsCount, customData, setRecipientsCount } = useSelectionStore.airdrop(
-    (state) => ({
+  const { recipientsCount, customData, setRecipientsCount } =
+    useSelectionStore.airdrop((state) => ({
       recipientsCount: state.recipientsCount,
       customData: state.customAirdropData,
       setRecipientsCount: state.setRecipientsCount,
-    }),
-  );
+    }));
 
   // Check if the custom recipients amount is valid when the user closes the popover
   const checkCustomInput = (open: boolean) => {
     if (!open && customInput === '') {
-      setCustomInput('1');
       setRecipientsCount(1);
     } else if (!open && Number(customInput) <= 0) {
-      setCustomInput('1');
       setRecipientsCount(1);
     } else if (!open && Number(customInput) > 1000) {
-      setCustomInput('1000');
       setRecipientsCount(1000);
     }
 
     setDrawerOpen(open);
   };
 
+  useEffect(() => {
+    setCustomInput(recipientsCount.toString());
+  }, [recipientsCount, setCustomInput]);
+
   if (isDesktop)
     return (
       <Popover onOpenChange={(o) => checkCustomInput(o)}>
-        <PopoverTrigger asChild disabled={formDisabled}>
-          <Button className="text-sm" variant="outline" disabled={customData.enabled}>
+        <PopoverTrigger asChild disabled={loadingAny}>
+          <Button
+            className="text-sm"
+            variant="outline"
+            disabled={customData.enabled}
+          >
             <pre className="flex items-center">
               {recipientsCount} recipient
               {recipientsCount === 0 || recipientsCount === 1 ? '' : 's'}
@@ -215,12 +275,10 @@ const RecipientsAmountButton = ({ formDisabled }: { formDisabled: boolean }) => 
             style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
             value={customInput}
             onChange={(e) => {
-              if (!isNaN(Number(e.target.value.toString()))) {
-                setCustomInput(e.target.value);
+              if (!isNaN(Number(e.target.value.toString())))
                 setRecipientsCount(Number(e.target.value));
-              }
             }}
-            disabled={formDisabled}
+            disabled={loadingAny}
           />
         </PopoverContent>
       </Popover>
@@ -229,15 +287,22 @@ const RecipientsAmountButton = ({ formDisabled }: { formDisabled: boolean }) => 
   return (
     <Drawer open={drawerOpen} onOpenChange={(o) => checkCustomInput(o)}>
       <DrawerTrigger asChild>
-        <Button className="text-sm" variant="outline" disabled={customData.enabled}>
+        <Button
+          className="text-sm"
+          variant="outline"
+          disabled={customData.enabled}
+        >
           <pre>
-            {recipientsCount} recipient{recipientsCount === 0 || recipientsCount === 1 ? '' : 's'}
+            {recipientsCount} recipient
+            {recipientsCount === 0 || recipientsCount === 1 ? '' : 's'}
           </pre>
         </Button>
       </DrawerTrigger>
       <DrawerContent>
         <div className="mb-8 mt-4 flex flex-col gap-2 border-t py-2">
-          <span className="mx-4 mb-1 text-sm text-muted-foreground">Amount of recipients</span>
+          <span className="mx-4 mb-1 text-sm text-muted-foreground">
+            Amount of recipients
+          </span>
           <Input
             type="number"
             min={1}
@@ -250,10 +315,11 @@ const RecipientsAmountButton = ({ formDisabled }: { formDisabled: boolean }) => 
                 setRecipientsCount(Number(e.target.value));
               }
             }}
-            disabled={formDisabled}
+            disabled={loadingAny}
           />
           <span className="mx-4 text-sm text-muted-foreground">
-            Enter any amount between 1 and 1000 to simulate an airdrop over random recipients
+            Enter any amount between 1 and 1000 to simulate an airdrop over
+            random recipients
           </span>
         </div>
       </DrawerContent>
@@ -265,32 +331,46 @@ const RecipientsAmountButton = ({ formDisabled }: { formDisabled: boolean }) => 
 /*                                 CUSTOM DATA                                */
 /* -------------------------------------------------------------------------- */
 
-const CustomDataInput = ({
-  formDisabled,
-  exampleValues,
-}: {
-  formDisabled: boolean;
+type CustomDataInputProps = {
+  loadingAny: boolean;
   exampleValues: string[][];
+};
+
+const CustomDataInput: FC<CustomDataInputProps> = ({
+  loadingAny,
+  exampleValues,
 }) => {
   const isDesktop = useMediaQuery('(min-width: 768px)'); // md
   const [customDataInput, setCustomDataInput] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
 
-  const { customAirdropData, tokenOption, setCustomAirdropData, setRecipientsCount } =
-    useSelectionStore.airdrop((state) => ({
-      customAirdropData: state.customAirdropData,
-      tokenOption: state.tokenOption,
-      setCustomAirdropData: state.setCustomAirdropData,
-      setRecipientsCount: state.setRecipientsCount,
-    }));
+  const {
+    customAirdropData,
+    tokenOption,
+    setCustomAirdropData,
+    setRecipientsCount,
+  } = useSelectionStore.airdrop((state) => ({
+    customAirdropData: state.customAirdropData,
+    tokenOption: state.tokenOption,
+    setCustomAirdropData: state.setCustomAirdropData,
+    setRecipientsCount: state.setRecipientsCount,
+  }));
 
   useEffect(() => {
     if (customAirdropData.enabled && customDataInput !== '') {
-      const { data, errors } = parseAirdropInput(customDataInput, tokenOption.value as Token['id']);
+      const { data, errors } = parseAirdropInput(
+        customDataInput,
+        tokenOption.value as Token['id'],
+      );
       if (errors) {
         setRecipientsCount(0);
         setErrors(errors);
-        setCustomAirdropData({ recipients: [], amounts: [], ids: [], enabled: true });
+        setCustomAirdropData({
+          recipients: [],
+          amounts: [],
+          ids: [],
+          enabled: true,
+        });
 
         // console.error(errors);
       } else {
@@ -316,7 +396,9 @@ const CustomDataInput = ({
   return (
     <div className="relative flex flex-col gap-2">
       {isDesktop ? (
-        <TooltipAlert
+        <TooltipResponsive
+          trigger="alert"
+          content={errors?.join('\n')}
           classNameTrigger={cn(
             'absolute top-2 right-2',
             !customAirdropData.enabled && 'opacity-30',
@@ -324,9 +406,7 @@ const CustomDataInput = ({
             'text-destructive transition-opacity',
           )}
           classNameContent="bg-destructive"
-          content={errors?.join('\n')}
           disabled={!errors.length}
-          disableHoverable={!errors.length}
         />
       ) : null}
       <Textarea
@@ -336,7 +416,7 @@ const CustomDataInput = ({
           tokenOption?.value === 'ERC1155' ? exampleValues[2][2] : ''
         }\n...`}
         minLength={41}
-        disabled={formDisabled || !customAirdropData.enabled}
+        disabled={loadingAny || !customAirdropData.enabled}
         className={cn(
           'min-h-[80px] font-mono text-xs transition-all md:text-sm',
           errors.length && customAirdropData.enabled && 'border-destructive',
@@ -344,7 +424,10 @@ const CustomDataInput = ({
         value={customDataInput}
         onChange={(e) => setCustomDataInput(e.target.value)}
       />
-      {customAirdropData.enabled && errors.length && customDataInput !== '' && !isDesktop ? (
+      {customAirdropData.enabled &&
+      errors.length &&
+      customDataInput !== '' &&
+      !isDesktop ? (
         <div className="flex flex-col text-sm font-medium text-destructive">
           {errors.map((e, i) => (
             <span key={i}>{e}</span>
@@ -362,7 +445,11 @@ const CustomDataInput = ({
 /*                              SUPPORTED FORMATS                             */
 /* -------------------------------------------------------------------------- */
 
-const SupportedFormats = ({ exampleValues }: { exampleValues: string[][] }) => {
+type SupportedFormatsProps = {
+  exampleValues: string[][];
+};
+
+const SupportedFormats: FC<SupportedFormatsProps> = ({ exampleValues }) => {
   return (
     <div className="text-sm text-muted-foreground">
       <Tabs defaultValue="text" className="mt-1">
@@ -376,7 +463,9 @@ const SupportedFormats = ({ exampleValues }: { exampleValues: string[][] }) => {
             <span className="font-semibold">{exampleValues[0].join(' ')}</span>
             <br />
             <br />
-            {`${exampleValues[1].join(' ')}\n${exampleValues[2].join(' ')}\n...`}
+            {`${exampleValues[1].join(' ')}\n${exampleValues[2].join(
+              ' ',
+            )}\n...`}
           </pre>
         </TabsContent>
         <TabsContent value="csv" className="overflow-scroll">
@@ -384,7 +473,9 @@ const SupportedFormats = ({ exampleValues }: { exampleValues: string[][] }) => {
             <span className="font-semibold">{exampleValues[0].join(',')}</span>
             <br />
             <br />
-            {`${exampleValues[1].join(',')}\n${exampleValues[2].join(',')}\n...`}
+            {`${exampleValues[1].join(',')}\n${exampleValues[2].join(
+              ',',
+            )}\n...`}
           </pre>
         </TabsContent>
         <TabsContent value="json" className="overflow-scroll">
@@ -393,7 +484,10 @@ const SupportedFormats = ({ exampleValues }: { exampleValues: string[][] }) => {
               exampleValues
                 .slice(1)
                 .map((v) =>
-                  v.reduce((acc, val, i) => ({ ...acc, [exampleValues[0][i]]: val }), {}),
+                  v.reduce(
+                    (acc, val, i) => ({ ...acc, [exampleValues[0][i]]: val }),
+                    {},
+                  ),
                 ),
               null,
               2,

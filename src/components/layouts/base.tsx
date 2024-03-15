@@ -2,13 +2,13 @@ import type { FC, ReactNode } from 'react';
 
 import SiteHeader from '@/components/common/site-header';
 
-/* ----------------------------------- SEO ---------------------------------- */
-
-/* -------------------------------- COMPONENT ------------------------------- */
 type BaseLayoutProps = {
   children: ReactNode;
 };
 
+/**
+ * @notice The base layout component for all pages
+ */
 const BaseLayout: FC<BaseLayoutProps> = ({ children }) => {
   return (
     <>

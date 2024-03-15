@@ -1,4 +1,4 @@
-import { GasControls, TxGasUsed } from '@/lib/types/estimate';
+import { GasControls, TxGasUsed } from '@/lib/types/gas';
 
 export type ApiTevmCall = {
   status: number;

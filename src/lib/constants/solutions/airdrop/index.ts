@@ -1,11 +1,15 @@
 import { Network, PenLine, SendHorizonal } from 'lucide-react';
 
-// @ts-ignore
-import { GasliteDrop1155 } from '@/lib/constants/solutions/airdrop/contracts/GasliteDrop1155.sol';
+import {
+  AirdropMethod,
+  AirdropSolution,
+  AirdropSolutionsList,
+  Token,
+} from '@/lib/types/solutions/airdrop';
 // @ts-ignore
 import { GasliteDrop } from '@/lib/constants/solutions/airdrop/contracts/GasliteDrop.sol';
-import { AirdropMethod, AirdropSolution, AirdropSolutionsList, Token } from '@/lib/types/airdrop';
-
+// @ts-ignore
+import { GasliteDrop1155 } from '@/lib/constants/solutions/airdrop/contracts/GasliteDrop1155.sol';
 import { Icon } from '@/components/common/icons';
 
 export const AIRDROP_TOKENS: Token[] = [
@@ -16,9 +20,23 @@ export const AIRDROP_TOKENS: Token[] = [
 ];
 
 export const AIRDROP_METHODS: AirdropMethod[] = [
-  { id: 'push', label: 'Airdrop (direct transfer)', icon: SendHorizonal as Icon },
-  { id: 'merkle', label: 'Claim (merkle tree)', icon: Network as Icon, disabled: true },
-  { id: 'signature', label: 'Claim (signature)', icon: PenLine as Icon, disabled: true },
+  {
+    id: 'push',
+    label: 'Airdrop (direct transfer)',
+    icon: SendHorizonal as Icon,
+  },
+  {
+    id: 'merkle',
+    label: 'Claim (merkle tree)',
+    icon: Network as Icon,
+    disabled: true,
+  },
+  {
+    id: 'signature',
+    label: 'Claim (signature)',
+    icon: PenLine as Icon,
+    disabled: true,
+  },
 ];
 
 const findToken = (id: Token['id']): Token => {
@@ -38,7 +56,8 @@ const gasliteDrop = {
   description: 'Bulk transfers for ERC20, ERC721, and Native Network Tokens',
   tokens: [findToken('native'), findToken('ERC20'), findToken('ERC721')],
   method: findMethod('push'),
-  sourceUrl: 'https://github.com/PopPunkLLC/gaslite-core/blob/main/src/GasliteDrop.sol',
+  sourceUrl:
+    'https://github.com/PopPunkLLC/gaslite-core/blob/main/src/GasliteDrop.sol',
   website: 'https://drop.gaslite.org',
   contract: GasliteDrop,
   deployments: {
@@ -56,7 +75,8 @@ const gasliteDrop1155 = {
   description: 'Bulk transfers for ERC1155',
   tokens: [findToken('ERC1155')],
   method: findMethod('push'),
-  sourceUrl: 'https://github.com/PopPunkLLC/gaslite-core/blob/main/src/GasliteDrop1155.sol',
+  sourceUrl:
+    'https://github.com/PopPunkLLC/gaslite-core/blob/main/src/GasliteDrop1155.sol',
   website: 'https://drop.gaslite.org',
   contract: GasliteDrop1155,
   deployments: {
@@ -75,7 +95,12 @@ const gasliteDrop1155 = {
 const gasliteMerkle = {
   name: 'GasliteMerkle',
   description: 'Merkle tree-based airdrop solution',
-  tokens: [findToken('native'), findToken('ERC20'), findToken('ERC721'), findToken('ERC1155')],
+  tokens: [
+    findToken('native'),
+    findToken('ERC20'),
+    findToken('ERC721'),
+    findToken('ERC1155'),
+  ],
   method: findMethod('merkle'),
   sourceUrl: '',
   website: '',
@@ -92,7 +117,12 @@ const gasliteMerkle = {
 const gasliteSignature = {
   name: 'GasliteSignature',
   description: 'Signature-based airdrop solution',
-  tokens: [findToken('native'), findToken('ERC20'), findToken('ERC721'), findToken('ERC1155')],
+  tokens: [
+    findToken('native'),
+    findToken('ERC20'),
+    findToken('ERC721'),
+    findToken('ERC1155'),
+  ],
   method: findMethod('signature'),
   sourceUrl: '',
   website: '',
@@ -118,7 +148,11 @@ export const AIRDROP_SOLUTIONS: AirdropSolutionsList = {
       functionName: 'airdropETH',
     },
     merkle: { ...gasliteMerkle, id: 'merkle-native', functionName: '' },
-    signature: { ...gasliteSignature, id: 'signature-native', functionName: '' },
+    signature: {
+      ...gasliteSignature,
+      id: 'signature-native',
+      functionName: '',
+    },
   },
   ERC20: {
     push: {
@@ -136,7 +170,11 @@ export const AIRDROP_SOLUTIONS: AirdropSolutionsList = {
       functionName: 'airdropERC721',
     },
     merkle: { ...gasliteMerkle, id: 'merkle-ERC721', functionName: '' },
-    signature: { ...gasliteSignature, id: 'signature-ERC721', functionName: '' },
+    signature: {
+      ...gasliteSignature,
+      id: 'signature-ERC721',
+      functionName: '',
+    },
   },
   ERC1155: {
     push: {
@@ -145,6 +183,10 @@ export const AIRDROP_SOLUTIONS: AirdropSolutionsList = {
       functionName: 'airdropERC1155',
     },
     merkle: { ...gasliteMerkle, id: 'merkle-ERC1155', functionName: '' },
-    signature: { ...gasliteSignature, id: 'signature-ERC1155', functionName: '' },
+    signature: {
+      ...gasliteSignature,
+      id: 'signature-ERC1155',
+      functionName: '',
+    },
   },
 };

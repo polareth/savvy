@@ -1,19 +1,26 @@
 import { FC, useEffect, useState } from 'react';
 
-import { useSelectionStore } from '@/lib/store/use-selection';
-
 type GweiAmountProps = {
   amount: string | number | bigint;
+  decimals?: number;
   noUnit?: boolean;
 };
 
-const GweiAmount: FC<GweiAmountProps> = ({ amount, noUnit = false }) => {
+/**
+ * @notice A component to display an amount in Gwei
+ * @dev The amount is formatted according to the current chain's gas controls if they exist.
+ * @param amount The amount in Gwei
+ * @param noUnit Whether to hide the unit (Gwei) or not
+ * @returns The formatted amount in Gwei
+ */
+const GweiAmount: FC<GweiAmountProps> = ({
+  amount,
+  decimals = 2,
+  noUnit = false,
+}) => {
   const [displayed, setDisplayed] = useState<string>(amount.toString());
-  const getCurrentChain = useSelectionStore.global((state) => state.getCurrentChain);
 
   useEffect(() => {
-    const decimals = getCurrentChain()?.gasControls?.gweiDecimals ?? 2;
-
     // Convert the amount to Gwei as a number for easy manipulation and formatting
     const amountInGwei = Number(amount) / 1e9;
 
@@ -37,7 +44,7 @@ const GweiAmount: FC<GweiAmountProps> = ({ amount, noUnit = false }) => {
 
     // Update the state to display the formatted amount
     setDisplayed(formatted);
-  }, [amount, getCurrentChain]);
+  }, [amount, decimals]);
 
   return (
     <>

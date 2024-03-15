@@ -1,15 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-
 import { isAddress } from 'viem';
 
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { useSelectionStore } from '@/lib/store/use-selection';
 import { cn } from '@/lib/utils';
-
-import TooltipAlert from '@/components/common/tooltip-alert';
-import TooltipInfo from '@/components/common/tooltip-info';
 import {
   Accordion,
   AccordionContent,
@@ -19,28 +15,34 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import TooltipResponsive from '@/components/common/tooltip-responsive';
 
 const CustomTokenSelection = () => {
   const isDesktop = useMediaQuery('(min-width: 768px)'); // md
-  const formDisabled = useSelectionStore.global((state) => state.formDisabled);
-  const { customToken, toggleCustomToken } = useSelectionStore.airdrop((state) => ({
-    customToken: state.customToken,
-    toggleCustomToken: state.toggleCustomToken,
-  }));
+  const loadingAny = useSelectionStore.global((state) => state.loadingAny);
+  const { customToken, toggleCustomToken } = useSelectionStore.airdrop(
+    (state) => ({
+      customToken: state.customToken,
+      toggleCustomToken: state.toggleCustomToken,
+    }),
+  );
 
   if (isDesktop)
     return (
       <div
         className={cn(
           'mt-2 grid grid-cols-5 items-end gap-2 transition-opacity',
-          formDisabled && 'opacity-50',
+          loadingAny && 'opacity-50',
         )}
       >
         <Button
           variant={customToken ? 'default' : 'secondary'}
-          className={cn('col-span-1 transition-opacity', !customToken && 'opacity-80')}
+          className={cn(
+            'col-span-1 transition-opacity',
+            !customToken && 'opacity-80',
+          )}
           onClick={toggleCustomToken}
-          disabled={formDisabled}
+          disabled={loadingAny}
         >
           Custom token
         </Button>
@@ -59,11 +61,15 @@ const CustomTokenSelection = () => {
       }}
     >
       <AccordionItem value="token-addresses" className="border-none">
-        <AccordionTrigger disabled={formDisabled} className="hover:no-underline" asChild>
+        <AccordionTrigger
+          disabled={loadingAny}
+          className="hover:no-underline"
+          asChild
+        >
           <Button
             variant={customToken ? 'default' : 'secondary'}
             className={cn(
-              'col-span-1 w-full justify-center transition-colors transition-opacity',
+              'col-span-1 w-full justify-center transition-colors',
               !customToken && 'opacity-80',
             )}
           >
@@ -83,7 +89,7 @@ const CustomTokenSelectionInputs = () => {
   const [invalidToken, setInvalidToken] = useState<boolean>(false);
   const [invalidHolder, setInvalidHolder] = useState<boolean>(false);
 
-  const formDisabled = useSelectionStore.global((state) => state.formDisabled);
+  const loadingAny = useSelectionStore.global((state) => state.loadingAny);
   const {
     customToken,
     customTokenAddress,
@@ -123,15 +129,15 @@ const CustomTokenSelectionInputs = () => {
         >
           Token address
           {isDesktop ? (
-            <TooltipAlert
+            <TooltipResponsive
+              trigger="alert"
+              content="The address does not pass the checksum test"
+              disabled={!invalidToken}
               classNameTrigger={cn(
                 !invalidToken && 'opacity-0',
                 'text-destructive transition-opacity',
               )}
               classNameContent="bg-destructive"
-              content="The address does not pass the checksum test"
-              disabled={!invalidToken}
-              disableHoverable={!invalidToken}
             />
           ) : null}
         </Label>
@@ -139,9 +145,13 @@ const CustomTokenSelectionInputs = () => {
           id="custom-token-address"
           value={customTokenAddress}
           onChange={(e) =>
-            checkAddressAndUpdate(e.target.value, setCustomTokenAddress, setInvalidToken)
+            checkAddressAndUpdate(
+              e.target.value,
+              setCustomTokenAddress,
+              setInvalidToken,
+            )
           }
-          disabled={!customToken || formDisabled}
+          disabled={!customToken || loadingAny}
           placeholder="0x..."
         />
         {!isDesktop && invalidToken && customToken ? (
@@ -161,23 +171,23 @@ const CustomTokenSelectionInputs = () => {
           <div className="flex items-center gap-2">
             Owner/Holder
             {isDesktop ? (
-              <TooltipInfo
+              <TooltipResponsive
+                trigger="info"
                 content="The owner of the contract with the ability to mint tokens or a holder with sufficient balance to cover the airdrop"
                 disabled={!customToken}
-                disableHoverable
               />
             ) : null}
           </div>
           {isDesktop ? (
-            <TooltipAlert
+            <TooltipResponsive
+              trigger="alert"
+              content="The address does not pass the checksum test"
+              disabled={!invalidHolder}
               classNameTrigger={cn(
                 !invalidHolder && 'opacity-0',
                 'text-destructive transition-opacity',
               )}
               classNameContent="bg-destructive"
-              content="The address does not pass the checksum test"
-              disabled={!invalidHolder}
-              disableHoverable={!invalidHolder}
             />
           ) : null}
         </Label>
@@ -185,16 +195,20 @@ const CustomTokenSelectionInputs = () => {
           id="custom-token-owner-holder"
           value={customTokenOwnerOrHolder}
           onChange={(e) =>
-            checkAddressAndUpdate(e.target.value, setcustomTokenOwnerOrHolder, setInvalidHolder)
+            checkAddressAndUpdate(
+              e.target.value,
+              setcustomTokenOwnerOrHolder,
+              setInvalidHolder,
+            )
           }
-          disabled={!customToken || formDisabled}
+          disabled={!customToken || loadingAny}
           placeholder="0x..."
         />
         {!isDesktop ? (
           <div className="text-xs text-muted-foreground">
             The owner of the contract with the ability to mint tokens{' '}
-            <span className="font-semibold">or</span> a holder with sufficient balance to cover the
-            airdrop
+            <span className="font-semibold">or</span> a holder with sufficient
+            balance to cover the airdrop
           </div>
         ) : null}
         {!isDesktop && invalidHolder && customToken ? (

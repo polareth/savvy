@@ -1,5 +1,7 @@
 import { CallToLocalChain, callToLocalChain } from '@/lib/utils/estimation/calls';
 
+export const maxDuration = 300;
+
 export async function POST(req: Request) {
   try {
     const params = await req.json();

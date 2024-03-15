@@ -2,12 +2,9 @@
 
 import { FC, useState } from 'react';
 
-import { ChevronDownIcon } from 'lucide-react';
-
-import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { ComboboxOption } from '@/lib/types/templates';
+import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { cn } from '@/lib/utils';
-
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -18,7 +15,12 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Icons } from '@/components/common/icons';
 
 /* -------------------------------------------------------------------------- */
 /*                                  COMBOBOX                                  */
@@ -27,81 +29,108 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 type ComboBoxResponsiveProps = {
   items: ComboboxOption[];
   label: string;
-  boxWidth?: string;
   selected: ComboboxOption;
   setSelected: (item: ComboboxOption) => void;
   header?: string;
   disabled?: boolean;
-  minimalDisplay?: boolean;
+  className?: string;
 };
 
+/**
+ * @notice A responsive combobox that will display a popover on desktop and a drawer on mobile
+ * @param items The list of items to display
+ * @param label The label to display on the button
+ * @param selected The currently selected item
+ * @param setSelected The function triggered when an item is selected
+ * @param header The header to display in the drawer (default: 'Select a {label}')
+ * @param disabled Whether the whole combobox is disabled (default: false)
+ * @param className Additional classses to apply to the button
+ * @dev Modified from shadcn/ui
+ * @see https://ui.shadcn.com/docs/components/combobox
+ */
 const ComboBoxResponsive: FC<ComboBoxResponsiveProps> = (props) => {
-  const { label, boxWidth, selected, disabled, header, minimalDisplay, setSelected } = props;
-  const [open, setOpen] = useState(false);
+  const { label, className, selected, setSelected, header, disabled } = props;
+  const [open, setOpen] = useState<boolean>(false);
+
   const isDesktop = useMediaQuery('(min-width: 768px)'); // md
 
+  /* --------------------------------- DESKTOP -------------------------------- */
   if (isDesktop) {
     return (
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild disabled={disabled}>
           <Button
             variant="outline"
-            className={cn('flex items-center justify-start', boxWidth || 'w-full')}
+            className={cn(
+              'flex w-[250px] items-center justify-start',
+              className,
+            )}
           >
             {selected ? (
               <>
                 {selected.icon ? (
                   <selected.icon
                     className="mr-2 h-4 w-4"
-                    style={{ stroke: selected.iconColor || 'currentColor' }}
+                    style={{ stroke: selected.iconColor || '' }}
                   />
                 ) : null}
                 {selected.label}
               </>
             ) : (
               <>
-                <ChevronDownIcon className="mr-2 h-4 w-4" /> {label}
+                <Icons.down className="mr-2 h-4 w-4" /> {label}
               </>
             )}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[250px] p-0" align="start">
-          <ItemList setOpen={setOpen} setSelectedItem={setSelected} {...props} />
+          <ItemList
+            setOpen={setOpen}
+            setSelectedItem={setSelected}
+            {...props}
+          />
         </PopoverContent>
       </Popover>
     );
   }
 
+  /* --------------------------------- MOBILE --------------------------------- */
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button
           variant="outline"
-          className={cn('flex items-center justify-start', !minimalDisplay && 'w-[250px]')}
+          className={cn('flex w-[250px] items-center justify-start', className)}
         >
           {selected ? (
             <>
               {selected.icon ? (
                 <selected.icon
                   className="h-4 w-4"
-                  style={{ stroke: selected.iconColor || 'currentColor' }}
+                  style={{ stroke: selected.iconColor || '' }}
                 />
               ) : null}
-              {minimalDisplay ? null : (
-                <span className={cn(selected.icon && 'ml-2')}>{selected.label}</span>
-              )}
+              <span className={cn(selected.icon && 'ml-2')}>
+                {selected.label}
+              </span>
             </>
           ) : (
             <>
-              <ChevronDownIcon className="mr-2 h-4 w-4" /> {label}
+              <Icons.down className="mr-2 h-4 w-4" /> {label}
             </>
           )}
         </Button>
       </DrawerTrigger>
       <DrawerContent>
-        <span className="mt-2 text-center font-medium text-muted-foreground">{header}</span>
+        <span className="mt-2 text-center font-medium text-muted-foreground">
+          {header}
+        </span>
         <div className="mt-4 border-t">
-          <ItemList setOpen={setOpen} setSelectedItem={setSelected} {...props} />
+          <ItemList
+            setOpen={setOpen}
+            setSelectedItem={setSelected}
+            {...props}
+          />
         </div>
       </DrawerContent>
     </Drawer>
@@ -119,7 +148,12 @@ type ItemListProps = {
   setSelectedItem: (item: ComboboxOption) => void;
 };
 
-const ItemList: FC<ItemListProps> = ({ items, label, setOpen, setSelectedItem }) => {
+const ItemList: FC<ItemListProps> = ({
+  items,
+  label,
+  setOpen,
+  setSelectedItem,
+}) => {
   return (
     <Command>
       <CommandInput placeholder={`Filter ${label.toLowerCase()}s...`} />
@@ -130,25 +164,18 @@ const ItemList: FC<ItemListProps> = ({ items, label, setOpen, setSelectedItem })
             <CommandItem
               key={item.value}
               value={item.value.toString()}
-              disabled={item.disabled}
               onSelect={(value) => {
                 setSelectedItem(
                   items.find(
-                    (priority) => priority.value.toString().toLowerCase() === value.toLowerCase(),
+                    (priority) =>
+                      priority.value.toString().toLowerCase() ===
+                      value.toLowerCase(),
                   ) || items[0],
                 );
                 setOpen(false);
               }}
             >
-              <div className="flex items-center">
-                {item.icon ? (
-                  <item.icon
-                    className="mr-2 h-4 w-4"
-                    style={{ stroke: item.iconColor || 'currentColor' }}
-                  />
-                ) : null}
-                {item.label}
-              </div>
+              <div className="flex items-center">{item.label}</div>
             </CommandItem>
           ))}
         </CommandGroup>

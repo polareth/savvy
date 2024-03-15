@@ -1,12 +1,9 @@
 'use client';
 
 import { ReactNode } from 'react';
-
 import { flexRender, Table as TableInterface } from '@tanstack/react-table';
 
 import { cn } from '@/lib/utils';
-
-import DataTablePagination from '@/components/templates/table/pagination';
 import {
   Table,
   TableBody,
@@ -15,23 +12,41 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import DataTablePagination from '@/components/templates/table/pagination';
 
 type DataTableProps<TData> = {
   table: TableInterface<TData>;
   header: ReactNode;
+  noDataLabel?: string;
   pagination?: boolean;
   className?: string;
 };
 
+/**
+ * @notice A table component that uses tanstack react-table and shadcn
+ * @dev This component is meant as a generic template for better consistency across the app
+ * @param table The table instance from tanstack react-table
+ * @param header A header displayed above the table
+ * @param noDataLabel A label to display when there is no data (default: 'No results.')
+ * @param pagination Whether to display pagination (default: false)
+ * @param className Additional classes to apply to the wrapper
+ * @dev Modified from shadcn/ui
+ * @see https://ui.shadcn.com/docs/components/data-table
+ */
 const DataTable = <TData,>({
   table,
   header,
+  noDataLabel = 'No results.',
   pagination = false,
   className,
 }: DataTableProps<TData>) => {
   return (
     <div className={cn('flex flex-col gap-2 rounded-md pb-2', className)}>
-      <div className="flex items-center justify-between gap-4 p-2">{header}</div>
+      {header ? (
+        <div className="flex items-center justify-between gap-4 p-2">
+          {header}
+        </div>
+      ) : null}
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -41,7 +56,10 @@ const DataTable = <TData,>({
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                   </TableHead>
                 );
               })}
@@ -51,7 +69,10 @@ const DataTable = <TData,>({
         <TableBody>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && 'selected'}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="font-mono">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -61,8 +82,11 @@ const DataTable = <TData,>({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={table.getAllColumns().length} className="h-24 text-center">
-                No results.
+              <TableCell
+                colSpan={table.getAllColumns().length}
+                className="h-24 text-center"
+              >
+                {noDataLabel}
               </TableCell>
             </TableRow>
           )}
@@ -72,45 +96,5 @@ const DataTable = <TData,>({
     </div>
   );
 };
-
-// type DataTableSkeletonProps = {
-//   columns: ColumnDef<>[];
-//   rows: number;
-//   className?: string;
-// };
-
-// export const DataTableSkeleton = ({ columns, rows, className }: DataTableSkeletonProps) => {
-//   return (
-//     <div className={cn('flex flex-col gap-2 rounded-md pb-2', className)}>
-//       <div className="flex items-center justify-between gap-4 p-2">
-//         {columns.map((column) => (
-//           <Skeleton key={column.id} className="h-8 w-full" />
-//         ))}
-//       </div>
-//       <Table>
-//         <TableHeader>
-//           <TableRow>
-//             {columns.map((column) => (
-//               <TableHead key={column.id}>
-//                 <Skeleton className="h-8 w-full" />
-//               </TableHead>
-//             ))}
-//           </TableRow>
-//         </TableHeader>
-//         <TableBody>
-//           {Array.from({ length: rows }).map((_, index) => (
-//             <TableRow key={index}>
-//               {columns.map((column) => (
-//                 <TableCell key={column.id} className="h-8">
-//                   <Skeleton className="h-8 w-full" />
-//                 </TableCell>
-//               ))}
-//             </TableRow>
-//           ))}
-//         </TableBody>
-//       </Table>
-//     </div>
-//   );
-// };
 
 export default DataTable;

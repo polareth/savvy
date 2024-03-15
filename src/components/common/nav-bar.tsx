@@ -1,23 +1,20 @@
 'use client';
 
-import Link, { LinkProps } from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
 import {
   ComponentPropsWithoutRef,
   ElementRef,
-  type FC,
   forwardRef,
   Fragment,
   useState,
+  type FC,
 } from 'react';
-
+import Link, { LinkProps } from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { ChevronRightIcon } from 'lucide-react';
 
-import { METADATA_BASE, NAVBAR_SOLUTIONS } from '@/lib/constants/site';
 import type { PageSlug } from '@/lib/types/site';
+import { METADATA_BASE, NAVBAR_SOLUTIONS } from '@/lib/constants/site';
 import { cn } from '@/lib/utils';
-
-import { Icons } from '@/components/common/icons';
 import { Button } from '@/components/ui/button';
 import {
   NavigationMenu,
@@ -29,12 +26,19 @@ import {
 } from '@/components/ui/navigation-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Icons } from '@/components/common/icons';
 
 type SubNavBarProps = {
   selected?: string[];
 };
 
+/**
+ * @notice The main navigation bar for the app
+ * @dev This will basically display a genuine navigation bar on desktop and a mobile-friendly one on mobile;
+ * meaning a side sheet that can be toggled with a button.
+ */
 const NavBar = () => {
+  // Find the selected page based on the current pathname to highlight
   const selected = (usePathname() as PageSlug)
     .split('/')
     .slice(1)
@@ -55,10 +59,18 @@ const NavBar = () => {
 const DesktopNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
   return (
     <nav className="z-popover pointer-events-auto mr-4 hidden items-center md:flex">
-      <Icons.logo
-        className={cn('h-8 w-8 items-center', selected[0] === '/' ? 'text-muted-foreground' : '')}
-      />
-      <NavigationMenu className="ml-4">
+      <Link
+        href="/"
+        className={cn(
+          'flex items-center gap-2 font-semibold transition-opacity duration-200 hover:opacity-75',
+          // selected[0] === '/' ? 'text-muted-foreground' : '',
+        )}
+        aria-label="Home"
+      >
+        <Icons.logo className="h-8 w-8" />
+        {METADATA_BASE.title?.toString()}
+      </Link>
+      {/* <NavigationMenu className="ml-4">
         <NavigationMenuList>
           <NavigationMenuItem>
             <NavigationMenuTrigger
@@ -103,7 +115,7 @@ const DesktopNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>
-      </NavigationMenu>
+      </NavigationMenu> */}
     </nav>
   );
 };
@@ -127,11 +139,15 @@ const MobileNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="pr-0">
-        <MobileLink href="/" className="flex items-center" onOpenChange={setOpen}>
+        <MobileLink
+          href="/"
+          className="flex items-center"
+          onOpenChange={setOpen}
+        >
           <Icons.logo className="mr-2 h-4 w-4" />
           <span className="font-bold">{METADATA_BASE.title?.toString()}</span>
         </MobileLink>
-        <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
+        {/* <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
           <div className="flex flex-col space-y-3">
             <h4 className="font-medium">Solutions</h4>
             {NAVBAR_SOLUTIONS.map((item) =>
@@ -153,7 +169,7 @@ const MobileNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
               ) : null,
             )}
           </div>
-        </ScrollArea>
+        </ScrollArea> */}
       </SheetContent>
     </Sheet>
   );
@@ -187,7 +203,9 @@ const ListItem = forwardRef<
             ) : null}
             {title}
           </div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">{children}</p>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
         </a>
       </NavigationMenuLink>
     </li>
@@ -196,13 +214,23 @@ const ListItem = forwardRef<
 
 ListItem.displayName = 'ListItem';
 
+/* -------------------------------------------------------------------------- */
+/*                                  MOBILE LINK                               */
+/* -------------------------------------------------------------------------- */
+
 type MobileLinkProps = LinkProps & {
   onOpenChange?: (open: boolean) => void;
   children: React.ReactNode;
   className?: string;
 };
 
-const MobileLink = ({ href, onOpenChange, className, children, ...props }: MobileLinkProps) => {
+const MobileLink = ({
+  href,
+  onOpenChange,
+  className,
+  children,
+  ...props
+}: MobileLinkProps) => {
   const router = useRouter();
 
   return (

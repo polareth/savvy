@@ -1,7 +1,7 @@
-import { isValidUint256 } from '.';
 import { isAddress } from 'viem';
 
-import { AirdropData, Token } from '@/lib/types/airdrop';
+import { AirdropData, Token } from '@/lib/types/solutions/airdrop';
+import { isValidUint256 } from '.';
 
 export function parseAirdropInput(
   input: string,
@@ -18,7 +18,8 @@ export function parseAirdropInput(
         (acc, item, index) => {
           const recipient: `0x${string}` = item.recipient || item.address;
           const amount: string = item.amount;
-          const id: string = item.id || item.tokenId || item.tokenID || item.token_id;
+          const id: string =
+            item.id || item.tokenId || item.tokenID || item.token_id;
 
           // Recipient
           recipient && isAddress(recipient)
@@ -27,7 +28,9 @@ export function parseAirdropInput(
 
           // Amount
           if (type === 'native' || type === 'ERC20' || type === 'ERC1155') {
-            amount ? acc.amounts.push(amount) : errors.push(`Invalid amount at index ${index}`);
+            amount
+              ? acc.amounts.push(amount)
+              : errors.push(`Invalid amount at index ${index}`);
           }
 
           // Id
@@ -118,6 +121,9 @@ export function parseAirdropInput(
 
     return { data: formatted };
   } catch (err) {
-    return { data: { recipients: [], amounts: [], ids: [] }, errors: ['Invalid input'] };
+    return {
+      data: { recipients: [], amounts: [], ids: [] },
+      errors: ['Invalid input'],
+    };
   }
 }

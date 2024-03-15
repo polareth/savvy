@@ -1,58 +1,87 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
+import { formatUnits } from 'viem';
 
+import { cn } from '@/lib/utils';
 import { Icons } from '@/components/common/icons';
-import TooltipPopoverResponsive from '@/components/common/tooltip-popover-responsive';
+import TooltipResponsive from '@/components/common/tooltip-responsive';
 
 type CurrencyAmountProps = {
   amount: string | number | bigint;
   symbol?: 'ETH' | 'MATIC' | 'USD' | string;
-  noIcon?: boolean;
+  decimals?: number;
+  full?: boolean;
+  icon?: boolean;
+  className?: string;
 };
 
-const CurrencyAmount: FC<CurrencyAmountProps> = ({ amount, symbol, noIcon = false }) => {
-  if (symbol === 'USD')
+/**
+ * @notice A component to display a currency amount with its symbol or icon
+ * @param amount The amount to display (full number including decimals)
+ * @param symbol The symbol of the currency (default: 'ETH')
+ * @param decimals The decimals of the currency (default: 18 for ETH)
+ * @param full Whether to display the full amount (default: false)
+ * @param icon Whether to display the icon of the currency (default: true)
+ * @param className Additional classes to apply to the component
+ */
+const CurrencyAmount: FC<CurrencyAmountProps> = ({
+  amount = 0,
+  symbol = 'ETH',
+  decimals = 18,
+  full = false,
+  icon = true,
+  className,
+}) => {
+  // Format the amount correctly based on the currency
+  const formatted = useMemo(() => {
+    return symbol === 'USD' ? amount : formatUnits(BigInt(amount), decimals);
+  }, [amount, symbol, decimals]);
+
+  // Format the displayed amount
+  const displayedAmount = useMemo(() => {
+    const tokenDisplayLimit = symbol === 'MATIC' ? BigInt(1e11) : BigInt(1e13);
+    const tokenDisplayPrecision = symbol === 'MATIC' ? 4 : 5;
+
+    switch (symbol) {
+      case 'USD':
+        if (Number(amount) < 0.01 && Number(amount) !== 0) return '<0.01';
+        if (Number(amount) === 0) return '0';
+        return `${parseFloat(Number(formatted).toFixed(2))}`;
+
+      default:
+        if (BigInt(amount) === BigInt(0)) return '0';
+        // 0 < amount < 0.00001 ETH || 0 < amount < 0.0000001 MATIC
+        if (BigInt(amount) < tokenDisplayLimit && BigInt(amount) > BigInt(0))
+          return '<0.00001';
+        return parseFloat(Number(formatted).toFixed(tokenDisplayPrecision));
+    }
+  }, [amount, formatted, symbol]);
+
+  // Does the currency have an icon?
+  const hasIcon = symbol === 'ETH' || symbol === 'MATIC' || symbol === 'USD';
+
+  if (full)
     return (
       <span>
-        {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-          Number(amount),
-        )}
+        {formatted.toString()} {symbol}
       </span>
     );
 
-  if (symbol === 'MATIC')
-    return (
-      <TooltipPopoverResponsive
-        trigger={
-          <span className="inline-flex items-center gap-1">
-            {noIcon ? null : <Icons.polygon className="mr-2 h-4 w-4" />}{' '}
-            {parseFloat(Number(amount).toFixed(4))}
-          </span>
-        }
-        content={`${amount.toString()} MATIC`}
-      />
-    );
-
-  if (symbol === 'ETH')
-    return (
-      <TooltipPopoverResponsive
-        trigger={
-          <span className="inline-flex items-center gap-1">
-            {noIcon ? null : <Icons.ethereum className="h-4 w-4" />}{' '}
-            {parseFloat(Number(amount).toFixed(4))}
-          </span>
-        }
-        content={`${amount.toString()} ETH`}
-      />
-    );
-
   return (
-    <TooltipPopoverResponsive
+    <TooltipResponsive
       trigger={
-        <span>
-          {Number(amount).toFixed(4)} {symbol}
-        </span>
+        <div className="inline-flex items-center gap-1">
+          {icon && symbol === 'ETH' ? (
+            <Icons.ethereum className="h-4 w-4" />
+          ) : icon && symbol === 'MATIC' ? (
+            <Icons.polygon className="h-4 w-4" />
+          ) : icon && symbol === 'USD' ? (
+            <span>$</span>
+          ) : null}
+          {displayedAmount} {!hasIcon ? symbol : null}
+        </div>
       }
-      content={`${amount.toString()} ${symbol}`}
+      content={`${formatted.toString()} ${symbol}`}
+      classNameTrigger={cn('w-min whitespace-nowrap', className)}
     />
   );
 };

@@ -1,7 +1,6 @@
 'use client';
 
 import { FC, useMemo, useState } from 'react';
-
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,13 +11,12 @@ import {
 } from '@tanstack/react-table';
 import { Search } from 'lucide-react';
 
-import { useMediaQuery } from '@/lib/hooks/use-media-query';
-import { AirdropData } from '@/lib/types/airdrop';
+import { AirdropData } from '@/lib/types/solutions/airdrop';
 import { AirdropDataType } from '@/lib/types/templates';
+import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { cn } from '@/lib/utils';
-
-import DataTable from '@/components/templates/table/data-table';
 import { Input } from '@/components/ui/input';
+import DataTable from '@/components/templates/table/data-table';
 
 type DataTableRecipientsProps = {
   data: AirdropData;
@@ -34,7 +32,9 @@ const DataTableRecipients: FC<DataTableRecipientsProps> = ({ data, keys }) => {
       keys.map((value) => ({
         accessorKey: value,
         header: () => (
-          <span className="font-semibold">{value.charAt(0).toUpperCase() + value.slice(1)}</span>
+          <span className="font-semibold">
+            {value.charAt(0).toUpperCase() + value.slice(1)}
+          </span>
         ),
       })),
     [keys],
@@ -75,22 +75,28 @@ const DataTableRecipients: FC<DataTableRecipientsProps> = ({ data, keys }) => {
             <>
               <span className="font-medium">Airdrop data</span>
               <span className="grow text-sm text-muted-foreground">
-                ({data.recipients.length} recipient{data.recipients.length > 1 && 's'})
+                ({data.recipients.length} recipient
+                {data.recipients.length > 1 && 's'})
               </span>
             </>
           ) : (
             <div className="flex flex-col whitespace-nowrap">
               <span className="font-medium">Airdrop data</span>
               <span className="grow text-sm text-muted-foreground">
-                ({data.recipients.length} recipient{data.recipients.length > 1 && 's'})
+                ({data.recipients.length} recipient
+                {data.recipients.length > 1 && 's'})
               </span>
             </div>
           )}
           <div className="relative">
             <Input
               placeholder="Filter recipients..."
-              value={(table.getColumn('recipient')?.getFilterValue() as string) ?? ''}
-              onChange={(e) => table.getColumn('recipient')?.setFilterValue(e.target.value)}
+              value={
+                (table.getColumn('recipient')?.getFilterValue() as string) ?? ''
+              }
+              onChange={(e) =>
+                table.getColumn('recipient')?.setFilterValue(e.target.value)
+              }
               className="max-w-[200px] pr-10 font-mono text-xs md:max-w-sm md:text-sm"
             />
             <Search
