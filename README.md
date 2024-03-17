@@ -1,120 +1,163 @@
-## TODO
+# savvy
 
-[ ] See this for editor (optimize-dependencies but with code editor, analyze dependencies, provide alternative, compile + deploy both contracts, run some calls and let the user know the difference): https://github.com/evmts/tevm-monorepo/blob/40263b9eb62edb557d8ddbea45d29ddf755eb1e1/examples/vite/src/SolEditor.tsx
+**An interface for the EVM on the browser, to simulate & visualize onchain activity.**
 
-- Also that to compile: https://github.com/evmts/tevm-monorepo/blob/40263b9eb62edb557d8ddbea45d29ddf755eb1e1/examples/vite/src/SolcWorker.ts
+## Table of contents
 
-[ ] Error handling: whenever an error occurs, the toast "contact" button should open a modal, with:
+<TODO> Update table of contents
 
-- a code block with all the values for the stores in json that can be copy/pasted
-- a quick and a more long version of bug reporting: quick is just drop a dm with the logs, longer would be with some details, screenshots, etc
-- maybe just automatically send/save the logs somewhere? would rather have the user decide if they want to send it or not, although the logs (stores) won't contain any sensitive information at all; or at most only send the data that comes from the app and nothing related to the user input
+- [Overview](#overview)
+- [About the project](#about-the-project)
+  - [How to use](#how-to-use)
+  - [Notes](#notes)
+- [Architecture](#architecture)
+  - [Actions (libraries, state management)](#actions-libraries-state-management)
+  - [Components](#components)
+- [Getting started](#getting-started)
+- [Acknowledgments](#acknowledgments)
+- [Contributing](#contributing)
+- [License](#license)
 
-[ ] Fix nextBaseFee => priority ratios; really bad when the base fee starts very low, as it increases way too much
+## Overview
 
-[ ] Save results history in local storage, and let the user retrieve them
+**Think ~ Etherscan + Remix**.
 
-[ ] Handle issues in retrieving token price (coinmarketcap), and other api calls as well (gas fees) => if error, use a default value & let the user choose
+Basically, it's a way to interact with a forked EVM chain, in a local-first environment, with a comprehensive set of actions/hacks/utilities exposed by Tevm—which is doing all the heavy lifting.
 
-[ ] Add guides; e.g. on airdrop page, a button in the sidebar to go to a quick guide to use it
+The state of each chain is the initial fork + all the local transactions, which are displayed in the history with all the details (data, errors, logs, inputs...).
 
-[ ] Add documentation (use vocs.dev) for both guides and breakdowns, how it works, calculations, contributing, roadmap, etc
+And also, and that's one of the main points of savvy, details on the gas usage of each transaction (fee, L1 submission fee if relevant...).
 
-[ ] Button "share results" to export them (md? pdf? json?); probably a table as well as all the details in a concise document
+You can think of it as a way of simulating a set of transactions, and visualizing the results, without having to actually send them to the network.
 
-[ ] in the local-chain api, return different error codes based on what failed, and decode them browser-side to display in the toast
+With no setup (wallet, signatures, etc.), on the browser, from any account (impersonation), with any amount of native tokens.
 
-[ ] When integrating Arbitrum, will need to change 'hasCustomStack' to differenciate OP and Arbitrum + add oracle addresses to config
+**This is a WIP, and Tevm is still under heavy development; you _will_ encounter bugs and unhandled errors. Please report them if you have the time!**
 
-[ ] Add a "underlying" property on rollups to be able to calculate the fee later, for instance the id of the underlying chain (e.g. currentChain being Optimism, we need to access the Ethereum client)
+## About the project
 
-- Use 2 gas price selection to simulate both the L2 and the L1 conditions
-- We can't just return a l1Submission string/bigint to account for that, needs more complex logic
+### Idea
 
-[ ] Allow do estimation with url query (amount of recipients, sender, token address, type…); even though drop.gaslite.org or any app can already do so with `estimateGas`, this provides a nice table with results + lets user estimate with different network conditions
+|           |                                                                                                                                                                              |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| available | run transactions in a simulated environment and remember activity on each chain                                                                                              |
+| available | mock network condition/congestion                                                                                                                                            |
+| available | estimate gas fees on EVM L1s, Polygon and OP-stack L2s                                                                                                                       |
+| todo      | provide helpers to generate mock data and quickly estimate costs for selected optimized solutions (e.g. GasliteDrop)                                                         |
+| todo      | run a tx on multiple chains and provide a comparative estimation of gas spent on each                                                                                        |
+| todo      | support Arbitrum orbit for gas fee on L1 submission                                                                                                                          |
+| todo      | paste a contract in a browser editor, deploy it and use it just like a regular forked contract                                                                               |
+| todo      | run ast on a pasted contract and provide inline recommendations to optimize both dependencies (e.g. OZ -> Solady) and known inefficient patterns                             |
+| todo      | provide selected secure and optimized contracts to deploy in a click with mock data + estimate costs (e.g. Gaslite core, Solady libs)                                        |
+| todo      | provide a rpc to publish tests to the Tevm forked chain and keep the state (already possible in the opposite way; fork a local Hardhat node to which tests can be published) |
+| todo      | wallet/social login to save transactions (sync with local storage)                                                                                                           |
 
-- also maybe if more convenient directly an api endpoint would be better? Actually maybe can be setup from vercel
+And a lot of other possibilities, although not prioritized because there are already great tools for most of these. Like:
 
-[x] REFACTORED: Put gas price & native token price inside Advanced (in a collapsible)
+- replicate transactions locally (given their hash + chain);
+- debug transactions by exploring state change;
+- copy a set of local transactions to get the multicall data and execute them on mainnet.
 
-[x] DONE: Utils to convert gwei (or anything really) based on currency; e.g. L2 on OP stack need at least 3-4 decimals when Ethereum/Polygon is ok with 2
+And any other ideas you might have (please share them).
 
-[x] REFACTORED: See if there is a "maxSupply" for the provided token (BEFORE fetching local-chain), and if so, compare it to the amount of tokens airdropped; if not enough, ask the user to provide an account that owns enough tokens
+### How to use
 
-[x] Use some kind of toggle group for recipients amount/custom data
+- **Search**
+  - Select a chain and paste the address of a contract, or click `Try with an example`.
+  - Click `Fork chain` to fork the chain again at the latest block.
+- **Caller**
+  - Enter an address to impersonate during calls; you can click `owner` to impersonate the owner of the contract if it found an appropriate method.
+  - Toggle `skip balance` to [ignore or not the native tokens balance](https://tevm.sh/reference/tevm/actions-types/type-aliases/basecallparams/#skipbalance) during calls.
+- **Low-level call**
+  - Call the current account with an arbitrary amount of native tokens and/or arbitrary encoded data.
+- **Contract interface**
+  - The ABI is displayed inside a table you can navigate through; fill the inputs if relevant, and click `Call` to send a transaction.
+  - Read methods are highlighted when they were found with certitude.
+- **Local transactions**
+  - The history of transactions displayed is the one recorded by the client for the selected chain, since the last fork.
+  - You can navigate through the history, click ↓ to see more details (data, errors, logs, inputs...), and click on an address to search for it.
 
-- when clicking on "mock" data, highlights input + slider, otherwise click on custom data (just the button like custom token but above the textarea on the left, and amount of recipients small on the right?) and highlight it and grey out the other
-- Add accordion for example data
+## Architecture
 
-[x] DONE: Add custom priority fee button, and actually move "low", "medium" and "high" to a more stealthy place like right below
+```ml
+app - "Main entry points for pages, layout and routing"
+├── (api) - "Serverless functions"
+│   └── abi - "Get the ABI of a contract (WhatsABI)"
+│   └── token-price - "Get the price of a native token (CoinMarketCap)"
+├── address
+│   └── [account] - "Account page (whenever an address is searched)"
+components - "Everything related to the UI"
+├── common - "Recurrent components across the app"
+├── config - "Independent config-related components (e.g. theme, analytics)"
+├── core - "Components related to the main logic/purpose of the app"
+├── layouts - "Layouts for the app used across all pages"
+├── templates - "Generic templates for better consistency"
+├── ui - "shadcn/ui components"
+lib - "Libraries, utilities and state management"
+├─ constants - "Constants for the site, default config, providers, starting points"
+├─ hooks - "Custom hooks (n.b. we're mostly using stores for state management)"
+├─ store - "State management (providers, config, transactions, etc.)"
+├─ tevm - "Tevm clients, calls and utilities"
+├─ types - "Type definitions that are used across multiple files"
+├─ ... - "Other libraries and utilities (e.g. WhatsABI, local storage, gas estimation)"
+styles - "Global styles, theme, and tailwind classes"
+```
 
-[x] DONE: Move everything using alchemy id in an api route, pass the chainId, the method from the client (with the params) the params and return the data; for each call to the api, decode the params using a type for this specific call (considering what should be returned)
+## Getting started
 
-[x] DONE: Put token above recipients, with a check "custom options" that opens a collapsible and sets some bool to true
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app), using [shadcn/ui](https://ui.shadcn.com/) components and design, as well as the overall project's organization. It is intended for use with the Next.js (13+) [App Router](https://nextjs.org/docs/app).
 
-[x] DONE: Same with the recipients, with a custom option to use custom addresses/amounts/(ids)
+The minimal steps to get started are:
 
----
+1. Clone the repository and navigate to this directory
+   ```bash
+   git clone git@github.com:0xpolarzero/savvy.git && cd savvy
+   ```
+2. Install the dependencies (preferably with [pnpm](https://pnpm.io))
+   ```bash
+   pnpm install
+   ```
+3. Copy the `.env.local.example` file to `.env.local` and fill in the required environment variables
+   ```bash
+   cp .env.local.example .env.local
+   # Then edit .env.local
+   # ALCHEMY_API_KEY
+   # COINMARKETCAP_API_KEY
+   # ETHERSCAN_API_KEY
+   # ARBISCAN_API_KEY
+   # BASESCAN_API_KEY
+   # OPTIMISTIC_ETHERSCAN_API_KEY
+   # POLYGONSCAN_API_KEY
+   ```
 
-## Steps
+We're using Alchemy for better modularity [when creating providers](./src/lib/constants/providers.ts#L66) and [Tevm clients](./src/lib/tevm.ts#L322), but you can replace it with any other provider, and update the way urls are created in the two aforementioned files.
 
-[x] For ERC20, just fetch the owner of the token contract (if any), and either mint as them or as the contract itself
-
-[ ] For ERC721, except if there is something better, crawl through the token IDS, see if there is an owner; if there is, impersonate them and send the token(s) to our caller, if not, mint them
-
-[ ] For ERC1155, same as ERC721, but just mint the tokens for each id
-
----
-
-## Error cases (to handle)
-
-Just search for anny "throw" and "console.error" in the code
-
-[ ] revert in a Tevm call
-
-[ ] provided arguments (addresses, amounts, ids) not valid
-
-[ ] provided token not found/issue
-
-[ ] provided owner/holder not able to mint, not holding enough tokens
-
-[ ] provided token not mintable/transferrable (see call revert)
-
----
-
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-## Getting Started
-
-First, run the development server:
+4. Run the development server
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+For any other considerations, please refer to the respective documentation for each package:
 
-## Learn More
+- [Next.js](https://nextjs.org/docs)
+- [shadcn/ui](https://ui.shadcn.com/docs)
+- [Tevm](https://tevm.sh/learn/reference)
+- [WhatsABI](https://github.com/shazow/whatsabi)
 
-To learn more about Next.js, take a look at the following resources:
+## Acknowledgments
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+You will find references to any code or ideas that were used in the project directly in the code, but here are some of the main ones:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- [shadcn/ui](https://ui.shadcn.com/): components, design, code/application structure and best practices
+- [fiveoutofnine](https://www.fiveoutofnine.com/): inspiration, best practices, organization
 
-## Deploy on Vercel
+Obviously, huge thanks and gratitude to [Will Cory](https://twitter.com/FUCORY) for the incredible work on Tevm, and for the countless advice, explanations and feedback. To [Shazow](https://twitter.com/shazow) as well for WhatsABI, and to all open-source contributors maintaining the libraries and tools we're using.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+See [License](./LICENSE).
