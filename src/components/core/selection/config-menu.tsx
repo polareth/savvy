@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Settings } from 'lucide-react';
 
+import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { useConfigStore } from '@/lib/store/use-config';
 import { useProviderStore } from '@/lib/store/use-provider';
 import { cn } from '@/lib/utils';
@@ -35,19 +36,17 @@ import NativePriceSelection from '@/components/core/selection/native-price';
  * @dev This includes the chain, gas price, native price, and caller selection.
  */
 const ConfigMenu = () => {
-  return (
-    <>
-      <ConfigMenuDesktop />
-      <ConfigMenuMobile />
-    </>
-  );
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
+  if (isMobile) return <ConfigMenuMobile />;
+  return <ConfigMenuDesktop />;
 };
 
 /* --------------------------------- DESKTOP -------------------------------- */
 const ConfigMenuDesktop = () => {
   return (
     <nav
-      className="hide-scrollbar sticky top-28 z-50 -ml-3 hidden min-w-[16rem] max-w-[16rem] flex-col gap-4 overflow-y-scroll px-0.5 md:flex lg:min-w-[18rem] lg:max-w-[18rem]"
+      className="hide-scrollbar sticky top-28 z-50 -ml-3 flex min-w-[16rem] max-w-[16rem] flex-col gap-4 overflow-y-scroll px-0.5 lg:min-w-[18rem] lg:max-w-[18rem]"
       style={{ height: 'calc(100vh - 11rem)' }}
     >
       <ChainSelection />
@@ -71,10 +70,7 @@ const ConfigMenuMobile = () => {
   return (
     <>
       <Sheet open={open} onOpenChange={(o) => setOpen(o)}>
-        <SheetTrigger
-          className="absolute right-4 top-4 md:hidden"
-          style={{ zIndex: 50 }}
-        >
+        <SheetTrigger className="absolute right-4 top-4" style={{ zIndex: 50 }}>
           <Button
             size="icon"
             variant="ghost"
