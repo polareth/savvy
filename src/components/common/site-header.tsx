@@ -1,10 +1,4 @@
-import Link from 'next/link';
-
-import { METADATA_EXTRA } from '@/lib/constants/site';
-import { buttonVariants } from '@/components/ui/button';
-import { Icons } from '@/components/common/icons';
 import NavBar from '@/components/common/nav-bar';
-import ThemeToggle from '@/components/common/theme-toggle';
 
 /**
  * @notice The site header

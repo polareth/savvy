@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { CaretUpIcon } from '@radix-ui/react-icons';
 import { Settings } from 'lucide-react';
 
 import { useConfigStore } from '@/lib/store/use-config';
@@ -21,7 +20,6 @@ import {
   SheetContent,
   SheetDescription,
   SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
 import GweiAmount from '@/components/common/gwei-amount';
