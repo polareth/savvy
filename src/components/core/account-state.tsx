@@ -59,7 +59,7 @@ const AccountState: FC<AccountStateProps> = ({ initialAddress }) => {
   // We know that if account is undefined but loading is true, the components
   // accessing account will be rendered as skeletons; if it's false, this won't be rendered at all
   return (
-    <div className="grid grid-cols-[min-content_min-content] items-center gap-x-8 gap-y-2 text-sm sm:text-base">
+    <div className="grid grid-cols-[min-content_min-content] items-center gap-x-4 gap-y-2 text-sm sm:gap-x-8 sm:text-base">
       <div className="flex items-center gap-2">
         <span className="text-sm text-gray-500">
           {!account || account.isEmpty
@@ -78,7 +78,7 @@ const AccountState: FC<AccountStateProps> = ({ initialAddress }) => {
       {loading || !account ? (
         <Skeleton className="h-6 w-24" />
       ) : (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <ShrinkedAddress
             address={account.address}
             explorer={chain.blockExplorers?.default.url}
@@ -87,7 +87,8 @@ const AccountState: FC<AccountStateProps> = ({ initialAddress }) => {
             <TooltipResponsive
               trigger={
                 <Badge variant="secondary" className="whitespace-nowrap">
-                  not initialized
+                  <span className="hidden md:block">not initialized</span>
+                  <span className="md:hidden">empty</span>
                 </Badge>
               }
               content="This account has never been initialized (0 balance, 0 nonce, no deployed bytecode)"

@@ -2,9 +2,30 @@
 
 import { useState } from 'react';
 import { CaretUpIcon } from '@radix-ui/react-icons';
+import { Settings } from 'lucide-react';
 
+import { useConfigStore } from '@/lib/store/use-config';
+import { useProviderStore } from '@/lib/store/use-provider';
 import { cn } from '@/lib/utils';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import GweiAmount from '@/components/common/gwei-amount';
+import ShrinkedAddress from '@/components/common/shrinked-address';
 import CallerSelection from '@/components/core/selection/caller';
 import ChainSelection from '@/components/core/selection/chain';
 import GasPriceSelection from '@/components/core/selection/gas-price';
@@ -43,38 +64,73 @@ const ConfigMenuDesktop = () => {
 const ConfigMenuMobile = () => {
   const [open, setOpen] = useState(false);
 
+  const chain = useProviderStore((state) => state.chain);
+  const { caller, gasFeesConfig } = useConfigStore((state) => ({
+    caller: state.caller,
+    gasFeesConfig: state.gasFeesConfig,
+  }));
+
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background px-1 shadow-lg md:hidden">
-      {/* Toggle Button */}
-      <Button
-        onClick={() => setOpen(!open)}
-        variant="ghost"
-        size="sm"
-        className="flex w-full justify-center"
-      >
-        <CaretUpIcon
-          className={cn(
-            'h-4 w-4 transition-transform duration-300',
-            open && 'rotate-180',
-          )}
-        />
-        <span className="sr-only">Toggle</span>
-      </Button>
+    <>
+      <Sheet open={open} onOpenChange={(o) => setOpen(o)}>
+        <SheetTrigger
+          className="absolute right-4 top-4 md:hidden"
+          style={{ zIndex: 50 }}
+        >
+          <Button
+            size="icon"
+            variant="ghost"
+            className={cn(
+              'transition-opacity duration-300',
+              open && 'opacity-70',
+            )}
+          >
+            <Settings className="h-6 w-6" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="bottom" className="pt-2">
+          <SheetHeader className="pb-4 text-muted-foreground">
+            Config
+          </SheetHeader>
+          <SheetDescription>
+            <div className="flex flex-col gap-2 overflow-hidden transition-all duration-300 ease-out">
+              <ChainSelection />
+              <NativePriceSelection />
 
-      {/* Sliding Menu Content */}
-      <div
-        className={cn(
-          'flex flex-col gap-2 overflow-hidden px-2 transition-all duration-300 ease-out',
-          open ? 'h-[600px]' : 'h-0',
-        )}
-      >
-        <ChainSelection />
-        <NativePriceSelection />
+              <GasPriceSelection />
+              <CallerSelection />
+            </div>
+          </SheetDescription>
+        </SheetContent>
+      </Sheet>
 
-        <GasPriceSelection />
-        <CallerSelection />
-      </div>
-    </div>
+      <Breadcrumb className="mb-2">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink
+              className="font-medium"
+              onClick={() => setOpen(true)}
+            >
+              {chain.name}
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink onClick={() => setOpen(true)}>
+              <GweiAmount
+                amount={gasFeesConfig?.nextBaseFeePerGas || BigInt(0)}
+              />
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>
+              <ShrinkedAddress address={caller} />
+            </BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    </>
   );
 };
 

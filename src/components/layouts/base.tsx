@@ -13,7 +13,7 @@ const BaseLayout: FC<BaseLayoutProps> = ({ children }) => {
   return (
     <>
       <SiteHeader />
-      <main className="relative flex grow flex-col">{children}</main>
+      <main className="flex grow flex-col">{children}</main>
     </>
   );
 };

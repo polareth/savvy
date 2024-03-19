@@ -12,6 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Separator } from '@/components/ui/separator';
 import DataTablePagination from '@/components/templates/table/pagination';
 
 /* ---------------------------------- TYPES --------------------------------- */
@@ -48,9 +49,9 @@ const TxHistoryCollapsibleMobile = <TData,>({
         {table.getRowModel().rows?.length ? (
           table.getRowModel().rows.map((row) => (
             <AccordionItem key={row.id} value={row.id}>
-              <AccordionTrigger className="grid grid-cols-[min-content_1fr_min-content_min-content] justify-start gap-2">
-                {/* id | function name | status | expand button */}
+              <AccordionTrigger className="grid grid-cols-[min-content_1fr_min-content_min-content] justify-start gap-2 hover:no-underline">
                 <>
+                  {/* id | function name | status | expand button */}
                   {flexRender(
                     row.getVisibleCells()[0].column.columnDef.cell,
                     row.getVisibleCells()[0].getContext(),
@@ -60,18 +61,19 @@ const TxHistoryCollapsibleMobile = <TData,>({
                     row.getVisibleCells()[2].getContext(),
                   )}
                   {flexRender(
-                    row.getVisibleCells()[4].column.columnDef.cell,
-                    row.getVisibleCells()[4].getContext(),
+                    row.getVisibleCells()[5].column.columnDef.cell,
+                    row.getVisibleCells()[5].getContext(),
                   )}
                 </>
               </AccordionTrigger>
               <AccordionContent className="relative">
                 {/* timestamp */}
-                <div className="absolute right-0 top-0 flex justify-end bg-muted/30 px-2 pt-2 text-xs font-medium text-muted-foreground">
+                <div className="px-2 pt-2 text-xs font-medium text-muted-foreground">
                   {flexRender(
-                    row.getVisibleCells()[3].column.columnDef.cell,
+                    row.getVisibleCells()[4].column.columnDef.cell,
                     row.getVisibleCells()[3].getContext(),
                   )}
+                  <Separator className="mt-2" />
                 </div>
 
                 {/* chain, account, caller, tx value, gas used, data, errors, logs, inputs */}

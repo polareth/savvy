@@ -48,7 +48,7 @@ const ElapsedTime: FC<ElapsedTimeProps> = ({ start, end, prefix, suffix }) => {
   }
 
   return (
-    <>
+    <span className="whitespace-nowrap">
       {prefix ? `${prefix} ` : ''}
       {years > 0
         ? `${years} year${years > 1 ? 's' : ''}`
@@ -64,7 +64,7 @@ const ElapsedTime: FC<ElapsedTimeProps> = ({ start, end, prefix, suffix }) => {
                   ? `${seconds} second${seconds > 1 ? 's' : ''}`
                   : 'a few seconds'}
       {suffix ? ` ${suffix}` : ''}
-    </>
+    </span>
   );
 };
 

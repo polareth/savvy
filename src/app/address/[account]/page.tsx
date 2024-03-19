@@ -24,7 +24,7 @@ export default function AccountPage({
   params: { account: string };
 }) {
   return (
-    <div className="relative flex flex-col space-x-0 pb-6 md:flex-row md:space-x-16">
+    <div className="flex flex-col space-x-0 pb-6 md:flex-row md:space-x-16">
       <ConfigMenu />
       <div className="flex grow flex-col gap-4">
         <Header initialAddress={params.account} />

@@ -13,9 +13,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import { ChevronRightIcon } from 'lucide-react';
 
 import type { PageSlug } from '@/lib/types/site';
-import { METADATA_BASE, NAVBAR_SOLUTIONS } from '@/lib/constants/site';
+import {
+  METADATA_BASE,
+  METADATA_EXTRA,
+  NAVBAR_SOLUTIONS,
+} from '@/lib/constants/site';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -27,6 +31,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Icons } from '@/components/common/icons';
+import ThemeToggle from '@/components/common/theme-toggle';
 
 type SubNavBarProps = {
   selected?: string[];
@@ -58,19 +63,20 @@ const NavBar = () => {
 
 const DesktopNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
   return (
-    <nav className="z-popover pointer-events-auto mr-4 hidden items-center md:flex">
-      <Link
-        href="/"
-        className={cn(
-          'flex items-center gap-2 font-semibold transition-opacity duration-200 hover:opacity-75',
-          // selected[0] === '/' ? 'text-muted-foreground' : '',
-        )}
-        aria-label="Home"
-      >
-        <Icons.logo className="h-8 w-8" />
-        {METADATA_BASE.title?.toString()}
-      </Link>
-      {/* <NavigationMenu className="ml-4">
+    <>
+      <nav className="z-popover pointer-events-auto mr-4 hidden items-center md:flex">
+        <Link
+          href="/"
+          className={cn(
+            'flex items-center gap-2 font-semibold transition-opacity duration-200 hover:opacity-75',
+            // selected[0] === '/' ? 'text-muted-foreground' : '',
+          )}
+          aria-label="Home"
+        >
+          <Icons.logo className="h-8 w-8" />
+          {METADATA_BASE.title?.toString()}
+        </Link>
+        {/* <NavigationMenu className="ml-4">
         <NavigationMenuList>
           <NavigationMenuItem>
             <NavigationMenuTrigger
@@ -116,7 +122,9 @@ const DesktopNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu> */}
-    </nav>
+      </nav>
+      <NavIcons className="hidden justify-end md:flex" />
+    </>
   );
 };
 
@@ -138,7 +146,7 @@ const MobileNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
           <span className="sr-only">Toggle Menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="pr-0">
+      <SheetContent side="left" className="flex flex-col md:hidden">
         <MobileLink
           href="/"
           className="flex items-center"
@@ -170,6 +178,8 @@ const MobileNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
             )}
           </div>
         </ScrollArea> */}
+        <div className="grow" />
+        <NavIcons className="mt-2 items-end" />
       </SheetContent>
     </Sheet>
   );
@@ -249,5 +259,54 @@ const MobileLink = ({
 };
 
 MobileLink.displayName = 'MobileLink';
+
+/* -------------------------------------------------------------------------- */
+/*                                    ICONS                                   */
+/* -------------------------------------------------------------------------- */
+
+type NavIconsProps = {
+  className?: string;
+};
+
+const NavIcons: FC<NavIconsProps> = ({ className }) => {
+  return (
+    <div className={cn('flex flex-1 items-center space-x-4', className)}>
+      <nav className="flex w-full items-center space-x-1 md:w-auto">
+        <Link
+          href={METADATA_EXTRA.links.github}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <div
+            className={buttonVariants({
+              size: 'icon',
+              variant: 'ghost',
+            })}
+          >
+            <Icons.gitHub className="h-5 w-5" />
+            <span className="sr-only">GitHub</span>
+          </div>
+        </Link>
+        <Link
+          href={METADATA_EXTRA.links.twitter}
+          target="_blank"
+          rel="noreferrer"
+          className="grow md:grow-0"
+        >
+          <div
+            className={buttonVariants({
+              size: 'icon',
+              variant: 'ghost',
+            })}
+          >
+            <Icons.twitter className="h-4 w-4 fill-current" />
+            <span className="sr-only">Twitter</span>
+          </div>
+        </Link>
+        <ThemeToggle />
+      </nav>
+    </div>
+  );
+};
 
 export default NavBar;

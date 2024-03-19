@@ -238,7 +238,6 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
   const expandableCell = (row: Row<TxEntry>) => {
     const txChain = CHAINS.find((c) => c.id === row.original.context.chainId);
     const hasUnderlying = !!row.original.context.gasConfig.stack;
-    console.log(row.original.gasCosts);
 
     return data === undefined ||
       (loading && row.original.id === data.length + 1) ? (
@@ -247,7 +246,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
       <>
         <TxDetailsSubTable tx={row.original} />
         <TxGasConfigSubTable tx={row.original} />
-        <div className="grid grid-cols-[min-content_1fr] justify-between gap-x-4 gap-y-2 bg-muted/30 p-2">
+        <div className="grid grid-cols-[min-content_1fr] justify-between gap-x-4 gap-y-2 p-2">
           <span className="whitespace-nowrap text-xs font-medium">
             {row.original.data && row.original.data !== '0x'
               ? row.original.decoded
@@ -266,7 +265,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
           <span className="whitespace-nowrap text-xs font-medium">
             {hasUnderlying ? 'L2 fee' : 'Fee'}
           </span>
-          <div className="flex items-center gap-1">
+          <div className="flex flex-col gap-1 lg:flex-row lg:items-center">
             <CurrencyAmount
               amount={row.original.gasCosts.costNative.root}
               symbol={txChain?.nativeCurrency.symbol}
@@ -579,14 +578,14 @@ const TxDetailsSubTable: FC<TxSubTableProps> = ({ tx }) => {
 
   /* --------------------------------- RENDER --------------------------------- */
   return (
-    <div className="grid grid-cols-1 gap-x-4 gap-y-2 bg-muted/30 p-2 lg:grid-cols-5">
+    <div className="grid grid-cols-[80px_1fr] gap-x-4 gap-y-2 p-2 lg:grid-cols-5">
       {table.map((row, i) => (
-        <div key={i} className="flex flex-col gap-2">
-          <span className="text-xs font-medium text-muted-foreground">
+        <Fragment key={i}>
+          <span className="whitespace-nowrap text-xs font-medium text-muted-foreground">
             {row.header()}
           </span>
           {row.cell()}
-        </div>
+        </Fragment>
       ))}
     </div>
   );
@@ -682,14 +681,14 @@ const TxGasConfigSubTable: FC<TxSubTableProps> = ({ tx }) => {
 
   /* --------------------------------- RENDER --------------------------------- */
   return (
-    <div className="grid grid-cols-1 gap-x-4 gap-y-2 bg-muted/30 p-2 lg:grid-cols-5">
+    <div className="grid grid-cols-[80px_1fr] gap-x-4 gap-y-2 p-2 lg:grid-cols-5">
       {table.map((row, i) => (
-        <div key={i} className="flex flex-col gap-2">
+        <Fragment key={i}>
           <span className="text-xs font-medium text-muted-foreground">
             {row.header()}
           </span>
           {row.cell()}
-        </div>
+        </Fragment>
       ))}
     </div>
   );
