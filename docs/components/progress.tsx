@@ -1,6 +1,7 @@
 import { FC, ReactNode } from 'react';
 import { CheckIcon, StarIcon, XIcon } from 'lucide-react';
 
+import { cn } from '../utils';
 import { Badge, BadgeIntent } from './badge';
 
 /* -------------------------------------------------------------------------- */
@@ -67,9 +68,10 @@ export const ProgressItem: FC<ProgressItemProps> = ({
   return (
     <>
       <div
-        className={`flex h-full items-start gap-2 pt-3 ${
-          completed || priority ? 'text-accent' : 'text-gray-500'
-        }`}
+        className={cn(
+          'flex h-full items-start gap-2 pt-3',
+          completed || priority ? 'text-accent' : 'text-gray-500',
+        )}
       >
         <div className="mt-[-5px]">
           {completed ? (
@@ -81,7 +83,7 @@ export const ProgressItem: FC<ProgressItemProps> = ({
           )}
         </div>
       </div>
-      <div className={completed ? 'font-medium' : ''}>{children}</div>
+      <div className={cn(completed && 'font-medium')}>{children}</div>
       {difficulty !== undefined ? (
         <DifficultyBadge difficulty={difficulty} />
       ) : (

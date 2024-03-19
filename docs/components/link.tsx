@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
 
+import { cn } from '../utils';
+
 // TODO TEMP until Link is available
 export const Link = ({
   href,
@@ -14,7 +16,7 @@ export const Link = ({
     href={href}
     target="_blank"
     rel="noopener noreferrer"
-    className={`vocs_Link_accent_underlined ${className}`}
+    className={cn('vocs_Link_accent_underlined', className)}
   >
     {children}
   </a>

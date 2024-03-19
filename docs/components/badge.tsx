@@ -1,5 +1,6 @@
 import { FC, ReactNode } from 'react';
-import clsx from 'clsx';
+
+import { cn } from '../utils';
 
 /* -------------------------------------------------------------------------- */
 /*                                    TYPES                                   */
@@ -28,8 +29,6 @@ const badgeIntents = {
   warning: 'vocs_Callout_warning',
 };
 
-// vocs_Callout_warning
-// note, info, danger, tip, success
 /* -------------------------------------------------------------------------- */
 /*                                 COMPONENTS                                 */
 /* -------------------------------------------------------------------------- */
@@ -40,7 +39,7 @@ export const Badge: FC<BadgeProps> = ({
   className,
 }) => {
   return (
-    <div className={clsx(badgeStyles, badgeIntents[intent], className)}>
+    <div className={cn(badgeStyles, badgeIntents[intent], className)}>
       {children}
     </div>
   );
