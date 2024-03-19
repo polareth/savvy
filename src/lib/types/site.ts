@@ -8,11 +8,17 @@ export type PageSlug = '/' | '/solutions/airdrop';
  * @param name The name of the page
  * @param description A short description of the page
  * @param slug The slug to access the page
+ * @param url The URL to access the page
+ * @param children The children of the page (which will render as a dropdown/submenu)
+ * @param external Whether the page is an external link
  */
 export type Page = {
   name: string;
+  slug?: PageSlug;
+  url?: string;
   description?: string;
-  slug: PageSlug;
+  children?: Page[];
+  external?: boolean;
 };
 
 /**

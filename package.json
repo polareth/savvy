@@ -7,10 +7,15 @@
   },
   "version": "0.0.1",
   "private": false,
+  "type": "module",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "docs:dev": "cd docs && vocs dev",
+    "docs:build": "cd docs && vocs build",
+    "docs:preview": "cd docs && vocs preview",
     "lint": "next lint",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit"
@@ -55,6 +60,7 @@
     "tevm": "1.0.0-next.44",
     "vaul": "^0.9.0",
     "viem": "^2.8.6",
+    "vocs": "1.0.0-alpha.43",
     "web-streams-polyfill": "^4.0.0",
     "zustand": "^4.5.0"
   },
@@ -84,6 +90,9 @@
     "patchedDependencies": {
       "viem@2.8.6": "patches/viem@2.8.6.patch",
       "@ethereumjs/common@4.1.0": "patches/@ethereumjs__common@4.1.0.patch"
+    },
+    "overrides": {
+      "yaml": "2.3.4"
     }
   }
 }

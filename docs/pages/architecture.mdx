@@ -1,0 +1,38 @@
+import {
+  ArchitectureItem,
+  ArchitectureWrapper,
+} from '../components/architecture';
+
+# Architecture
+
+:::note
+The structure below can be accessed inside the [`src`](https://github.com/0xpolarzero/savvy/tree/main/src) folder.
+:::
+
+<ArchitectureWrapper nesting={3}>
+<ArchitectureItem name="app" description="Main entry points for pages, layout and routing" url='https://github.com/0xpolarzero/savvy/tree/main/src/app'>
+  <ArchitectureItem name="(api)" description="Serverless functions" nested={1} url='https://github.com/0xpolarzero/savvy/tree/main/src/app/(api)'>
+    <ArchitectureItem name="abi" description="Get the ABI of a contract (WhatsABI)" nested={2} url='https://github.com/0xpolarzero/savvy/tree/main/src/app/(api)/abi' />
+    <ArchitectureItem name="token-price" description="Get the price of a native token (CoinMarketCap)" nested={2} url='https://github.com/0xpolarzero/savvy/tree/main/src/app/(api)/token-price' />
+  </ArchitectureItem>
+  <ArchitectureItem name="address/[account]" description="Account page (whenever an address is searched)" nested={1} url='https://github.com/0xpolarzero/savvy/tree/main/src/app/address/[account]' />
+</ArchitectureItem>
+<ArchitectureItem name="components" description="Everything related to the UI" url='https://github.com/0xpolarzero/savvy/tree/main/src/components'>
+  <ArchitectureItem name="common" description="Recurrent components across the app" nested={1} url='https://github.com/0xpolarzero/savvy/tree/main/src/components/common' />
+  <ArchitectureItem name="config" description="Independent config-related components (e.g. theme, analytics)" nested={1} url='https://github.com/0xpolarzero/savvy/tree/main/src/components/config' />
+  <ArchitectureItem name="core" description="Components related to the main logic/purpose of the app" nested={1} url='https://github.com/0xpolarzero/savvy/tree/main/src/components/core' />
+  <ArchitectureItem name="layouts" description="Layouts for the app used across all pages" nested={1} url='https://github.com/0xpolarzero/savvy/tree/main/src/components/layouts' />
+  <ArchitectureItem name="templates" description="Generic templates for better consistency" nested={1} url='https://github.com/0xpolarzero/savvy/tree/main/src/components/templates' />
+  <ArchitectureItem name="ui" description="shadcn/ui components" nested={1} url='https://github.com/0xpolarzero/savvy/tree/main/src/components/ui' />
+</ArchitectureItem>
+<ArchitectureItem name="lib" description="Libraries, utilities and state management" url='https://github.com/0xpolarzero/savvy/tree/main/src/lib'>
+  <ArchitectureItem name="constants" description="Constants for the site, default config, providers, starting points" nested={1} url='https://github.com/0xpolarzero/savvy/tree/main/src/lib/constants' />
+  <ArchitectureItem name="hooks" description="Custom hooks (n.b. we're mostly using stores for state management)" nested={1} url='https://github.com/0xpolarzero/savvy/tree/main/src/lib/hooks' />
+  <ArchitectureItem name="store" description="State management (providers, config, transactions, etc.)" nested={1} url='https://github.com/0xpolarzero/savvy/tree/main/src/lib/store' />
+  <ArchitectureItem name="tevm" description="Tevm clients, calls and utilities" nested={1} url='https://github.com/0xpolarzero/savvy/tree/main/src/lib/tevm' />
+  <ArchitectureItem name="types" description="Type definitions that are used across multiple files" nested={1} url='https://github.com/0xpolarzero/savvy/tree/main/src/lib/types' />
+  <ArchitectureItem name="..." description="Other libraries and utilities (e.g. WhatsABI, local storage, gas estimation)" nested={1} url='https://github.com/0xpolarzero/savvy/tree/main/src/lib' />
+</ArchitectureItem>
+<ArchitectureItem name="styles" description="Global styles, theme, and tailwind classes" url='https://github.com/0xpolarzero/savvy/tree/main/src/styles' />
+
+</ArchitectureWrapper>

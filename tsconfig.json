@@ -17,7 +17,8 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "react": ["node_modules/@types/react"]
     },
     "plugins": [
       {
@@ -26,6 +27,13 @@
       { "name": "@tevm/ts-plugin" }
     ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "tailwind.config.cjs",
+    "docs/vocs.config.mjs"
+  ],
   "exclude": ["node_modules"]
 }

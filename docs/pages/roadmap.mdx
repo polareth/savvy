@@ -1,0 +1,57 @@
+import { RoadmapItem, RoadmapList } from '../components/roadmap';
+
+# Roadmap
+
+Please don't hesitate to [ask](https://github.com/0xpolarzero/savvy/issues) if you have any questions or suggestions, or if you would like a feature to be prioritized!
+
+<RoadmapList>
+  <RoadmapItem completed={true}>
+    run transactions in a simulated environment and remember activity on each
+    chain
+  </RoadmapItem>
+  <RoadmapItem completed={true}>mock network condition/congestion</RoadmapItem>
+  <RoadmapItem completed={true}>
+    estimate gas fees on EVM L1s, Polygon and OP-stack L2s
+  </RoadmapItem>
+  <RoadmapItem completed={false} priority>
+    provide helpers to generate mock data and quickly estimate costs for
+    selected optimized solutions (e.g. GasliteDrop)
+  </RoadmapItem>
+  <RoadmapItem completed={false}>
+    run a tx on multiple chains and provide a comparative estimation of gas
+    spent on each
+  </RoadmapItem>
+  <RoadmapItem completed={false}>
+    support Arbitrum orbit for gas fee on L1 submission
+  </RoadmapItem>
+  <RoadmapItem completed={false}>
+    paste a contract in a browser editor, deploy it and use it just like a
+    regular forked contract
+  </RoadmapItem>
+  <RoadmapItem completed={false}>
+    run ast on a pasted contract and provide inline recommendations to optimize
+    both dependencies (e.g. OZ -> Solady) and known inefficient patterns
+  </RoadmapItem>
+  <RoadmapItem completed={false}>
+    provide selected secure and optimized contracts to deploy in a click with
+    mock data + estimate costs (e.g. Gaslite core, Solady libs)
+  </RoadmapItem>
+  <RoadmapItem completed={false}>
+    provide a rpc to publish tests to the Tevm forked chain and keep the state
+    (already possible in the opposite way; fork a local Hardhat node to which
+    tests can be published)
+  </RoadmapItem>
+  <RoadmapItem completed={false} priority>
+    wallet/social login to save transactions (sync with local storage)
+  </RoadmapItem>
+  <RoadmapItem completed={false} priority>
+    separate between two versions: advanced (intended for devs) and "onboarding"
+    for non-crypto natives, with detailed explanations, guidance and examples
+  </RoadmapItem>
+</RoadmapList>
+
+And a lot of other possibilities, although not prioritized because there are already great tools for most of these. Like:
+
+- replicate transactions locally (given their hash + chain);
+- debug transactions by exploring state change;
+- copy a set of local transactions to get the multicall data and execute them on mainnet.

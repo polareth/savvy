@@ -2,17 +2,15 @@
 
 **An interface for the EVM on the browser, to simulate & visualize onchain activity.**
 
-## Table of contents
+_A more comprehensive/readable version is available [in the documentation](https://docs.svvy.sh)._
 
-<TODO> Update table of contents
+## Table of contents
 
 - [Overview](#overview)
 - [About the project](#about-the-project)
+  - [Idea](#idea)
   - [How to use](#how-to-use)
-  - [Notes](#notes)
 - [Architecture](#architecture)
-  - [Actions (libraries, state management)](#actions-libraries-state-management)
-  - [Components](#components)
 - [Getting started](#getting-started)
 - [Acknowledgments](#acknowledgments)
 - [Contributing](#contributing)
@@ -51,6 +49,7 @@ With no setup (wallet, signatures, etc.), on the browser, from any account (impe
 | todo      | provide selected secure and optimized contracts to deploy in a click with mock data + estimate costs (e.g. Gaslite core, Solady libs)                                        |
 | todo      | provide a rpc to publish tests to the Tevm forked chain and keep the state (already possible in the opposite way; fork a local Hardhat node to which tests can be published) |
 | todo      | wallet/social login to save transactions (sync with local storage)                                                                                                           |
+| todo      | separate between two versions: advanced (intended for devs) and "onboarding" for non-crypto natives, with detailed explanations, guidance and examples                       |
 
 And a lot of other possibilities, although not prioritized because there are already great tools for most of these. Like:
 
@@ -130,7 +129,7 @@ The minimal steps to get started are:
    # POLYGONSCAN_API_KEY
    ```
 
-We're using Alchemy for better modularity [when creating providers](./src/lib/constants/providers.ts#L66) and [Tevm clients](./src/lib/tevm.ts#L322), but you can replace it with any other provider, and update the way urls are created in the two aforementioned files.
+We're using Alchemy for better modularity [when creating providers](./src/lib/constants/providers.ts#L49) and [Tevm clients](./src/lib/tevm/client.ts#L42), but you can replace it with any other provider, and update the way urls are created in the two aforementioned files.
 
 4. Run the development server
 
