@@ -40,7 +40,7 @@ const DifficultyBadge: FC<DifficultyBadgeProps> = ({ difficulty }) => {
   if (difficulty === 3) data = { label: 'extensive', intent: 'fail' };
 
   return (
-    <Badge intent={data.intent} className="mt-2">
+    <Badge intent={data.intent} className="mt-2 justify-self-end">
       {data.label}
     </Badge>
   );
