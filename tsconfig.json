@@ -18,7 +18,6 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "react": ["node_modules/@types/react"]
     },
     "plugins": [
       {
@@ -33,7 +32,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "tailwind.config.cjs",
-    "docs/vocs.config.mjs"
+    "vocs.config.mjs"
   ],
   "exclude": ["node_modules"]
 }

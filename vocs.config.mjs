@@ -2,7 +2,6 @@ import { defineConfig } from 'vocs';
 
 export default defineConfig({
   baseUrl: 'https://docs.svvy.sh',
-  rootDir: '.',
   title: 'savvy · docs',
   titleTemplate: '%s – savvy • docs',
   description:
