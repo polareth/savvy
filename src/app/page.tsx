@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 
 import { Separator } from '@/components/ui/separator';
+import Welcome from '@/components/companion/welcome';
 
 // Import dynamically to avoid SSR issues due to persisted state (see zustand stores)
 const ConfigMenu = dynamic(
@@ -20,7 +21,7 @@ const Home = () => {
       <ConfigMenu />
       <div className="flex grow flex-col gap-4">
         <Header />
-
+        <Welcome />
         <Separator className="my-4" />
         <TxHistory />
       </div>

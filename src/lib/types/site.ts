@@ -29,5 +29,6 @@ export type MetadataExtra = {
   links: {
     github: string;
     twitter: string;
+    documentation: string;
   };
 };

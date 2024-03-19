@@ -7,7 +7,6 @@ const description =
   'An interface for the EVM on the browser, to simulate & visualize onchain activity.';
 const authorUrl = 'https://twitter.com/0xpolarzero';
 const websiteUrl = 'https://svvy.sh';
-const documentationUrl = 'https://docs.svvy.sh';
 
 /* -------------------------------------------------------------------------- */
 /*                                  METADATA                                  */
@@ -47,6 +46,7 @@ export const METADATA_EXTRA: MetadataExtra = {
   links: {
     github: 'https://github.com/0xpolarzero/savvy',
     twitter: 'https://twitter.com/0xpolarzero',
+    documentation: 'https://docs.svvy.sh',
   },
 };
 
@@ -57,7 +57,7 @@ export const METADATA_EXTRA: MetadataExtra = {
 export const NAVBAR: Page[] = [
   {
     name: 'documentation',
-    url: documentationUrl,
+    url: METADATA_EXTRA.links.documentation,
     external: true,
   },
   // description: 'Find the most optimized airdrop solution for your use case',
