@@ -49,16 +49,14 @@ export const ArchitectureItem = ({
           className={`flex items-center text-sm font-bold ${nested === 0 ? 'text-accent' : ''}`}
         >
           <div className="flex">
-            {Array(carretAmount)
-              .fill(carretAmount)
-              .map((_, i) => (
-                <ChevronRightIcon
-                  key={i}
-                  className={`mt-1 h-4 w-4 ${i !== carretAmount - 1 ? 'mr-[-10px]' : ''} ${
-                    i === (nested || 0) ? 'text-accent' : 'text-gray-500'
-                  }`}
-                />
-              ))}
+            {Array.from({ length: carretAmount }).map((_, i) => (
+              <ChevronRightIcon
+                key={i}
+                className={`mt-1 h-4 w-4 ${i !== carretAmount - 1 ? 'mr-[-10px]' : ''} ${
+                  i === (nested || 0) ? 'text-accent' : 'text-gray-500'
+                }`}
+              />
+            ))}
           </div>{' '}
           {url ? (
             <Link href={url} className="font-semibold no-underline">

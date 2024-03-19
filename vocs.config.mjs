@@ -49,8 +49,8 @@ export default defineConfig({
       link: '/overview',
     },
     {
-      text: 'Roadmap',
-      link: '/roadmap',
+      text: 'Progress',
+      link: '/progress',
     },
     {
       text: 'Architecture',
@@ -96,5 +96,13 @@ export default defineConfig({
       text: 'Notes',
       link: '/notes',
     },
+  ],
+  topNav: [
+    { text: 'Overview', link: '/overview' },
+    {
+      text: 'Progress',
+      link: '/progress',
+    },
+    { text: 'savvy', link: 'https://svvy.sh' },
   ],
 });

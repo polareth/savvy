@@ -1,0 +1,79 @@
+import { Step, Steps } from 'vocs/components';
+
+import { ProgressItem, ProgressList } from '../components/progress';
+
+# Progress
+
+Please don't hesitate to [ask](https://github.com/0xpolarzero/savvy/issues) if you have any questions or suggestions, or if you would like a feature to be prioritized!
+
+<Steps className="relative">
+  <Step title="Core" titleLevel={5}>
+    <ProgressList>
+      <ProgressItem completed={true} difficulty={3}>
+        run transactions in a simulated environment and remember activity on
+        each chain
+      </ProgressItem>
+      <ProgressItem completed={true} difficulty={2}>
+        mock network condition/congestion (gas/blob gas price)
+      </ProgressItem>
+      <ProgressItem completed={true} difficulty={2}>
+        estimate gas fees on EVM L1s, Polygon and OP-stack L2s
+      </ProgressItem>
+      <ProgressItem completed={false} difficulty={1}>
+        support Arbitrum orbit for gas fee on L1 submission
+      </ProgressItem>
+      <ProgressItem completed={false} priority difficulty={0}>
+        wallet/social login to save transactions (sync with local storage)
+      </ProgressItem>
+    </ProgressList>
+  </Step>
+  <Step title="Additional features" titleLevel={5}>
+    <ProgressList>
+      <ProgressItem completed={false} priority difficulty={1}>
+        provide helpers to generate mock data and quickly estimate costs for
+        selected optimized solutions (e.g. GasliteDrop)
+      </ProgressItem>
+      <ProgressItem completed={false} difficulty={0}>
+        run a tx on multiple chains and provide a comparative estimation of gas
+        spent on each
+      </ProgressItem>
+    </ProgressList>
+  </Step>
+  <Step title="Core extensions" titleLevel={5}>
+    <ProgressList>
+      <ProgressItem completed={false} difficulty={2}>
+        paste a contract in a browser editor, deploy it and use it just like a
+        regular forked contract
+      </ProgressItem>
+      <ProgressItem completed={false} difficulty={3}>
+        run ast on a pasted contract and provide inline recommendations to
+        optimize both dependencies (e.g. OZ -> Solady) and known inefficient
+        patterns
+      </ProgressItem>
+      <ProgressItem completed={false} difficulty={3}>
+        provide selected secure and optimized contracts to deploy in a click
+        with mock data + estimate costs (e.g. Gaslite core, Solady libs)
+      </ProgressItem>
+    </ProgressList>
+  </Step>
+  <Step title="Breaking" titleLevel={5}>
+    <ProgressList>
+      <ProgressItem completed={false} difficulty={-1}>
+        provide a rpc to publish tests to the Tevm forked chain and keep the
+        state (already possible in the opposite way; fork a local Hardhat node
+        to which tests can be published)
+      </ProgressItem>
+      <ProgressItem completed={false} difficulty={1}>
+        separate between two versions: advanced (intended for devs) and
+        "onboarding" for non-crypto natives, with detailed explanations,
+        guidance and examples
+      </ProgressItem>
+    </ProgressList>
+  </Step>
+</Steps>
+
+And a lot of other possibilities, although not prioritized because there are already great tools for most of these. Like:
+
+- replicate transactions locally (given their hash + chain);
+- debug transactions by exploring state change;
+- copy a set of local transactions to get the multicall data and execute them on mainnet.
