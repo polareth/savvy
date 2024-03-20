@@ -34,14 +34,11 @@ const ArbitraryCall = () => {
   const isTablet = useMediaQuery('(min-width: 640px)'); // sm
 
   // The current chain and client (Tevm), and their initialization status
-  const { chain, client, opStackL1Client, initializing } = useProviderStore(
-    (state) => ({
-      chain: state.chain,
-      client: state.client,
-      opStackL1Client: state.opStackL1Client,
-      initializing: state.initializing,
-    }),
-  );
+  const { chain, client, initializing } = useProviderStore((state) => ({
+    chain: state.chain,
+    client: state.client,
+    initializing: state.initializing,
+  }));
 
   const {
     account,
@@ -134,7 +131,6 @@ const ArbitraryCall = () => {
         },
       },
       client,
-      opStackL1Client,
       loading,
     );
 

@@ -1,5 +1,5 @@
-import { createGasPriceOracle, createL1Block, L1Client } from '@tevm/opstack';
-import { encodePacked, MemoryClient } from 'tevm';
+import { createGasPriceOracle, createL1Block } from '@tevm/opstack';
+import { encodePacked, JsonRpcReturnTypeFromMethod, MemoryClient } from 'tevm';
 import { Hex } from 'tevm/utils';
 import { toFunctionSelector } from 'viem';
 
@@ -11,7 +11,6 @@ const L1Block = createL1Block();
 
 type CalculateL1DataFee = (
   client: MemoryClient,
-  opClient: L1Client,
   txData: Hex,
   baseFee: bigint,
   blobBaseFee: bigint,
@@ -24,23 +23,12 @@ type CalculateL1DataFee = (
 }>;
 
 /**
- * @notice Create and initialize the client for OP stack operations (gas overrides and estimation)
- */
-export const createAndInitializeL1Client = async () => {
-  const { createL1Client } = await import('@tevm/opstack');
-  // Create the L1 client
-  const client = createL1Client();
-  await client.ready();
-  return client;
-};
-
-/**
  * @notice Calculate the L1 data fee for a transaction on the OP stack
- * @dev This will fetch the current base fee and blob base fee scalars from the chain, then use
- * a mock op client to set these values on the L1Block contract and call the GasPriceOracle to
- * calculate the L1 data fee for the transaction data.
+ * @dev This will fetch the current base fee and blob base fee scalars from the chain, then set
+ * them on the L1Block contract and call the GasPriceOracle to calculate the L1 data fee for the transaction data.
+ * @dev Here we're assuming the chain has activated the Ecotone upgrade. If it was not obvious, we could just check it
+ * and then call either `setL1BlockValues()` or `setL1BlockValuesEcotone()` depending on the upgrade status.
  * @param client The memory client for the chain
- * @param opClient The OP stack memory client on Optimism
  * @param txData The serialized transaction data
  * @param baseFee The base fee for the transaction on the underlying chain
  * @param blobBaseFee The blob base fee for the transaction on the underlying chain
@@ -50,7 +38,6 @@ export const createAndInitializeL1Client = async () => {
 // see https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts-bedrock/src/L2/L1Block.sol#L101
 export const calculateL1DataFee: CalculateL1DataFee = async (
   client,
-  opClient,
   txData,
   baseFee,
   blobBaseFee,
@@ -59,29 +46,50 @@ export const calculateL1DataFee: CalculateL1DataFee = async (
 ) => {
   // We just want to grab any first error that occurs, since any subsequent call would be inacurate
   try {
-    // Create the L1Block and GasPriceOracle contracts
-    await opClient.setAccount({
-      address: L1Block.address,
-      deployedBytecode: L1Block.deployedBytecode,
-    });
-    await opClient.setAccount({
-      address: GasPriceOracle.address,
-      deployedBytecode: GasPriceOracle.deployedBytecode,
-    });
-
+    // TODO Use this batch call when it's fixed
+    /* ------------------------------------ - ----------------------------------- */
     // Find the scalar values for the base and blob base fees on this chain
+    // const [
+    //   baseFeeScalar,
+    //   blobBaseFeeScalar,
+    // ]: JsonRpcReturnTypeFromMethod<'tevm_call'>[] = await client.sendBulk([
+    //   {
+    //     method: 'tevm_call',
+    //     params: [GasPriceOracle.read.baseFeeScalar()],
+    //     id: 1,
+    //     jsonrpc: '2.0',
+    //   },
+    //   {
+    //     method: 'tevm_call',
+    //     params: [GasPriceOracle.read.blobBaseFeeScalar()],
+    //     id: 2,
+    //     jsonrpc: '2.0',
+    //   },
+    // ]);
+
+    // Estimation will fail (= not accurate) if there is an error so we throw it
+    // if (baseFeeScalar.error || blobBaseFeeScalar.error) {
+    //   const error =
+    //     baseFeeScalar.error?.message || blobBaseFeeScalar.error?.message;
+    //   throw new Error(error === '0x' ? 'Unknown error' : error);
+    // }
+
     const { data: baseFeeScalar } = await client.contract({
       ...GasPriceOracle.read.baseFeeScalar(),
     });
+
     const { data: blobBaseFeeScalar } = await client.contract({
       ...GasPriceOracle.read.blobBaseFeeScalar(),
     });
+    /* ------------------------------------ - ----------------------------------- */
 
     // Set the L1Block values
-    await opClient.call({
-      createTransaction: true,
+    await client.call({
       caller: DEPOSITOR_ACCOUNT,
       to: L1Block.address,
+      createTransaction: true,
+      // We're encoding the data manually because the function doesn't specify inputs,
+      // instead it uses the calldata directly
       data: (toFunctionSelector('setL1BlockValuesEcotone()') +
         encodePacked(
           [
@@ -96,8 +104,10 @@ export const calculateL1DataFee: CalculateL1DataFee = async (
             'bytes32', // _batcherHash
           ],
           [
-            baseFeeScalar || 0,
-            blobBaseFeeScalar || 0,
+            // Number(baseFeeScalar.result?.rawData) || 0,
+            // Number(blobBaseFeeScalar.result?.rawData) || 0,
+            Number(baseFeeScalar) || 0,
+            Number(blobBaseFeeScalar) || 0,
             BigInt(0),
             BigInt(0),
             BigInt(0),
@@ -109,20 +119,8 @@ export const calculateL1DataFee: CalculateL1DataFee = async (
         ).slice(2)) as Hex,
     });
 
-    // Activate Ecotone (blobs) only if not already activated
-    const { data: ecotoneActivated } = await opClient.contract({
-      ...GasPriceOracle.read.isEcotone(),
-    });
-    if (!ecotoneActivated) {
-      await opClient.contract({
-        ...GasPriceOracle.write.setEcotone(),
-        createTransaction: true,
-        caller: DEPOSITOR_ACCOUNT,
-      });
-    }
-
     // Calculate the L1 data fee
-    const { data: l1DataFee } = await opClient.contract({
+    const { data: l1DataFee } = await client.contract({
       ...GasPriceOracle.read.getL1Fee(txData),
     });
 

@@ -166,7 +166,8 @@ export const calculateGasCost = (
 };
 
 // Convert a native token amount to USD based on the native token price and its decimals
+// We're fine with numbers here (!= bigint), and we want full usd precision
 export const nativeToUsd = (native: bigint, price: number, decimals: number) =>
-  Number(
-    (native * BigInt(price) * PRECISION) / BigInt(10 ** decimals) / PRECISION,
-  );
+  (Number(native) * price * Number(PRECISION)) /
+  10 ** decimals /
+  Number(PRECISION);

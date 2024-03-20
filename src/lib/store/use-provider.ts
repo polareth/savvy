@@ -1,4 +1,3 @@
-import { L1Client } from '@tevm/opstack';
 import { MemoryClient } from 'tevm';
 import { Address, getAddress } from 'tevm/utils';
 import { extractChain } from 'viem';
@@ -11,14 +10,12 @@ import { CHAINS } from '@/lib/constants/providers';
 import { TEVM_PREFIX } from '@/lib/local-storage';
 import { useConfigStore } from '@/lib/store/use-config';
 import { initializeClient } from '@/lib/tevm/client';
-import { createAndInitializeL1Client as createAndInitializeOPStackL1Client } from '@/lib/tevm/op-stack';
 
 /* ---------------------------------- TYPES --------------------------------- */
 type ProviderInitialState = {
   chain: Chain;
   chainId: Chain['id'] | undefined; // synced with local storage
   client: MemoryClient | null;
-  opStackL1Client: L1Client | undefined;
   forkTime: Record<Chain['id'], number>; // synced with local storage
   initializedClients: MemoryClient[] | [];
   initializing: boolean;
@@ -51,8 +48,6 @@ export const useProviderStore = create<ProviderStore>()(
       chainId: undefined,
       // The current Tevm client
       client: null,
-      // The current OP Stack L1 client
-      opStackL1Client: undefined,
       // The timestamp of the fork for each chain (when first initialized or when reset)
       forkTime: CHAINS.reduce(
         (acc, chain) => ({ ...acc, [chain.id]: undefined }),
@@ -73,7 +68,6 @@ export const useProviderStore = create<ProviderStore>()(
         const {
           chainId: currentChainId,
           client: currentClient,
-          opStackL1Client,
           initializing,
           initializedClients,
           forkTime,
@@ -115,15 +109,9 @@ export const useProviderStore = create<ProviderStore>()(
             set({ initializedClients: [...initializedClients, client] });
           }
 
-          // 4. Create the op stack client if it's the first time
-          if (!opStackL1Client && chain.custom.tech.rollup === 'op-stack') {
-            const opStackL1Client = await createAndInitializeOPStackL1Client();
-            set({ opStackL1Client });
-          }
-
           set({ chain, client, initializing: false });
 
-          // 5. Fetch the latest gas fees and native token price
+          // 4. Fetch the latest gas fees and native token price
           // Only if we're switching chains or hydrating
           if (currentChainId !== chain.id || hydrate) {
             const { getLatestGasFeesData, getLatestNativeTokenPrice } =

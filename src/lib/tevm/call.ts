@@ -1,7 +1,6 @@
 'use client';
 
 import { ABI, ABIFunction } from '@shazow/whatsabi/lib.types/abi';
-import { L1Client } from '@tevm/opstack';
 import { toast } from 'sonner';
 import { Abi, CallParams, ContractParams, MemoryClient } from 'tevm';
 import { Address, encodeFunctionData, Hex } from 'tevm/utils';
@@ -87,7 +86,6 @@ type HandleAfterCall = (
   tx: TxResponse,
   context: TxContext,
   client: MemoryClient,
-  opStackL1Client: L1Client | undefined,
   toastId: string | number,
 ) => Promise<Omit<TxEntry, 'id'>>;
 
@@ -251,7 +249,6 @@ export const handleAfterCall: HandleAfterCall = async (
   tx,
   context,
   client,
-  opStackL1Client,
   toastId,
 ) => {
   const chain = CHAINS.find((chain) => chain.id === context.chainId);
@@ -274,10 +271,9 @@ export const handleAfterCall: HandleAfterCall = async (
     native: costL1SubmissionNative,
     usd: costL1SubmissionUsd,
     error: estimationError,
-  } = gasConfig.stack === 'op-stack' && opStackL1Client
+  } = gasConfig.stack === 'op-stack'
     ? await calculateOpStackL1DataFee(
         client,
-        opStackL1Client,
         serializeTransaction({
           type: 'eip1559',
           chainId: context.chainId,

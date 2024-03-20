@@ -58,10 +58,9 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
   const isDesktop = useMediaQuery('(min-width: 768px)'); // md
 
   // The current blockchain data for the call
-  const { chain, client, opStackL1Client } = useProviderStore((state) => ({
+  const { chain, client } = useProviderStore((state) => ({
     chain: state.chain,
     client: state.client,
-    opStackL1Client: state.opStackL1Client,
   }));
   const {
     account,
@@ -206,7 +205,6 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
           },
         },
         client,
-        opStackL1Client,
         loading,
       );
 
@@ -220,7 +218,6 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
     [
       chain,
       client,
-      opStackL1Client,
       caller,
       account,
       abi,

@@ -144,9 +144,12 @@ const ChainSelection: FC<ChainSelectionProps> = ({ hydrating = false }) => {
               id: Number(chainOption.value),
             });
             // Change the chain
-            const client = await setProvider(selectedChain, account?.address);
+            const newClient = await setProvider(
+              selectedChain,
+              account?.address,
+            );
             // Catch any issue if the client could not be set
-            if (!client) {
+            if (!newClient) {
               toast.error('Failed to set provider', {
                 description: `The provider for ${selectedChain.name} could not be retrieved`,
               });
@@ -155,11 +158,11 @@ const ChainSelection: FC<ChainSelectionProps> = ({ hydrating = false }) => {
 
             // Update the state of the account if an account is set
             // If an account is set, update its state
-            if (account) {
+            if (account && newClient) {
               updateAccount(account.address, {
                 updateAbi: true,
-                chain,
-                client,
+                chain: selectedChain,
+                client: newClient,
               });
             }
 

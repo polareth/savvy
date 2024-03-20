@@ -266,7 +266,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
             <span className="text-xs text-muted-foreground">No data</span>
           )}
           <Separator className="col-span-2 my-2 w-8" />
-          <span className="whitespace-nowrap text-xs font-medium">
+          <span className="flex items-center whitespace-nowrap text-xs font-medium">
             {hasUnderlying ? 'L2 fee' : 'Fee'}
           </span>
           <div className="flex flex-col gap-1 lg:flex-row lg:items-center">
@@ -289,7 +289,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
 
           {hasUnderlying ? (
             <>
-              <span className="whitespace-nowrap text-xs font-medium">
+              <span className="flex items-center whitespace-nowrap text-xs font-medium">
                 L1 fee
               </span>
               {row.original.gasCosts.error ? (
@@ -325,10 +325,10 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
             <ScrollArea className="max-h-48 rounded-sm border border-secondary p-2">
               <div className="grid grid-cols-[min-content_1fr] gap-x-2 gap-y-1 text-xs">
                 {row.original.errors.map((e, i) => (
-                  <pre key={i}>
+                  <Fragment key={i}>
                     <span className="text-muted-foreground">{i + 1}.</span>
                     {e.message.replace('\n\n', '\n')}
-                  </pre>
+                  </Fragment>
                 ))}
               </div>
             </ScrollArea>
