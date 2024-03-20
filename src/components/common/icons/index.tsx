@@ -123,21 +123,21 @@ export const Icons = {
       {...props}
     >
       <path
-        d="M3 5H11"
+        d="M21 5H13"
         stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       ></path>
       <path
-        d="M3 12H16"
+        d="M21 12H8"
         stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       ></path>
       <path
-        d="M3 19H21"
+        d="M21 19H3"
         stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"

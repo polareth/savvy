@@ -61,7 +61,7 @@ const NavBar = () => {
 const DesktopNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
   return (
     <>
-      <nav className="z-popover pointer-events-auto mr-4 hidden items-center md:flex">
+      <nav className="z-popover pointer-events-auto mr-4 hidden items-center lg:flex">
         <Link
           href="/"
           className={cn(
@@ -138,7 +138,7 @@ const DesktopNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
           </NavigationMenuList>
         </NavigationMenu>
       </nav>
-      <NavIcons className="hidden justify-end md:flex" />
+      <NavIcons className="hidden justify-end lg:flex" />
     </>
   );
 };
@@ -155,13 +155,13 @@ const MobileNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
       <SheetTrigger asChild>
         <Button
           variant="ghost"
-          className="justify-start px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
+          className="justify-start px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 lg:hidden"
         >
           <Icons.menu />
           <span className="sr-only">Toggle Menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="flex flex-col md:hidden">
+      <SheetContent side="right" className="flex flex-col lg:hidden">
         <MobileLink
           href="/"
           className="flex items-center"
@@ -305,7 +305,7 @@ type NavIconsProps = {
 const NavIcons: FC<NavIconsProps> = ({ className }) => {
   return (
     <div className={cn('flex flex-1 items-center space-x-4', className)}>
-      <nav className="flex w-full items-center space-x-1 md:w-auto">
+      <nav className="flex w-full items-center space-x-1 lg:w-auto">
         <Link
           href={METADATA_EXTRA.links.github}
           target="_blank"
@@ -325,7 +325,7 @@ const NavIcons: FC<NavIconsProps> = ({ className }) => {
           href={METADATA_EXTRA.links.twitter}
           target="_blank"
           rel="noreferrer"
-          className="grow md:grow-0"
+          className="grow lg:grow-0"
         >
           <div
             className={buttonVariants({

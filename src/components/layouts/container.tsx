@@ -1,6 +1,14 @@
+'use client';
+
 import type { FC, ReactNode } from 'react';
+import dynamic from 'next/dynamic';
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
+
+// Import dynamically to avoid SSR issues due to persisted state (see zustand stores)
+const ConfigMenuDesktop = dynamic(
+  () => import('@/components/core/selection/config-menu/desktop'),
+);
 
 type ContainerLayoutProps = JSX.IntrinsicElements['div'] & {
   children?: ReactNode;
@@ -24,7 +32,10 @@ const ContainerLayout: FC<ContainerLayoutProps> = ({
       )}
       {...rest}
     >
-      {children}
+      <div className="flex grow flex-col space-x-0 pb-6 md:flex-row md:space-x-16">
+        <ConfigMenuDesktop />
+        {children}
+      </div>
     </div>
   );
 };

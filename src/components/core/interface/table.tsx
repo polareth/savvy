@@ -54,8 +54,8 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  // Expand the table from tablet
-  const isTablet = useMediaQuery('(min-width: 640px)'); // sm
+  // Expand the table from desktop
+  const isDesktop = useMediaQuery('(min-width: 768px)'); // md
 
   // The current blockchain data for the call
   const { chain, client, opStackL1Client } = useProviderStore((state) => ({
@@ -253,15 +253,14 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
           if (loading) return <SkeletonCell />;
           return (
             <div className="flex flex-col gap-1">
-              <span>
-                <pre>{row.original.sig}</pre>
-              </span>
-              <span className="text-sm text-muted-foreground">
-                {row.original.selector}
-              </span>
+              {row.original.selector ? (
+                <span className="text-sm text-muted-foreground">
+                  {row.original.selector}
+                </span>
+              ) : null}
               {/* We can't show for sure write functions, because sometimes the abi will specify
               "nonpayable/payable" for all functions if it couldn't determine the state */}
-              <span className="text-sm text-muted-foreground">
+              <span className="flex text-sm text-muted-foreground">
                 {mut && (mut === 'pure' || mut === 'view') ? (
                   <Badge variant="secondary">read</Badge>
                 ) : null}
@@ -291,12 +290,12 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
             return <Icons.close className="h-4 w-4 opacity-50" />; // no inputs
 
           return (
-            <div className="grid items-center gap-x-4 gap-y-2 lg:grid-cols-[auto_1fr]">
+            <div className="grid items-center gap-x-4 gap-y-1 sm:grid-cols-[auto_1fr]">
               {payable ? (
                 <>
                   <Label
                     htmlFor={`${id}-value`}
-                    className="flex min-w-[100px] items-center gap-2 whitespace-nowrap text-xs text-muted-foreground sm:text-sm"
+                    className="flex min-w-[100px] items-center gap-2 whitespace-nowrap text-xs text-muted-foreground"
                   >
                     value ({chain.nativeCurrency.symbol})
                     <TooltipResponsive
@@ -308,7 +307,7 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
                     id={`${id}-value`}
                     type="text"
                     placeholder="0"
-                    className="h-7 w-full max-w-xs text-xs sm:h-9 sm:text-sm"
+                    className="h-7 w-full max-w-xs text-xs"
                     value={inputValues[id]['value'] as string}
                     onFocus={() => (focusedInputRef.current = `${id}-value`)}
                     onBlur={() => (focusedInputRef.current = null)}
@@ -321,14 +320,14 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
                 <Fragment key={index}>
                   <Label
                     htmlFor={`${id}-args-${index}`}
-                    className="min-w-[100px] whitespace-nowrap text-xs text-muted-foreground sm:text-sm"
+                    className="min-w-[100px] whitespace-nowrap text-xs text-muted-foreground"
                   >
                     {input.name || `arg ${index + 1}`}
                   </Label>
                   <Input
                     id={`${id}-args-${index}`}
                     placeholder={input.type}
-                    className="h-7 w-full max-w-xs text-xs sm:h-9 sm:text-sm"
+                    className="h-7 w-full max-w-xs text-xs"
                     value={inputValues[id]['args'][index] as string | number}
                     onFocus={() =>
                       (focusedInputRef.current = `${id}-args-${index}`)
@@ -424,8 +423,8 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
 
   const table = useReactTable<ABIFunction>({
     data: dataMemoized,
-    // Below tabled (640px), aggregate the name & details columns into one
-    columns: isTablet
+    // Below md (768px), aggregate the name & details columns into one
+    columns: isDesktop
       ? columns
       : [
           {

@@ -30,9 +30,7 @@ const Welcome = () => {
           passHref
           legacyBehavior
         >
-          <Button rel="noopener noreferrer" className="h-8 text-xs">
-            Overview
-          </Button>
+          <Button rel="noopener noreferrer">Overview</Button>
         </Link>
         <Link
           href={`${METADATA_EXTRA.links.documentation}/progress`}
@@ -41,11 +39,7 @@ const Welcome = () => {
           passHref
           legacyBehavior
         >
-          <Button
-            rel="noopener noreferrer"
-            variant="secondary"
-            className="h-8 text-xs"
-          >
+          <Button rel="noopener noreferrer" variant="secondary">
             Follow development
           </Button>
         </Link>

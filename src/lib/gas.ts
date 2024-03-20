@@ -14,7 +14,6 @@ const FEES_DATA_LOWER_BOUND = 30;
 const FEES_DATA_MIDDLE_BOUND = 60;
 const FEES_DATA_UPPER_BOUND = 90;
 const PRECISION = DEFAULTS.precision;
-const CMC_PRECISION = 1e12;
 
 // We could use `estimateFeesPerGas` to get maxFee & maxPriorityFee for EIP-1559 chains and
 // gasPrice for legacy chains. But actually:
@@ -168,5 +167,6 @@ export const calculateGasCost = (
 
 // Convert a native token amount to USD based on the native token price and its decimals
 export const nativeToUsd = (native: bigint, price: number, decimals: number) =>
-  Number((native * BigInt(price * CMC_PRECISION)) / BigInt(10 ** decimals)) /
-  CMC_PRECISION;
+  Number(
+    (native * BigInt(price) * PRECISION) / BigInt(10 ** decimals) / PRECISION,
+  );

@@ -16,6 +16,7 @@ import {
 import { TxEntry } from '@/lib/types/tx';
 import { CHAINS } from '@/lib/constants/providers';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
+import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -92,8 +93,12 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  // Display table layout from large desktop
-  const isLargeDesktop = useMediaQuery('(min-width: 1024px)'); // lg
+  // Display table layout from md (large layout) to lg (sidebar appeared), then again from xl
+  const isMediumOrLarge = useMediaQuery(
+    '(min-width: 768px) and (max-width: 1024px)',
+  ); // md to lg
+  const isExtraLarge = useMediaQuery('(min-width: 1280px)'); // xl
+  const largeDisplay = isMediumOrLarge || isExtraLarge;
 
   /* --------------------------------- COLUMNS -------------------------------- */
   // Id, type, function/selector (if relevant), timestamp, status
@@ -244,8 +249,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
       <Skeleton className="my-2 h-24 w-full" />
     ) : (
       <>
-        <TxDetailsSubTable tx={row.original} />
-        <TxGasConfigSubTable tx={row.original} />
+        <TxDetailsSubTable tx={row.original} largeDisplay={largeDisplay} />
         <div className="grid grid-cols-[min-content_1fr] justify-between gap-x-4 gap-y-2 p-2">
           <span className="whitespace-nowrap text-xs font-medium">
             {row.original.data && row.original.data !== '0x'
@@ -415,7 +419,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
     initialState: {
       pagination: {
         pageIndex: 0,
-        pageSize: isLargeDesktop ? 10 : 5,
+        pageSize: largeDisplay ? 10 : 5,
       },
     },
     // Sorting
@@ -431,7 +435,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
   });
 
   /* ----------------------------- RENDER DESKTOP ----------------------------- */
-  if (isLargeDesktop)
+  if (largeDisplay)
     return (
       <DataTableExpandable<TxEntry>
         table={table}
@@ -518,22 +522,30 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
 
 type TxSubTableProps = {
   tx: TxEntry;
+  largeDisplay?: boolean;
 };
 
 /**
  * @notice A sub-table to display the details of a transaction
- * @dev This will display the context of the transaction (chain, target, caller, inputValues),
- * the data (decoded?), logs, errors, and gasUsed.
+ * @dev This will display the context of the transaction (chain, target, caller, tx value, gas used),
+ * as well as the gas configuration at the time of the transaction (base fee, priority fee, underlying
+ * base fee, blob base fee, native token price).
  * @dev We don't need anything fancy here, just a simple grid with the details
  * @param tx The transaction to display
+ * @param largeDisplay Whether the table is displayed in a large layout (screen size)
  * @returns A sub-table with the details of the transaction
  */
-const TxDetailsSubTable: FC<TxSubTableProps> = ({ tx }) => {
+const TxDetailsSubTable: FC<TxSubTableProps> = ({ tx, largeDisplay }) => {
   const txChain = CHAINS.find((c) => c.id === tx.context.chainId);
+
+  const gasConfig = tx.context.gasConfig;
+  const hasPriorityFee = gasConfig.hasChainPriorityFee;
+  const hasUnderlying = !!gasConfig.stack;
 
   /* ---------------------------------- TABLE --------------------------------- */
   const table = useMemo(
     () => [
+      // 1st row
       {
         header: () => 'Chain',
         cell: () => txChain?.name || tx.context.chainId,
@@ -572,42 +584,7 @@ const TxDetailsSubTable: FC<TxSubTableProps> = ({ tx }) => {
         header: () => 'Gas used',
         cell: () => tx.gasUsed,
       },
-    ],
-    [tx, txChain],
-  );
-
-  /* --------------------------------- RENDER --------------------------------- */
-  return (
-    <div className="grid grid-cols-[80px_1fr] gap-x-4 gap-y-2 p-2 lg:grid-cols-5">
-      {table.map((row, i) => (
-        <Fragment key={i}>
-          <span className="whitespace-nowrap text-xs font-medium text-muted-foreground">
-            {row.header()}
-          </span>
-          {row.cell()}
-        </Fragment>
-      ))}
-    </div>
-  );
-};
-
-/**
- * @notice A sub-table to display the config of a transaction
- * @dev This will display the configuration at the time of the transaction (base fee, priority fee,
- * if relevant underlying base fee and blob base fee, native token price).
- * @dev We don't need anything fancy here, just a simple grid with the details
- * @param tx The transaction to display
- * @returns A sub-table with the configuration of the transaction
- */
-const TxGasConfigSubTable: FC<TxSubTableProps> = ({ tx }) => {
-  const txChain = CHAINS.find((c) => c.id === tx.context.chainId);
-  const gasConfig = tx.context.gasConfig;
-  const hasPriorityFee = gasConfig.hasChainPriorityFee;
-  const hasUnderlying = !!gasConfig.stack;
-
-  /* ---------------------------------- TABLE --------------------------------- */
-  const allItems = useMemo(
-    () => [
+      // 2nd row
       {
         header: () => 'Base fee',
         cell: () => (
@@ -663,33 +640,50 @@ const TxGasConfigSubTable: FC<TxSubTableProps> = ({ tx }) => {
         ),
       },
     ],
-    [tx, txChain, gasConfig],
+    [tx, gasConfig, txChain],
   );
 
   // Filter the items to display
-  const table = useMemo(
+  const tableAvailable = useMemo(
     () =>
-      allItems.filter(
+      table.filter(
         (_, i) =>
-          (i === 1 && hasPriorityFee) ||
-          (i === 2 && hasUnderlying) ||
-          (i === 3 && hasUnderlying) ||
-          (i !== 1 && i !== 2 && i !== 3),
+          // priority fee
+          (i === 6 && hasPriorityFee) ||
+          // underlying base fee
+          (i === 7 && hasUnderlying) ||
+          // blob base fee
+          (i === 8 && hasUnderlying) ||
+          (i !== 6 && i !== 7 && i !== 8),
       ),
-    [allItems, hasPriorityFee, hasUnderlying],
+    [table, hasPriorityFee, hasUnderlying],
   );
 
   /* --------------------------------- RENDER --------------------------------- */
   return (
-    <div className="grid grid-cols-[80px_1fr] gap-x-4 gap-y-2 p-2 lg:grid-cols-5">
-      {table.map((row, i) => (
-        <Fragment key={i}>
-          <span className="text-xs font-medium text-muted-foreground">
-            {row.header()}
-          </span>
-          {row.cell()}
-        </Fragment>
-      ))}
+    <div
+      className={cn(
+        'grid grid-cols-[150px_1fr] items-center gap-x-4 gap-y-2 p-2',
+        largeDisplay && 'grid-cols-[auto_1fr_1fr_auto_auto] gap-x-16',
+      )}
+    >
+      {tableAvailable.map((row, i) =>
+        largeDisplay ? (
+          <div key={i} className="flex flex-col gap-2">
+            <span className="whitespace-nowrap text-xs font-medium text-muted-foreground">
+              {row.header()}
+            </span>
+            {row.cell()}
+          </div>
+        ) : (
+          <Fragment key={i}>
+            <span className="whitespace-nowrap pt-[3px] text-xs font-medium text-muted-foreground">
+              {row.header()}
+            </span>
+            {row.cell()}
+          </Fragment>
+        ),
+      )}
     </div>
   );
 };

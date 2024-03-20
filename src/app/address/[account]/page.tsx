@@ -5,9 +5,6 @@ import dynamic from 'next/dynamic';
 import { Separator } from '@/components/ui/separator';
 
 // Import dynamically to avoid SSR issues due to persisted state (see zustand stores)
-const ConfigMenu = dynamic(
-  () => import('@/components/core/selection/config-menu'),
-);
 const Header = dynamic(() => import('@/components/core/header'));
 const AccountState = dynamic(() => import('@/components/core/account-state'));
 const Interact = dynamic(() => import('@/components/core/interact'));
@@ -24,17 +21,14 @@ export default function AccountPage({
   params: { account: string };
 }) {
   return (
-    <div className="flex flex-col space-x-0 pb-6 md:flex-row md:space-x-16">
-      <ConfigMenu />
-      <div className="flex grow flex-col gap-4">
-        <Header initialAddress={params.account} />
+    <div className="flex grow flex-col gap-4">
+      <Header initialAddress={params.account} />
 
-        <AccountState initialAddress={params.account} />
-        <Interact />
+      <AccountState initialAddress={params.account} />
+      <Interact />
 
-        <Separator className="my-4" />
-        <TxHistory />
-      </div>
+      <Separator className="my-4" />
+      <TxHistory />
     </div>
   );
 }

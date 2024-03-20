@@ -48,7 +48,19 @@ const TxHistoryCollapsibleMobile = <TData,>({
       <Accordion type="single" collapsible className="w-full">
         {table.getRowModel().rows?.length ? (
           table.getRowModel().rows.map((row) => (
-            <AccordionItem key={row.id} value={row.id}>
+            <AccordionItem
+              key={row.id}
+              value={row.id}
+              className={
+                // border-b only if not the last item
+                cn(
+                  row.id ===
+                    table.getRowModel().rows[
+                      table.getRowModel().rows.length - 1
+                    ].id && 'border-none',
+                )
+              }
+            >
               <AccordionTrigger className="grid grid-cols-[min-content_1fr_min-content_min-content] justify-start gap-2 hover:no-underline">
                 <>
                   {/* id | function name | status | expand button */}

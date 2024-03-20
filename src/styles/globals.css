@@ -4,57 +4,48 @@
 
 @layer base {
   :root {
-    --flexoki-bg: 48 100% 97%;
-    --flexoki-bg-2: 51 33% 92%;
-
-    --flexoki-ui: 51 21% 88%;
-    --flexoki-ui-2: 50 14% 83%;
-    --flexoki-ui-3: 55 10% 79%;
-
-    --flexoki-tx: 0 3% 6%;
-    --flexoki-tx-2: 50 3% 42%;
-    --flexoki-tx-3: 49 7% 70%;
-
-    --flexoki-re: 3 62% 42%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --radius: 0.3rem;
   }
 
   .dark {
-    --flexoki-bg: 0 3% 6%;
-    --flexoki-bg-2: 30 4% 11%;
-
-    --flexoki-ui: 30 3% 15%;
-    --flexoki-ui-2: 40 3% 20%;
-    --flexoki-ui-3: 30 3% 24%;
-
-    --flexoki-tx: 55 10% 79%;
-    --flexoki-tx-2: 43 3% 52%;
-    --flexoki-tx-3: 45 2% 33%;
-
-    --flexoki-re: 5 61% 54%;
-  }
-
-  :root {
-    --background: var(--flexoki-bg);
-    --foreground: var(--flexoki-tx);
-    --card: var(--flexoki-bg);
-    --card-foreground: var(--flexoki-tx);
-    --popover: var(--flexoki-bg);
-    --popover-foreground: var(--flexoki-tx);
-    --primary: var(--flexoki-tx);
-    --primary-foreground: var(--flexoki-bg);
-    /* switched secondary and muted */
-    --muted: var(--flexoki-ui-2);
-    --muted-foreground: var(--flexoki-tx-2);
-    --secondary: var(--flexoki-bg-2);
-    --secondary-foreground: var(--flexoki-tx-3);
-    --accent: var(--flexoki-ui);
-    --accent-foreground: var(--flexoki-tx-2);
-    --destructive: var(--flexoki-re);
-    --destructive-foreground: var(--flexoki-bg);
-    --border: var(--flexoki-ui-2);
-    --input: var(--flexoki-ui-2);
-    --ring: var(--flexoki-ui-3);
-    --radius: 0.5rem;
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
   }
 }
 
