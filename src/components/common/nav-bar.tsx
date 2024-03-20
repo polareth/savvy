@@ -65,12 +65,12 @@ const DesktopNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
         <Link
           href="/"
           className={cn(
-            'flex items-center gap-2 font-semibold transition-opacity duration-200 hover:opacity-75',
+            'flex items-center gap-3 font-semibold transition-opacity duration-200 hover:opacity-75',
             // selected[0] === '/' ? 'text-muted-foreground' : '',
           )}
           aria-label="Home"
         >
-          <Icons.logo className="h-8 w-8" />
+          <Icons.logo className="h-6 w-6" />
           <span className="mt-[-2px]">{METADATA_BASE.title?.toString()}</span>
         </Link>
         <NavigationMenu className="ml-4">
