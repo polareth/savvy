@@ -148,25 +148,25 @@ const evmOptimisticRollupBase: OptimisticRollupBase = {
 
 export const CHAINS: Chain[] = [
   /* --------------------------------- ARBITRUM -------------------------------- */
-  {
-    ...arbitrum,
-    custom: {
-      tech: {
-        ...evmOptimisticRollupBase,
-        avgBlockTime: 260,
-        hasPriorityFee: false,
-        rollup: 'arbitrum-orbit',
-      },
-      config: {
-        rpcUrl: RPC_URLS.arbitrum,
-        provider: createProvider(arbitrum, RPC_URLS.arbitrum),
-        nativeTokenSlug: 'ethereum',
-        // TODO: Add gas controls
-        icon: Icons.arbitrum,
-        disabled: true,
-      },
-    },
-  },
+  // TODO Add when arbitrum orbit is supported
+  // {
+  //   ...arbitrum,
+  //   custom: {
+  //     tech: {
+  //       ...evmOptimisticRollupBase,
+  //       avgBlockTime: 260,
+  //       hasPriorityFee: false,
+  //       rollup: 'arbitrum-orbit',
+  //     },
+  //     config: {
+  //       rpcUrl: RPC_URLS.arbitrum,
+  //       provider: createProvider(arbitrum, RPC_URLS.arbitrum),
+  //       nativeTokenSlug: 'ethereum',
+  //       // TODO: Add gas controls
+  //       icon: Icons.arbitrum,
+  //     },
+  //   },
+  // },
   /* ---------------------------------- BASE ---------------------------------- */
   {
     ...base,
