@@ -46,34 +46,7 @@ export const calculateL1DataFee: CalculateL1DataFee = async (
 ) => {
   // We just want to grab any first error that occurs, since any subsequent call would be inacurate
   try {
-    // TODO Use this batch call when it's fixed
-    /* ------------------------------------ - ----------------------------------- */
     // Find the scalar values for the base and blob base fees on this chain
-    // const [
-    //   baseFeeScalar,
-    //   blobBaseFeeScalar,
-    // ]: JsonRpcReturnTypeFromMethod<'tevm_call'>[] = await client.sendBulk([
-    //   {
-    //     method: 'tevm_call',
-    //     params: [GasPriceOracle.read.baseFeeScalar()],
-    //     id: 1,
-    //     jsonrpc: '2.0',
-    //   },
-    //   {
-    //     method: 'tevm_call',
-    //     params: [GasPriceOracle.read.blobBaseFeeScalar()],
-    //     id: 2,
-    //     jsonrpc: '2.0',
-    //   },
-    // ]);
-
-    // Estimation will fail (= not accurate) if there is an error so we throw it
-    // if (baseFeeScalar.error || blobBaseFeeScalar.error) {
-    //   const error =
-    //     baseFeeScalar.error?.message || blobBaseFeeScalar.error?.message;
-    //   throw new Error(error === '0x' ? 'Unknown error' : error);
-    // }
-
     const { data: baseFeeScalar } = await client.contract({
       ...GasPriceOracle.read.baseFeeScalar(),
     });
@@ -81,7 +54,6 @@ export const calculateL1DataFee: CalculateL1DataFee = async (
     const { data: blobBaseFeeScalar } = await client.contract({
       ...GasPriceOracle.read.blobBaseFeeScalar(),
     });
-    /* ------------------------------------ - ----------------------------------- */
 
     // Set the L1Block values
     await client.call({
@@ -104,8 +76,6 @@ export const calculateL1DataFee: CalculateL1DataFee = async (
             'bytes32', // _batcherHash
           ],
           [
-            // Number(baseFeeScalar.result?.rawData) || 0,
-            // Number(blobBaseFeeScalar.result?.rawData) || 0,
             Number(baseFeeScalar) || 0,
             Number(blobBaseFeeScalar) || 0,
             BigInt(0),
