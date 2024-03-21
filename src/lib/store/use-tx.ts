@@ -29,7 +29,6 @@ type TxSetState = {
   // Tx history
   saveTx: (chainId: number, tx: Omit<TxEntry, 'id'>) => void;
   resetTxs: (chainId: number) => void;
-  getTxs: (chainId: number) => TxEntry[];
   // Tx processing
   setProcessing: (value: string) => void;
   // Handling inputs
@@ -69,8 +68,6 @@ export const useTxStore = create<TxStore>()(
           return { txHistory: state.txHistory };
         });
       },
-      // Get the history for a chain
-      getTxs: (chainId) => get().txHistory[chainId] ?? [],
 
       /* ------------------------------- PROCESSING ------------------------------- */
       // The current transaction being processed (function id or empty string for none)

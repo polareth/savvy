@@ -139,7 +139,7 @@ export type TxContext = {
  * @property {number} gasUsed The amount of gas used by the call
  * @property {string | string[]} data The data returned by the call, either decoded or raw (hex)
  * @property {boolean} decoded Whether the data is decoded or not
- * @property {boolean} success Whether the call was successful
+ * @property {'success' | 'revert' | 'failure' | 'pending'} status The status of the transaction
  * @property {TxError[] | null} errors The errors that occurred during the call
  * @property {number} timestamp The timestamp of the transaction (when it was saved)
  */
@@ -153,7 +153,7 @@ export type TxEntry = {
   // Output
   data: string | string[];
   decoded: boolean;
-  status: 'success' | 'revert' | 'failure';
+  status: 'success' | 'revert' | 'failure' | 'pending';
   logs: Log[] | null;
   errors: TxError[] | null;
   timestamp: number;

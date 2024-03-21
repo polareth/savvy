@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, Fragment, ReactNode, useMemo, useState } from 'react';
+import { FC, Fragment, ReactNode, useCallback, useMemo, useState } from 'react';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -33,11 +33,19 @@ import DataTableExpandable from '@/components/templates/table/data-table-expanda
 import { DataTableFacetedFilter } from '@/components/templates/table/faceted-filter';
 import { DataTableViewOptions } from '@/components/templates/table/view';
 
+/* ---------------------------------- TYPES --------------------------------- */
 type TxHistoryTableProps = {
   data: TxEntry[] | undefined;
   loading?: boolean;
 };
 
+type CellNodeContext = {
+  id: number;
+  data?: TxEntry[];
+  loading?: boolean;
+};
+
+/* --------------------------------- HELPERS -------------------------------- */
 // The loading row with mock data (just to display a skeleton)
 const getLoadingRow = (id: number): TxEntry => ({
   id,
@@ -70,11 +78,24 @@ const getLoadingRow = (id: number): TxEntry => ({
   gasUsed: '0',
   data: '',
   decoded: false,
-  status: 'failure',
+  status: 'pending',
   logs: null,
   errors: null,
   timestamp: Date.now(),
 });
+
+// Render a loading skeleton if it's the latest transaction being processed or the original data if it's not
+const getCellNode = (
+  cell: ReactNode | string,
+  context: CellNodeContext,
+  skeletonClass?: string,
+) =>
+  context.data === undefined ||
+  (context.loading && context.id === context.data.length) ? (
+    <Skeleton className={cn('h-4 w-16', skeletonClass)} />
+  ) : (
+    cell
+  );
 
 /* -------------------------------------------------------------------------- */
 /*                              TX HISTORY TABLE                              */
@@ -100,17 +121,16 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
   const isExtraLarge = useMediaQuery('(min-width: 1280px)'); // xl
   const largeDisplay = isMediumOrLarge || isExtraLarge;
 
+  /* --------------------------------- HELPERS -------------------------------- */
+  // The context to pass to the cell node to figure out if it's a loading tx or a processed one
+  const cellNodeContext = useCallback(
+    (id: number) => ({ id, data, loading }),
+    [data, loading],
+  );
+
   /* --------------------------------- COLUMNS -------------------------------- */
   // Id, type, function/selector (if relevant), timestamp, status
   const columns: ColumnDef<TxEntry>[] = useMemo(() => {
-    // Render a loading skeleton if it's the latest transaction being processed or the original data if it's not
-    const getCellNode = (cell: ReactNode | string, id: number) =>
-      data === undefined || (loading && id === data.length + 1) ? (
-        <Skeleton className="h-4 w-16" />
-      ) : (
-        cell
-      );
-
     return [
       {
         accessorKey: 'id',
@@ -135,7 +155,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
             ) : (
               <Badge variant="outline">?</Badge>
             ),
-            row.original.id,
+            cellNodeContext(row.original.id),
           ),
       },
       {
@@ -150,7 +170,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
                 </span>
               )}
             </pre>,
-            row.original.id,
+            cellNodeContext(row.original.id),
           ),
         filterFn: (row, id, value) => {
           return row.original.context.functionName?.includes(value) || false;
@@ -198,7 +218,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
                 </div>
               </div>
             </div>,
-            row.original.id,
+            cellNodeContext(row.original.id),
           ),
       },
       {
@@ -214,7 +234,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
               }
               content={new Date(row.original.timestamp).toLocaleString()}
             />,
-            row.original.id,
+            cellNodeContext(row.original.id),
           ),
       },
       {
@@ -232,24 +252,25 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
             ) : (
               <Badge variant="destructive">Error</Badge>
             ),
-            row.original.id,
+            cellNodeContext(row.original.id),
           ),
       },
     ];
-  }, [data, loading]);
+  }, [cellNodeContext]);
 
   /* ------------------------------- EXPANDABLE ------------------------------- */
   // context (chain, target, caller, inputValues), data (decoded?), logs, errors, gasUsed
   const expandableCell = (row: Row<TxEntry>) => {
     const txChain = CHAINS.find((c) => c.id === row.original.context.chainId);
-    const hasUnderlying = !!row.original.context.gasConfig.stack;
+    const hasUnderlying = !!txChain?.custom.tech.underlying;
 
-    return data === undefined ||
-      (loading && row.original.id === data.length + 1) ? (
-      <Skeleton className="my-2 h-24 w-full" />
-    ) : (
+    return (
       <>
-        <TxDetailsSubTable tx={row.original} largeDisplay={largeDisplay} />
+        <TxDetailsSubTable
+          tx={row.original}
+          largeDisplay={largeDisplay}
+          cellNodeContext={cellNodeContext}
+        />
         <div className="grid grid-cols-[min-content_1fr] justify-between gap-x-4 gap-y-2 p-2">
           <span className="whitespace-nowrap text-xs font-medium">
             {row.original.data && row.original.data !== '0x'
@@ -258,33 +279,45 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
                 : 'Raw data'
               : 'Data'}
           </span>
-          {row.original.data && row.original.data !== '0x' ? (
-            <pre className="overflow-x-auto whitespace-pre-wrap break-words text-xs">
-              {row.original.data}
-            </pre>
-          ) : (
-            <span className="text-xs text-muted-foreground">No data</span>
+          {getCellNode(
+            row.original.data && row.original.data !== '0x' ? (
+              <pre className="overflow-x-auto whitespace-pre-wrap break-words text-xs">
+                {row.original.data}
+              </pre>
+            ) : (
+              <span className="text-xs text-muted-foreground">No data</span>
+            ),
+            cellNodeContext(row.original.id),
+            'h-4 w-full',
           )}
           <Separator className="col-span-2 my-2 w-8" />
           <span className="flex items-center whitespace-nowrap text-xs font-medium">
             {hasUnderlying ? 'L2 fee' : 'Fee'}
           </span>
           <div className="flex flex-col gap-1 lg:flex-row lg:items-center">
-            <CurrencyAmount
-              amount={row.original.gasCosts.costNative.root}
-              symbol={txChain?.nativeCurrency.symbol}
-              decimals={txChain?.nativeCurrency.decimals}
-              full
-            />
-            <span className="text-xs text-muted-foreground">
-              (
+            {getCellNode(
               <CurrencyAmount
-                amount={row.original.gasCosts.costUsd.root}
-                symbol="USD"
+                amount={row.original.gasCosts.costNative.root}
+                symbol={txChain?.nativeCurrency.symbol}
+                decimals={txChain?.nativeCurrency.decimals}
                 full
-              />
-              )
-            </span>
+              />,
+              cellNodeContext(row.original.id),
+              'h-4 w-full',
+            )}
+            {getCellNode(
+              <span className="text-xs text-muted-foreground">
+                (
+                <CurrencyAmount
+                  amount={row.original.gasCosts.costUsd.root}
+                  symbol="USD"
+                  full
+                />
+                )
+              </span>,
+              cellNodeContext(row.original.id),
+              'h-4 w-full',
+            )}
           </div>
 
           {hasUnderlying ? (
@@ -300,91 +333,110 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
                 />
               ) : (
                 <div className="flex flex-col gap-1 lg:flex-row lg:items-center">
-                  <CurrencyAmount
-                    amount={row.original.gasCosts.costNative.l1Submission || 0}
-                    symbol={txChain?.nativeCurrency.symbol}
-                    decimals={txChain?.nativeCurrency.decimals}
-                    full
-                  />
-                  <span className="text-xs text-muted-foreground">
-                    (
+                  {getCellNode(
                     <CurrencyAmount
-                      amount={row.original.gasCosts.costUsd.l1Submission || 0}
-                      symbol="USD"
+                      amount={
+                        row.original.gasCosts.costNative.l1Submission || 0
+                      }
+                      symbol={txChain?.nativeCurrency.symbol}
+                      decimals={txChain?.nativeCurrency.decimals}
                       full
-                    />
-                    )
-                  </span>
+                    />,
+                    cellNodeContext(row.original.id),
+                    'h-4 w-full',
+                  )}
+                  {getCellNode(
+                    <span className="text-xs text-muted-foreground">
+                      (
+                      <CurrencyAmount
+                        amount={row.original.gasCosts.costUsd.l1Submission || 0}
+                        symbol="USD"
+                        full
+                      />
+                      )
+                    </span>,
+                    cellNodeContext(row.original.id),
+                    'h-4 w-full',
+                  )}
                 </div>
               )}
             </>
           ) : null}
           <Separator className="col-span-2 my-2 w-8" />
           <span className="text-xs font-medium">Errors</span>
-          {row.original.errors ? (
-            <ScrollArea className="max-h-48 rounded-sm border border-secondary p-2">
-              <div className="grid grid-cols-[min-content_1fr] gap-x-2 gap-y-1 text-xs">
-                {row.original.errors.map((e, i) => (
-                  <Fragment key={i}>
-                    <span className="text-muted-foreground">{i + 1}.</span>
-                    {e.message.replace('\n\n', '\n')}
-                  </Fragment>
-                ))}
-              </div>
-            </ScrollArea>
-          ) : (
-            <span className="text-xs text-muted-foreground">No errors</span>
+          {getCellNode(
+            row.original.errors ? (
+              <ScrollArea className="max-h-48 rounded-sm border border-secondary p-2">
+                <div className="grid grid-cols-[min-content_1fr] gap-x-2 gap-y-1 text-xs">
+                  {row.original.errors.map((e, i) => (
+                    <Fragment key={i}>
+                      <span className="text-muted-foreground">{i + 1}.</span>
+                      {e.message.replace('\n\n', '\n')}
+                    </Fragment>
+                  ))}
+                </div>
+              </ScrollArea>
+            ) : (
+              <span className="text-xs text-muted-foreground">No errors</span>
+            ),
+            cellNodeContext(row.original.id),
           )}
           <span className="text-xs font-medium">Logs</span>
-          {row.original.logs && row.original.logs.length > 0 ? (
-            <ScrollArea className="max-h-48 rounded-sm border border-secondary p-2">
-              <div className="text-wrap grid grid-cols-[min-content_1fr_1fr_1fr] gap-x-2 gap-y-1 text-xs">
-                <span />
-                <span className="text-muted-foreground">Address</span>
-                <span className="text-muted-foreground">Data</span>
-                <span className="text-muted-foreground">Topics</span>
-                {row.original.logs.map((l, i) => (
-                  <Fragment key={i}>
-                    <pre className="text-muted-foreground">{i + 1}.</pre>
-                    <pre>{l.address}</pre>
-                    <pre>{l.data}</pre>
-                    <pre>{l.topics.join(', ')}</pre>
-                  </Fragment>
-                ))}
-              </div>
-            </ScrollArea>
-          ) : (
-            <span className="text-xs text-muted-foreground">No logs</span>
+          {getCellNode(
+            row.original.logs && row.original.logs.length > 0 ? (
+              <ScrollArea className="max-h-48 rounded-sm border border-secondary p-2">
+                <div className="text-wrap grid grid-cols-[min-content_1fr_1fr_1fr] gap-x-2 gap-y-1 text-xs">
+                  <span />
+                  <span className="text-muted-foreground">Address</span>
+                  <span className="text-muted-foreground">Data</span>
+                  <span className="text-muted-foreground">Topics</span>
+                  {row.original.logs.map((l, i) => (
+                    <Fragment key={i}>
+                      <pre className="text-muted-foreground">{i + 1}.</pre>
+                      <pre>{l.address}</pre>
+                      <pre>{l.data}</pre>
+                      <pre>{l.topics.join(', ')}</pre>
+                    </Fragment>
+                  ))}
+                </div>
+              </ScrollArea>
+            ) : (
+              <span className="text-xs text-muted-foreground">No logs</span>
+            ),
+            cellNodeContext(row.original.id),
           )}
           <Separator className="col-span-2 my-2 w-8" />
           <span className="whitespace-nowrap text-xs font-medium">Inputs</span>
-          {row.original.context.inputValues.length > 0 &&
-          !(
-            row.original.context.inputValues.length === 1 &&
-            row.original.context.inputValues[0].value === '0x'
-          ) ? (
-            <ScrollArea className="max-h-48 rounded-sm border border-secondary p-2">
-              <div className="text-wrap grid grid-cols-[min-content_1fr] gap-x-2 gap-y-1 text-xs">
-                {row.original.context.inputValues.map((input, i) => (
-                  <Fragment key={i}>
-                    <pre className="text-muted-foreground">
-                      {input.name !== '' ? input.name : `arg ${i + 1}`}
-                    </pre>
-                    <pre className="flex flex-col gap-1">
-                      {Array.isArray(input.value)
-                        ? input.value.map((v, j) => (
-                            <span key={j} className="text-xs">
-                              {v.toString()}
-                            </span>
-                          ))
-                        : input.value.toString()}
-                    </pre>
-                  </Fragment>
-                ))}
-              </div>
-            </ScrollArea>
-          ) : (
-            <span className="text-xs text-muted-foreground">No inputs</span>
+          {getCellNode(
+            row.original.context.inputValues.length > 0 &&
+              !(
+                row.original.context.inputValues.length === 1 &&
+                row.original.context.inputValues[0].value === '0x'
+              ) ? (
+              <ScrollArea className="max-h-48 rounded-sm border border-secondary p-2">
+                <div className="text-wrap grid grid-cols-[min-content_1fr] gap-x-2 gap-y-1 text-xs">
+                  {row.original.context.inputValues.map((input, i) => (
+                    <Fragment key={i}>
+                      <pre className="text-muted-foreground">
+                        {input.name !== '' ? input.name : `arg ${i + 1}`}
+                      </pre>
+                      <pre className="flex flex-col gap-1">
+                        {Array.isArray(input.value)
+                          ? input.value.map((v, j) => (
+                              <span key={j} className="text-xs">
+                                {v.toString()}
+                              </span>
+                            ))
+                          : input.value.toString()}
+                      </pre>
+                    </Fragment>
+                  ))}
+                </div>
+              </ScrollArea>
+            ) : (
+              <span className="text-xs text-muted-foreground">No inputs</span>
+            ),
+            cellNodeContext(row.original.id),
           )}
         </div>
       </>
@@ -398,12 +450,12 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
 
     // If data is undefined, it could not yet retrieve the transactions (loading)
     if (data === undefined) {
-      return [getLoadingRow(1)];
+      return [getLoadingRow(0)];
     }
 
     // If loading (processing a tx), add a loading entry first
     if (loading) {
-      return [getLoadingRow((data?.length ?? 0) + 1 || 1), ...sorted];
+      return [getLoadingRow(data?.length ?? 0), ...sorted];
     }
 
     return sorted;
@@ -524,6 +576,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
 
 type TxSubTableProps = {
   tx: TxEntry;
+  cellNodeContext: (id: number) => CellNodeContext;
   largeDisplay?: boolean;
 };
 
@@ -537,7 +590,11 @@ type TxSubTableProps = {
  * @param largeDisplay Whether the table is displayed in a large layout (screen size)
  * @returns A sub-table with the details of the transaction
  */
-const TxDetailsSubTable: FC<TxSubTableProps> = ({ tx, largeDisplay }) => {
+const TxDetailsSubTable: FC<TxSubTableProps> = ({
+  tx,
+  cellNodeContext,
+  largeDisplay,
+}) => {
   const txChain = CHAINS.find((c) => c.id === tx.context.chainId);
 
   const gasConfig = tx.context.gasConfig;
@@ -550,99 +607,123 @@ const TxDetailsSubTable: FC<TxSubTableProps> = ({ tx, largeDisplay }) => {
       // 1st row
       {
         header: () => 'Chain',
-        cell: () => txChain?.name || tx.context.chainId,
+        cell: () =>
+          getCellNode(
+            txChain?.name || tx.context.chainId,
+            cellNodeContext(tx.id),
+          ),
       },
       {
         header: () => 'Account',
-        cell: () => (
-          <ShrinkedAddress
-            address={tx.context.target.address}
-            explorer={txChain?.blockExplorers?.default.url}
-            adapt={false}
-          />
-        ),
+        cell: () =>
+          getCellNode(
+            <ShrinkedAddress
+              address={tx.context.target.address}
+              explorer={txChain?.blockExplorers?.default.url}
+              adapt={false}
+            />,
+            cellNodeContext(tx.id),
+          ),
       },
       {
         header: () => 'Caller',
-        cell: () => (
-          <ShrinkedAddress
-            address={tx.context.caller}
-            explorer={txChain?.blockExplorers?.default.url}
-            adapt={false}
-          />
-        ),
+        cell: () =>
+          getCellNode(
+            <ShrinkedAddress
+              address={tx.context.caller}
+              explorer={txChain?.blockExplorers?.default.url}
+              adapt={false}
+            />,
+            cellNodeContext(tx.id),
+          ),
       },
       {
         header: () => 'Tx value',
-        cell: () => (
-          <CurrencyAmount
-            amount={tx.context.value}
-            symbol={txChain?.nativeCurrency.symbol}
-            icon={tx.context.value !== '0'}
-          />
-        ),
+        cell: () =>
+          getCellNode(
+            <CurrencyAmount
+              amount={tx.context.value}
+              symbol={txChain?.nativeCurrency.symbol}
+              icon={tx.context.value !== '0'}
+            />,
+            cellNodeContext(tx.id),
+          ),
       },
       {
         header: () => 'Gas used',
-        cell: () => tx.gasUsed,
+        cell: () => getCellNode(tx.gasUsed, cellNodeContext(tx.id)),
       },
       // 2nd row
       {
         header: () => 'Base fee',
-        cell: () => (
-          <GweiAmount
-            amount={gasConfig.baseFee}
-            decimals={txChain?.custom.config.gasControls?.gweiDecimals}
-          />
-        ),
+        cell: () =>
+          getCellNode(
+            <GweiAmount
+              amount={gasConfig.baseFee}
+              decimals={txChain?.custom.config.gasControls?.gweiDecimals}
+            />,
+            cellNodeContext(tx.id),
+          ),
       },
       {
         header: () => 'Priority fee',
-        cell: () => (
-          <GweiAmount
-            amount={gasConfig.priorityFee || BigInt(0)}
-            decimals={txChain?.custom.config.gasControls?.gweiDecimals}
-          />
-        ),
+        cell: () =>
+          getCellNode(
+            <GweiAmount
+              amount={gasConfig.priorityFee || BigInt(0)}
+              decimals={txChain?.custom.config.gasControls?.gweiDecimals}
+            />,
+            cellNodeContext(tx.id),
+          ),
       },
       {
         header: () =>
           `${txChain?.custom.tech.underlying?.name || 'Underlying'} base fee`,
-        cell: () => (
-          <GweiAmount
-            amount={gasConfig.underlyingBaseFee || BigInt(0)}
-            decimals={
-              txChain?.custom.tech.underlying?.custom.config.gasControls
-                ?.gweiDecimals
-            }
-          />
-        ),
+        cell: () =>
+          getCellNode(
+            <GweiAmount
+              amount={gasConfig.underlyingBaseFee || BigInt(0)}
+              decimals={
+                txChain?.custom.tech.underlying?.custom.config.gasControls
+                  ?.gweiDecimals
+              }
+            />,
+            cellNodeContext(tx.id),
+          ),
       },
       {
         header: () =>
           `${txChain?.custom.tech.underlying?.name || 'Underlying'} blob base fee`,
         cell: () =>
-          // It might just be 1 wei
-          gasConfig.underlyingBlobBaseFee?.toString() === '1' ? (
-            '1 wei'
-          ) : (
-            <GweiAmount
-              amount={gasConfig.underlyingBlobBaseFee || BigInt(0)}
-              decimals={
-                txChain?.custom.tech.underlying?.custom.config.gasControls
-                  ?.gweiDecimals
-              }
-            />
+          getCellNode(
+            // It might just be 1 wei
+            gasConfig.underlyingBlobBaseFee?.toString() === '1' ? (
+              '1 wei'
+            ) : (
+              <GweiAmount
+                amount={gasConfig.underlyingBlobBaseFee || BigInt(0)}
+                decimals={
+                  txChain?.custom.tech.underlying?.custom.config.gasControls
+                    ?.gweiDecimals
+                }
+              />
+            ),
+            cellNodeContext(tx.id),
           ),
       },
       {
         header: () => `${txChain?.nativeCurrency.symbol} price`,
-        cell: () => (
-          <CurrencyAmount amount={tx.context.nativeTokenPrice} symbol="USD" />
-        ),
+        cell: () =>
+          getCellNode(
+            <CurrencyAmount
+              amount={tx.context.nativeTokenPrice}
+              symbol="USD"
+            />,
+            cellNodeContext(tx.id),
+          ),
       },
     ],
-    [tx, gasConfig, txChain],
+    [tx, gasConfig, txChain, cellNodeContext],
   );
 
   // Filter the items to display
