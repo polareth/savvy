@@ -110,7 +110,7 @@ const ChainSelection: FC<ChainSelectionProps> = ({ hydrating = false }) => {
         />
       </div>
       {initializing || hydrating ? (
-        <Skeleton className="h-[32px] w-[85px]" />
+        <Skeleton className="h-4 w-[85px]" />
       ) : (
         <Button
           variant="ghost"
@@ -122,7 +122,7 @@ const ChainSelection: FC<ChainSelectionProps> = ({ hydrating = false }) => {
         </Button>
       )}
       {initializing || hydrating ? (
-        <Skeleton className="h-[36px] w-[200px] md:w-[250px]" />
+        <Skeleton className="col-span-2 h-[36px] w-full" />
       ) : (
         <ComboBoxResponsive
           items={CHAINS.map((chain) => ({
