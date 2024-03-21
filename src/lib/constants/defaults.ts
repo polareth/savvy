@@ -12,7 +12,7 @@ export const DEFAULTS = {
   // The initial chain
   chain: extractChain({
     chains: CHAINS,
-    id: Number(1),
+    id: Number(8453), // Base
   }),
   // The gas limit for Tevm calls
   gasLimit: BigInt(30_000_000), // 30M
@@ -26,7 +26,7 @@ export const DEFAULTS = {
     gweiDecimals: 2,
   },
   // The default caller for any calls
-  caller: `0x${'1'.repeat(40)}` as const,
+  caller: `0x73767679${'0'.repeat(24)}73767679` as const,
 };
 
 /* -------------------------------------------------------------------------- */
