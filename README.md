@@ -1,6 +1,6 @@
 # savvy
 
-**An interface for the EVM on the browser, to simulate & visualize onchain activity.**
+**An interface for the EVM on the browser, to simulate and visualize your onchain activity, especially the costs associated with it.**
 
 _A more comprehensive/readable version is available [in the documentation](https://docs.svvy.sh)._
 
