@@ -1,5 +1,5 @@
 import { createGasPriceOracle, createL1Block } from '@tevm/opstack';
-import { encodePacked, JsonRpcReturnTypeFromMethod, MemoryClient } from 'tevm';
+import { encodePacked, MemoryClient } from 'tevm';
 import { Hex } from 'tevm/utils';
 import { toFunctionSelector } from 'viem';
 
