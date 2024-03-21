@@ -13,7 +13,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import { TxEntry } from '@/lib/types/tx';
+import { TxEntry, TxPending } from '@/lib/types/tx';
 import { CHAINS } from '@/lib/constants/providers';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { cn } from '@/lib/utils';
@@ -37,41 +37,18 @@ import { DataTableViewOptions } from '@/components/templates/table/view';
 type TxHistoryTableProps = {
   data: TxEntry[] | undefined;
   hydrating: boolean;
-  pending: boolean;
+  pending: TxPending | undefined;
 };
 
 type CellNodeContext = {
-  id: number;
-  data?: TxEntry[];
-  loading?: boolean;
+  id: string;
+  pendingId: string | undefined;
 };
 
 /* --------------------------------- HELPERS -------------------------------- */
 // The loading row with mock data (just to display a skeleton)
-const getLoadingRow = (id: number): TxEntry => ({
-  id,
-  context: {
-    chainId: 0,
-    target: {
-      address: '0x',
-      balance: BigInt(0),
-      deployedBytecode: '0x',
-      nonce: BigInt(0),
-      storageRoot: '0x',
-      codeHash: '0x',
-      isContract: false,
-      isEmpty: true,
-    },
-    caller: '0x',
-    functionName: '',
-    inputValues: [],
-    value: '0',
-    nativeTokenPrice: 0,
-    gasConfig: {
-      baseFee: BigInt(0),
-      hasChainPriorityFee: false,
-    },
-  },
+const getLoadingRow = (pending: TxPending): TxEntry => ({
+  ...pending,
   gasCosts: {
     costUsd: { root: '0' },
     costNative: { root: '0' },
@@ -91,8 +68,7 @@ const getCellNode = (
   context: CellNodeContext,
   skeletonClass?: string,
 ) =>
-  context.data === undefined ||
-  (context.loading && context.id === context.data.length) ? (
+  context.id === context.pendingId ? (
     <Skeleton className={cn('h-4 w-16', skeletonClass)} />
   ) : (
     cell
@@ -130,8 +106,8 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
   /* --------------------------------- HELPERS -------------------------------- */
   // The context to pass to the cell node to figure out if it's a loading tx or a processed one
   const cellNodeContext = useCallback(
-    (id: number) => ({ id, data, pending }),
-    [data, pending],
+    (id: string) => ({ id, pendingId: pending?.id }),
+    [pending],
   );
 
   /* --------------------------------- COLUMNS -------------------------------- */
@@ -143,11 +119,16 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title="#" />
         ),
-        cell: ({ row }) => (
-          <span className="mr-2 text-muted-foreground lg:mr-0">
-            {row.original.id + 1}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const index = data
+            ?.sort((a, b) => a.timestamp - b.timestamp)
+            .indexOf(row.original);
+          return (
+            <span className="mr-2 text-muted-foreground lg:mr-0">
+              {!index || index === -1 ? (data?.length || 0) + 1 : index + 1}
+            </span>
+          );
+        },
       },
       {
         accessorKey: 'call',
@@ -262,7 +243,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
           ),
       },
     ];
-  }, [cellNodeContext]);
+  }, [data, cellNodeContext]);
 
   /* ------------------------------- EXPANDABLE ------------------------------- */
   // context (chain, target, caller, inputValues), data (decoded?), logs, errors, gasUsed
@@ -452,20 +433,17 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
   /* ---------------------------------- DATA ---------------------------------- */
   // Sort the data by id (latest first)
   const dataMemoized = useMemo(() => {
-    const sorted = data?.sort((a, b) => b.id - a.id) || [];
+    const sorted = data?.sort((a, b) => b.timestamp - a.timestamp) || [];
 
-    // If data is undefined, it could not yet retrieve the transactions (loading)
-    if (data === undefined) {
-      return [getLoadingRow(0)];
-    }
+    if (hydrating) return [];
 
-    // If pending (processing a tx), add a loading entry first
+    // If a tx is pending, add a loading entry
     if (pending) {
-      return [getLoadingRow(data?.length ?? 0), ...sorted];
+      return [getLoadingRow(pending), ...sorted];
     }
 
     return sorted;
-  }, [data, pending]);
+  }, [data, hydrating, pending]);
 
   /* ---------------------------------- TABLE --------------------------------- */
   const table = useReactTable<TxEntry>({
@@ -587,7 +565,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
 
 type TxSubTableProps = {
   tx: TxEntry;
-  cellNodeContext: (id: number) => CellNodeContext;
+  cellNodeContext: (id: string) => CellNodeContext;
   largeDisplay?: boolean;
 };
 

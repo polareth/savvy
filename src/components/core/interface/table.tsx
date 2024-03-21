@@ -13,8 +13,9 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { toast } from 'sonner';
+import { v4 as randomId } from 'uuid';
 
-import { Input as InputType } from '@/lib/types/tx';
+import { Input as InputType, TxContext } from '@/lib/types/tx';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { useConfigStore } from '@/lib/store/use-config';
 import { useProviderStore } from '@/lib/store/use-provider';
@@ -84,17 +85,17 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
   // Manage transactions and inputs
   const {
     inputValues,
-    processing,
+    pending,
     updateInputValue,
     initializeInputs,
-    setProcessing,
+    setPending,
     saveTx,
   } = useTxStore((state) => ({
     inputValues: state.inputValues,
-    processing: state.processing,
+    pending: state.pending,
     updateInputValue: state.updateInputValue,
     initializeInputs: state.initializeInputs,
-    setProcessing: state.setProcessing,
+    setPending: state.setPending,
     saveTx: state.saveTx,
   }));
 
@@ -163,13 +164,38 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
         return;
       }
 
+      // Format the context of the call
+      const id = randomId();
+      const context: TxContext = {
+        chainId: chain.id,
+        target: account,
+        caller,
+        functionName,
+        // Convert bigints to strings for local storage
+        inputValues: JSON.parse(
+          JSON.stringify(formattedInputs, (_, value) =>
+            typeof value === 'bigint' ? value.toString() : value,
+          ),
+        ),
+        value: value,
+        nativeTokenPrice,
+        gasConfig: {
+          baseFee: gasFeesConfig.nextBaseFeePerGas,
+          hasChainPriorityFee: gasFeesConfig.hasChainPriorityFee,
+          priorityFee: gasFeesConfig.priorityFeePerGas,
+          underlyingBaseFee: gasFeesConfig.underlyingNextBaseFeePerGas,
+          underlyingBlobBaseFee: gasFeesConfig.underlyingBlobBaseFeePerGas,
+          stack: chain.custom.tech.rollup,
+        },
+      };
+
       // Display loading state
-      setProcessing(functionName);
+      setPending({ id, context });
       const loading = toast.loading(`Calling ${functionName}...`, {
         description: 'Please wait while the transaction is being processed.',
       });
 
-      // Start processing the transaction
+      // Start pending the transaction
       const tx = await callContract(
         client,
         caller,
@@ -183,33 +209,13 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
 
       const formattedTx = await handleAfterCall(
         tx,
-        {
-          chainId: chain.id,
-          target: account,
-          caller,
-          functionName,
-          // Convert bigints to strings for local storage
-          inputValues: JSON.parse(
-            JSON.stringify(formattedInputs, (_, value) =>
-              typeof value === 'bigint' ? value.toString() : value,
-            ),
-          ),
-          value: tx.value,
-          nativeTokenPrice,
-          gasConfig: {
-            baseFee: gasFeesConfig.nextBaseFeePerGas,
-            hasChainPriorityFee: gasFeesConfig.hasChainPriorityFee,
-            priorityFee: gasFeesConfig.priorityFeePerGas,
-            underlyingBaseFee: gasFeesConfig.underlyingNextBaseFeePerGas,
-            underlyingBlobBaseFee: gasFeesConfig.underlyingBlobBaseFeePerGas,
-            stack: chain.custom.tech.rollup,
-          },
-        },
+        context,
+        id,
         client,
         loading,
       );
 
-      setProcessing('');
+      setPending(undefined);
       // Update the account state after the call
       updateAccount(account.address, { updateAbi: false, chain, client }); // no need to wait for completion
 
@@ -226,7 +232,7 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
       nativeTokenPrice,
       gasFeesConfig,
       saveTx,
-      setProcessing,
+      setPending,
       updateAccount,
     ],
   );
@@ -364,7 +370,7 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
             <Button
               variant="secondary"
               size="sm"
-              disabled={!isCallReady[id] || processing !== ''}
+              disabled={!isCallReady[id] || !!pending}
               onClick={() =>
                 call(
                   row.original.name || '', // we're actually confident this is not undefined
@@ -381,7 +387,9 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
                 )
               }
             >
-              {processing === id ? <Icons.loading className="mr-2" /> : null}
+              {pending?.context.functionName === id ? (
+                <Icons.loading className="mr-2" />
+              ) : null}
               <span className="hidden sm:inline-block">Call</span>
               <Icons.right className="inline-block h-4 w-4 sm:hidden" />
             </Button>
@@ -393,7 +401,7 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
       abi,
       loading,
       inputValues,
-      processing,
+      pending,
       isCallReady,
       chain.nativeCurrency.symbol,
       call,

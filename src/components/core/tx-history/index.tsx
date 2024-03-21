@@ -16,11 +16,11 @@ const TxHistory = () => {
     forkTime: state.forkTime,
   }));
 
-  const { globalTxHistory, processing, isHydrated } = useTxStore((state) => ({
+  const { globalTxHistory, pending, isHydrated } = useTxStore((state) => ({
     // The tx history for all chains
     globalTxHistory: state.txHistory,
     // The current transaction being processed
-    processing: state.processing,
+    pending: state.pending,
     // Whether the local storage is rehydrated
     isHydrated: state.isHydrated,
   }));
@@ -37,7 +37,7 @@ const TxHistory = () => {
     <TxHistoryTable
       data={txHistory}
       hydrating={!isHydrated}
-      pending={processing !== ''}
+      pending={pending}
     />
   );
 };

@@ -36,7 +36,7 @@ type TevmResult = CallResult | ContractResult;
 
 /**
  * @type {Object} TxError
- * @notice An error that occurred during the call or on the app when processing the call
+ * @notice An error that occurred during the call or on the app when pending the call
  * @property {string} title The title of the error
  * @property {string} message The message of the error
  * @dev This will wrap any Tevm error or app error that occurred during the call
@@ -133,7 +133,7 @@ export type TxContext = {
 /**
  * @type {Object} TxEntry
  * @notice The entry of a transaction in the local storage
- * @property {number} id The id of the transaction (auto-incremented)
+ * @property {string} id The unique id of the transaction
  * @property {TxContext} context The context of the transaction (chain, target, caller, function)
  * @property {TxGasResult} gasCosts The gas costs of the transaction in native tokens and usd
  * @property {number} gasUsed The amount of gas used by the call
@@ -144,7 +144,7 @@ export type TxContext = {
  * @property {number} timestamp The timestamp of the transaction (when it was saved)
  */
 export type TxEntry = {
-  id: number;
+  id: string;
   // Input/details
   context: TxContext;
   // Gas
@@ -159,20 +159,33 @@ export type TxEntry = {
   timestamp: number;
 };
 
+/**
+ * @type {Object} TxPending
+ * @notice The pending transaction (for loading purposes)
+ * @property {string} id The unique id of the transaction
+ * @property {TxContext} context The context of the transaction (chain, target, caller, function)
+ */
+export type TxPending = {
+  id: string;
+  context: TxContext;
+};
+
 /* -------------------------------- FUNCTIONS ------------------------------- */
 /**
  * @type {Function} SaveTx
  * @param {TxEntry} entry The transaction to save along with its context
  */
-export type SaveTx = (entry: Omit<TxEntry, 'id'>) => void;
+export type SaveTx = (entry: TxEntry) => void;
 
 /**
  * @type {Function} FormatTx
  * @param {TxResponse & { gasResult: TxGasResult }} tx The transaction to format along with its gas costs
  * @param {TxContext} context The context of the transaction
+ * @param {string} id A unique id for this transaction
  * @returns {TxEntry} The formatted transaction
  */
 export type FormatTx = (
   tx: TxResponse & { gasResult: TxGasResult },
   context: TxContext,
-) => Omit<TxEntry, 'id'>;
+  id: string,
+) => TxEntry;

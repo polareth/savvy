@@ -10,7 +10,7 @@ export const TEVM_PREFIX = 'TEVM_';
  * @notice Format a transaction for the local storage
  * @dev This will format the transaction into a `TxEntry` object
  */
-export const formatTx: FormatTx = (tx, context) => {
+export const formatTx: FormatTx = (tx, context, id) => {
   const data =
     'data' in tx.result && tx.result.data !== undefined
       ? (tx.result.data as ExpectedType)
@@ -21,6 +21,7 @@ export const formatTx: FormatTx = (tx, context) => {
     : data.toString();
 
   return {
+    id,
     context: {
       ...context,
       gasConfig: {

@@ -79,15 +79,17 @@ type HandleCall = (
  * @type {Function} HandleAfterCall
  * @param {TxResponse} tx The result of the transaction
  * @param {TxContext} context The context of the transaction
+ * @param {string} id The unique id of the transaction
  * @param {string | number} toastId The id of the toast to update
- * @returns {Promise<Omit<TxEntry, 'id'>>} The formatted transaction
+ * @returns {Promise<TxEntry>} The formatted transaction
  */
 type HandleAfterCall = (
   tx: TxResponse,
   context: TxContext,
+  id: string,
   client: MemoryClient,
   toastId: string | number,
-) => Promise<Omit<TxEntry, 'id'>>;
+) => Promise<TxEntry>;
 
 /* -------------------------------------------------------------------------- */
 /*                                  FUNCTIONS                                 */
@@ -248,6 +250,7 @@ const handleCall: HandleCall = async (
 export const handleAfterCall: HandleAfterCall = async (
   tx,
   context,
+  id,
   client,
   toastId,
 ) => {
@@ -346,5 +349,6 @@ export const handleAfterCall: HandleAfterCall = async (
       },
     },
     context,
+    id,
   );
 };

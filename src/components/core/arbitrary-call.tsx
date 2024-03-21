@@ -3,7 +3,9 @@
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Hex, isHex } from 'tevm/utils';
+import { v4 as randomId } from 'uuid';
 
+import { TxContext } from '@/lib/types/tx';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { useConfigStore } from '@/lib/store/use-config';
 import { useProviderStore } from '@/lib/store/use-provider';
@@ -62,11 +64,11 @@ const ArbitraryCall = () => {
     updateAccount: state.updateAccount,
   }));
 
-  // Save a tx in the history and set the current processing state
-  const { saveTx, processing, setProcessing } = useTxStore((state) => ({
+  // Save a tx in the history and set the current pending state
+  const { saveTx, pending, setPending } = useTxStore((state) => ({
     saveTx: state.saveTx,
-    processing: state.processing,
-    setProcessing: state.setProcessing,
+    pending: state.pending,
+    setPending: state.setPending,
   }));
 
   // Whether each argument is valid
@@ -91,8 +93,28 @@ const ArbitraryCall = () => {
     // Check if the inputs are valid, although this should not be possible
     if (!isValid.data || !isValid.value) return;
 
+    // Format the context of the call
+    const id = randomId();
+    const context: TxContext = {
+      chainId: chain.id,
+      target: account,
+      caller,
+      functionName: undefined,
+      inputValues: [{ name: 'data', type: 'bytes', value: dataInput || '0x' }],
+      value: valueInput === '' ? '0' : valueInput,
+      nativeTokenPrice,
+      gasConfig: {
+        baseFee: gasFeesConfig.nextBaseFeePerGas,
+        hasChainPriorityFee: gasFeesConfig.hasChainPriorityFee,
+        priorityFee: gasFeesConfig.priorityFeePerGas,
+        underlyingBaseFee: gasFeesConfig.underlyingNextBaseFeePerGas,
+        underlyingBlobBaseFee: gasFeesConfig.underlyingBlobBaseFeePerGas,
+        stack: chain.custom.tech.rollup,
+      },
+    };
+
     // Display loading state
-    setProcessing('arbitrary-call');
+    setPending({ id, context });
     const loading = toast.loading('Processing the call...', {
       description: `Calling ${account.address} with the provided data and value`,
     });
@@ -109,32 +131,9 @@ const ArbitraryCall = () => {
       skipBalance,
     );
 
-    const formattedTx = await handleAfterCall(
-      tx,
-      {
-        chainId: chain.id,
-        target: account,
-        caller,
-        functionName: undefined,
-        inputValues: [
-          { name: 'data', type: 'bytes', value: dataInput || '0x' },
-        ],
-        value: tx.value,
-        nativeTokenPrice,
-        gasConfig: {
-          baseFee: gasFeesConfig.nextBaseFeePerGas,
-          hasChainPriorityFee: gasFeesConfig.hasChainPriorityFee,
-          priorityFee: gasFeesConfig.priorityFeePerGas,
-          underlyingBaseFee: gasFeesConfig.underlyingNextBaseFeePerGas,
-          underlyingBlobBaseFee: gasFeesConfig.underlyingBlobBaseFeePerGas,
-          stack: chain.custom.tech.rollup,
-        },
-      },
-      client,
-      loading,
-    );
+    const formattedTx = await handleAfterCall(tx, context, id, client, loading);
 
-    setProcessing('');
+    setPending(undefined);
 
     // Update the account state after the call
     updateAccount(account.address, { updateAbi: false, chain, client }); // no need to wait for completion
@@ -223,9 +222,7 @@ const ArbitraryCall = () => {
         ) : (
           <Button
             className="w-full sm:w-auto"
-            disabled={
-              processing !== '' || Object.values(isValid).some((v) => !v)
-            }
+            disabled={!!pending || Object.values(isValid).some((v) => !v)}
             onClick={handleArbitraryCall}
           >
             Call

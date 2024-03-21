@@ -2,7 +2,7 @@ import { ABIFunction } from '@shazow/whatsabi/lib.types/abi';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { TxEntry } from '@/lib/types/tx';
+import { TxEntry, TxPending } from '@/lib/types/tx';
 import { TEVM_PREFIX } from '@/lib/local-storage';
 
 import { getFunctionId } from '../utils';
@@ -17,8 +17,8 @@ type InputValues = Record<
 type TxInitialState = {
   // Tx history
   txHistory: Record<number, TxEntry[]>; // chainId -> txs
-  // Tx processing
-  processing: string;
+  // Context of the current transaction being processed
+  pending: TxPending | undefined;
   // Input values
   inputValues: InputValues;
 
@@ -27,10 +27,10 @@ type TxInitialState = {
 
 type TxSetState = {
   // Tx history
-  saveTx: (chainId: number, tx: Omit<TxEntry, 'id'>) => void;
+  saveTx: (chainId: number, tx: TxEntry) => void;
   resetTxs: (chainId: number) => void;
-  // Tx processing
-  setProcessing: (value: string) => void;
+  // Tx pending
+  setPending: (pending: TxPending | undefined) => void;
   // Handling inputs
   updateInputValue: (id: string, index: number, value: unknown) => void;
   initializeInputs: (abi: ABIFunction[]) => void; // we eliminated events
@@ -53,11 +53,10 @@ export const useTxStore = create<TxStore>()(
       // Save a transaction to the history
       saveTx: (chainId, tx) => {
         const { txHistory } = get();
-        const id = txHistory[chainId]?.length ?? 0;
         set({
           txHistory: {
             ...txHistory,
-            [chainId]: [...(txHistory[chainId] ?? []), { ...tx, id }],
+            [chainId]: [...(txHistory[chainId] ?? []), { ...tx }],
           },
         });
       },
@@ -71,8 +70,8 @@ export const useTxStore = create<TxStore>()(
 
       /* ------------------------------- PROCESSING ------------------------------- */
       // The current transaction being processed (function id or empty string for none)
-      processing: '',
-      setProcessing: (value) => set({ processing: value }),
+      pending: undefined,
+      setPending: (pending) => set({ pending }),
 
       /* --------------------------------- INPUTS --------------------------------- */
       inputValues: {},
