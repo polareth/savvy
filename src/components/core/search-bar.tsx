@@ -100,6 +100,18 @@ const SearchBar: FC<SearchBarProps> = ({
   };
 
   /* --------------------------------- RENDER --------------------------------- */
+  // If hydrating, we don't know the screen size yet; we want to avoid flashing buttons
+  if (hydrating) {
+    return (
+      <div className="flex w-full flex-col gap-1">
+        <div className="lg:h-[29px]" />
+        <div className="grid grid-cols-[1fr_min-content] items-center gap-2 sm:flex sm:gap-4">
+          <Skeleton className="h-[36px] w-full" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex w-full flex-col gap-1">
       <div className="lg:h-[29px]" />
@@ -129,7 +141,7 @@ const SearchBar: FC<SearchBarProps> = ({
             <Icons.paste className="h-4 w-4" /> Paste
           </Button>
         )}
-        {initializing || hydrating ? (
+        {initializing ? (
           <>
             <Skeleton className="h-[36px] w-[238px]" />
             <Skeleton className="h-[36px] w-[110px]" />

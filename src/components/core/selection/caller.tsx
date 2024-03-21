@@ -240,8 +240,8 @@ const CallerSelection = () => {
           )
         ) : (
           <div className="flex w-full items-center gap-2 text-sm font-medium text-muted-foreground opacity-80">
-            Currently set to
-            <Skeleton className="h-4 w-80" />
+            <span className="whitespace-nowrap">Currently set to</span>
+            <Skeleton className="h-4 w-full" />
           </div>
         )}
         <SkipBalanceCheck />

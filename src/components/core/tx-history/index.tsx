@@ -36,7 +36,8 @@ const TxHistory = () => {
   return (
     <TxHistoryTable
       data={txHistory}
-      loading={!isHydrated || processing !== ''}
+      hydrating={!isHydrated}
+      pending={processing !== ''}
     />
   );
 };

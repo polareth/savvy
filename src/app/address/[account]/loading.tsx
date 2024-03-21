@@ -1,7 +1,7 @@
 import { Icons } from '@/components/common/icons';
 
 /**
- * @notice The root component for the loading page
+ * @notice The component for the loading page on an account
  */
 const Loading = () => {
   return (

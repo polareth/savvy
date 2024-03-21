@@ -36,7 +36,8 @@ import { DataTableViewOptions } from '@/components/templates/table/view';
 /* ---------------------------------- TYPES --------------------------------- */
 type TxHistoryTableProps = {
   data: TxEntry[] | undefined;
-  loading?: boolean;
+  hydrating: boolean;
+  pending: boolean;
 };
 
 type CellNodeContext = {
@@ -106,10 +107,15 @@ const getCellNode = (
  * @dev This will display both successful and failed transactions made locally after forking a chain,
  * whether they modified the state or not (read/write).
  * @param data The history of transactions fetched from local storage
- * @param loading Whether the latest transaction is being processed (or a client initializing)
+ * @param hydrating Whether the local storage is still being hydrated or not
+ * @param pending Whether a transaction is currently being processed
  * @returns A table with the history of transactions
  */
-const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
+const TxHistoryTable: FC<TxHistoryTableProps> = ({
+  data,
+  hydrating,
+  pending,
+}) => {
   /* ---------------------------------- STATE --------------------------------- */
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -124,8 +130,8 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
   /* --------------------------------- HELPERS -------------------------------- */
   // The context to pass to the cell node to figure out if it's a loading tx or a processed one
   const cellNodeContext = useCallback(
-    (id: number) => ({ id, data, loading }),
-    [data, loading],
+    (id: number) => ({ id, data, pending }),
+    [data, pending],
   );
 
   /* --------------------------------- COLUMNS -------------------------------- */
@@ -453,13 +459,13 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
       return [getLoadingRow(0)];
     }
 
-    // If loading (processing a tx), add a loading entry first
-    if (loading) {
+    // If pending (processing a tx), add a loading entry first
+    if (pending) {
       return [getLoadingRow(data?.length ?? 0), ...sorted];
     }
 
     return sorted;
-  }, [data, loading]);
+  }, [data, pending]);
 
   /* ---------------------------------- TABLE --------------------------------- */
   const table = useReactTable<TxEntry>({
@@ -486,6 +492,61 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
     },
   });
 
+  /* --------------------------------- HEADER --------------------------------- */
+  const header = useMemo(
+    () => (
+      <>
+        <div className="flex grow items-center gap-2 whitespace-nowrap font-medium">
+          <Separator orientation="vertical" className="mr-2 h-4" />
+          Local transactions
+        </div>
+        {largeDisplay ? (
+          <Input
+            placeholder="Filter transactions..."
+            value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
+            onChange={(e) =>
+              table.getColumn('name')?.setFilterValue(e.target.value)
+            }
+            className="max-w-sm"
+          />
+        ) : null}
+        {table.getColumn('status') ? (
+          <DataTableFacetedFilter
+            className="ml-2"
+            column={table.getColumn('status')}
+            title="Status"
+            options={[
+              { value: 'success', label: 'Success' },
+              { value: 'revert', label: 'Reverted' },
+              { value: 'failure', label: 'Error' },
+            ]}
+          />
+        ) : null}
+        {largeDisplay ? null : (
+          <Input
+            placeholder="Filter transactions..."
+            value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
+            onChange={(e) =>
+              table.getColumn('name')?.setFilterValue(e.target.value)
+            }
+            className={largeDisplay ? 'max-w-sm' : 'col-span-2'}
+          />
+        )}
+      </>
+    ),
+    [table, largeDisplay],
+  );
+
+  /* ---------------------------- RENDER HYDRATING ---------------------------- */
+  // Just render the header with a skeleton to avoid flashing the table layout + data
+  if (hydrating)
+    return (
+      <div className="grid grid-cols-[1fr] gap-4">
+        <div className="flex w-full items-center gap-4">{header}</div>
+        <Skeleton className="h-[300px] w-full" />
+      </div>
+    );
+
   /* ----------------------------- RENDER DESKTOP ----------------------------- */
   if (largeDisplay)
     return (
@@ -497,34 +558,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
         noDataLabel="No transactions yet."
         header={
           <div className="flex w-full items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="flex grow items-center gap-2 whitespace-nowrap font-medium">
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                Local transactions
-              </div>
-              <Input
-                placeholder="Filter transactions..."
-                value={
-                  (table.getColumn('name')?.getFilterValue() as string) ?? ''
-                }
-                onChange={(e) =>
-                  table.getColumn('name')?.setFilterValue(e.target.value)
-                }
-                className="max-w-sm"
-              />
-              {table.getColumn('status') ? (
-                <DataTableFacetedFilter
-                  className="ml-2"
-                  column={table.getColumn('status')}
-                  title="Status"
-                  options={[
-                    { value: 'success', label: 'Success' },
-                    { value: 'revert', label: 'Reverted' },
-                    { value: 'failure', label: 'Error' },
-                  ]}
-                />
-              ) : null}
-            </div>
+            <div className="flex items-center gap-4">{header}</div>
             <DataTableViewOptions table={table} />
           </div>
         }
@@ -538,30 +572,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
       expandableRender={expandableCell}
       header={
         <div className="grid grid-cols-[1fr_min-content] items-center gap-4">
-          <div className="flex grow items-center gap-2 whitespace-nowrap font-medium">
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            Local transactions
-          </div>
-          {table.getColumn('status') ? (
-            <DataTableFacetedFilter
-              className="ml-2"
-              column={table.getColumn('status')}
-              title="Status"
-              options={[
-                { value: 'success', label: 'Success' },
-                { value: 'revert', label: 'Reverted' },
-                { value: 'failure', label: 'Error' },
-              ]}
-            />
-          ) : null}
-          <Input
-            placeholder="Filter transactions..."
-            value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-            onChange={(e) =>
-              table.getColumn('name')?.setFilterValue(e.target.value)
-            }
-            className="col-span-2"
-          />
+          {header}
         </div>
       }
       noDataLabel="No transactions yet."
