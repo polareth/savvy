@@ -25,6 +25,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Icons } from '@/components/common/icons';
 import TooltipResponsive from '@/components/common/tooltip-responsive';
@@ -476,11 +477,14 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
     <DataTable<ABIFunction>
       table={table}
       pagination={dataMemoized.length > 10}
-      className="rounded-none border-x border-secondary px-2"
+      className="rounded-none"
       header={
         <div className="flex w-full items-center justify-between gap-4">
-          <span className="grow font-medium">Contract interface</span>
-          <div className="flex items-center py-4">
+          <div className="flex grow items-center gap-2 whitespace-nowrap font-medium">
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            Contract interface
+          </div>
+          <div className="flex items-center">
             <Input
               placeholder="Filter functions..."
               value={

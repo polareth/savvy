@@ -59,9 +59,7 @@ const DataTableExpandable = <TData,>({
   return (
     <div className={cn('flex flex-col gap-2 rounded-md pb-2', className)}>
       {header ? (
-        <div className="flex items-center justify-between gap-4 p-2">
-          {header}
-        </div>
+        <div className="flex items-center justify-between gap-4">{header}</div>
       ) : null}
       <Table>
         <TableHeader>
@@ -123,7 +121,7 @@ const DataTableExpandable = <TData,>({
                       colSpan={table.getAllColumns().length + 1}
                       className="border-b pb-4"
                     >
-                      <div className="border-x border-muted/30">
+                      <div className="border-muted/30">
                         {expandableRender(row)}
                       </div>
                     </td>

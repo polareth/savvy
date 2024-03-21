@@ -148,6 +148,7 @@ const ArbitraryCall = () => {
 
   return (
     <div className="flex flex-col gap-2">
+      <Separator className="mb-4 mt-2" />
       <div className="flex items-center gap-2">
         <Separator orientation="vertical" className="mr-2 h-4" />
         <Label htmlFor="caller" className="text-base font-medium">

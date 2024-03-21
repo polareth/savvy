@@ -44,7 +44,7 @@ const TxHistoryCollapsibleMobile = <TData,>({
 }: TxHistoryCollapsibleMobileProps<TData>) => {
   return (
     <div className={cn('flex flex-col gap-2 rounded-md', className)}>
-      {header ? <div className="p-2">{header}</div> : null}
+      {header ? <div>{header}</div> : null}
       <Accordion type="single" collapsible className="w-full">
         {table.getRowModel().rows?.length ? (
           table.getRowModel().rows.map((row) => (

@@ -299,7 +299,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
                   classNameTrigger="w-min"
                 />
               ) : (
-                <div className="flex items-center gap-1">
+                <div className="flex flex-col gap-1 lg:flex-row lg:items-center">
                   <CurrencyAmount
                     amount={row.original.gasCosts.costNative.l1Submission || 0}
                     symbol={txChain?.nativeCurrency.symbol}
@@ -441,14 +441,15 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
         table={table}
         expandableRender={expandableCell}
         pagination={dataMemoized.length > 10}
-        className="rounded-none border-x border-secondary px-2"
+        className="rounded-none border-secondary px-2"
         noDataLabel="No transactions yet."
         header={
           <div className="flex w-full items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <span className="grow whitespace-nowrap font-medium">
+              <div className="flex grow items-center gap-2 whitespace-nowrap font-medium">
+                <Separator orientation="vertical" className="mr-2 h-4" />
                 Local transactions
-              </span>
+              </div>
               <Input
                 placeholder="Filter transactions..."
                 value={
@@ -485,9 +486,10 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({ data, loading }) => {
       expandableRender={expandableCell}
       header={
         <div className="grid grid-cols-[1fr_min-content] items-center gap-4">
-          <span className="grow whitespace-nowrap font-medium">
+          <div className="flex grow items-center gap-2 whitespace-nowrap font-medium">
+            <Separator orientation="vertical" className="mr-2 h-4" />
             Local transactions
-          </span>
+          </div>
           {table.getColumn('status') ? (
             <DataTableFacetedFilter
               className="ml-2"

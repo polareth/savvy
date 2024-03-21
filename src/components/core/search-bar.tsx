@@ -33,7 +33,7 @@ const SearchBar: FC<SearchBarProps> = ({
 }) => {
   /* ---------------------------------- STATE --------------------------------- */
   // The current input value
-  const [inputValue, setInputValue] = useState<string>(initialAddress ?? '');
+  const [inputValue, setInputValue] = useState<string>('');
   // Whether the targets's address passes the checksum
   const [isValidAddress, setIsValidAddress] =
     useState<boolean>(!!initialAddress);
@@ -95,14 +95,14 @@ const SearchBar: FC<SearchBarProps> = ({
 
     // Don't push the prefix if we're already on the address page
     push(`${initialAddress ? '' : 'address/'}${address ?? inputValue}`);
+    // Reset the input value
+    setInputValue('');
   };
 
   /* --------------------------------- RENDER --------------------------------- */
   return (
     <div className="flex w-full flex-col gap-1">
-      <div className="mt-2 flex h-6 items-center text-sm">
-        <Icons.bullet /> Search
-      </div>
+      <div className="lg:h-[29px]" />
       <div className="grid grid-cols-[1fr_min-content] items-center gap-2 sm:flex sm:gap-4">
         <Input
           id="target"

@@ -27,7 +27,7 @@ export default function AccountPage({
       <AccountState initialAddress={params.account} />
       <Interact />
 
-      <Separator className="my-4" />
+      <Separator />
       <TxHistory />
     </div>
   );
