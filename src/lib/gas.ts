@@ -61,8 +61,52 @@ export const getGasFeesData = async (
   // const underlyingBlobBaseFeePerGas: bigint | undefined = underlying
   //   ? await underlying.custom.config.provider.getBlobGasFee()
   //   : undefined;
+  // TODO Temporarily use a direct JSON-RPC call with a public endpoint
+  const fetchBlobBaseFeePerGas = async () => {
+    try {
+      const response = await fetch('https://eth.llamarpc.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'eth_blobBaseFee',
+          params: [],
+        }),
+      });
+
+      const data = await response.json();
+      return BigInt(data.result);
+    } catch (err) {
+      console.error(err);
+      return BigInt(0);
+    }
+  };
   const underlyingBlobBaseFeePerGas: bigint | undefined = underlying
-    ? BigInt(1)
+    ? await (async () => {
+        try {
+          const response = await fetch('https://eth.llamarpc.com', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              id: 1,
+              method: 'eth_blobBaseFee',
+              params: [],
+            }),
+          });
+
+          const data = await response.json();
+          return BigInt(data.result);
+        } catch (err) {
+          console.error(err);
+          return BigInt(0);
+        }
+      })()
     : undefined;
 
   // Calculate the average period of the calculation (we don't need anything too precise here)
