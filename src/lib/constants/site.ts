@@ -4,7 +4,7 @@ import { MetadataExtra, Page } from '@/lib/types/site';
 
 const title = 'savvy';
 const description =
-  'An interface for the EVM on the browser, to simulate & visualize onchain activity.';
+  'An interface for the EVM in the browser, to simulate & visualize onchain activity.';
 const authorUrl = 'https://twitter.com/0xpolarzero';
 const websiteUrl = 'https://svvy.sh';
 

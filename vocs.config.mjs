@@ -5,7 +5,7 @@ export default defineConfig({
   title: 'savvy · docs',
   titleTemplate: '%s – savvy • docs',
   description:
-    'An interface for the EVM on the browser, to simulate and visualize onchain activity.',
+    'An interface for the EVM in the browser, to simulate and visualize onchain activity.',
   banner:
     "savvy is under heavy development—don't hesitate to report any issues you encounter!",
   editLink: {

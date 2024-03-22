@@ -1,6 +1,6 @@
 # savvy
 
-**An interface for the EVM on the browser, to simulate and visualize your onchain activity, especially the costs associated with it.**
+**An interface for the EVM in the browser, to simulate and visualize your onchain activity, especially the costs associated with it.**
 
 _A more comprehensive/readable version is available [in the documentation](https://docs.svvy.sh)._
 
@@ -28,7 +28,7 @@ And also, and that's one of the main points of savvy, details on the gas usage o
 
 You can think of it as a way of simulating a set of transactions, and visualizing the results, without having to actually send them to the network.
 
-With no setup (wallet, signatures, etc.), on the browser, from any account (impersonation), with any amount of native tokens.
+With no setup (wallet, signatures, etc.), in the browser, from any account (impersonation), with any amount of native tokens.
 
 **This is a WIP, and Tevm is still under heavy development; you _will_ encounter bugs and unhandled errors. Please report them if you have the time!**
 
