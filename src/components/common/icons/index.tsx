@@ -111,7 +111,7 @@ export const Icons = {
         y2="35.744105"
         transform="matrix(.707107 0.707107-.230979 0.230979 207.118961 144.251971)"
         stroke="currentColor"
-        stroke-width="3"
+        strokeWidth="3"
       ></line>
       <line
         x1="0"
@@ -120,7 +120,7 @@ export const Icons = {
         y2="17.567361"
         transform="matrix(.707107 0.707107-.306906 0.306906 189.006951 147.116572)"
         stroke="currentColor"
-        stroke-width="3"
+        strokeWidth="3"
       ></line>
       <line
         x1="0"
@@ -130,7 +130,7 @@ export const Icons = {
         transform="matrix(.707107-.707107 0.2225 0.2225 192.009975 143.571867)"
         fill="none"
         stroke="currentColor"
-        stroke-width="3"
+        strokeWidth="3"
       ></line>
     </svg>
   ),

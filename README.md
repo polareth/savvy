@@ -36,7 +36,7 @@ With no setup (wallet, signatures, etc.), in the browser, from any account (impe
 
 ### Progress
 
-|           |                                                                                                                                                                              |
+| status    | idea                                                                                                                                                                         |
 | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | available | run transactions in a simulated environment and remember activity on each chain                                                                                              |
 | available | mock network condition/congestion                                                                                                                                            |
