@@ -8,7 +8,7 @@ _A more comprehensive/readable version is available [in the documentation](https
 
 - [Overview](#overview)
 - [About the project](#about-the-project)
-  - [Idea](#idea)
+  - [Progress](#progress)
   - [How to use](#how-to-use)
 - [Architecture](#architecture)
 - [Getting started](#getting-started)
@@ -34,13 +34,14 @@ With no setup (wallet, signatures, etc.), on the browser, from any account (impe
 
 ## About the project
 
-### Idea
+### Progress
 
 |           |                                                                                                                                                                              |
 | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | available | run transactions in a simulated environment and remember activity on each chain                                                                                              |
 | available | mock network condition/congestion                                                                                                                                            |
 | available | estimate gas fees on EVM L1s, Polygon and OP-stack L2s                                                                                                                       |
+| available | aggregate total fees, include/exclude transactions                                                                                                                           |
 | todo      | provide helpers to generate mock data and quickly estimate costs for selected optimized solutions (e.g. GasliteDrop)                                                         |
 | todo      | run a tx on multiple chains and provide a comparative estimation of gas spent on each                                                                                        |
 | todo      | support Arbitrum orbit for gas fee on L1 submission                                                                                                                          |
