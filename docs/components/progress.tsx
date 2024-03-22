@@ -8,7 +8,13 @@ import { Badge, BadgeIntent } from './badge';
 /*                                    TYPES                                   */
 /* -------------------------------------------------------------------------- */
 
-type ProgressListProps = {
+type ProgressListHeadingProps = {
+  title: string;
+  caption?: string;
+};
+
+type ProgressListContentProps = {
+  caption?: string;
   children: ReactNode;
 };
 
@@ -51,7 +57,23 @@ const DifficultyBadge: FC<DifficultyBadgeProps> = ({ difficulty }) => {
 /*                                 COMPONENTS                                 */
 /* -------------------------------------------------------------------------- */
 
-export const ProgressList: FC<ProgressListProps> = ({ children }) => {
+export const ProgressListHeading: FC<ProgressListHeadingProps> = ({
+  title,
+  caption,
+}) => {
+  return (
+    <div className="mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
+      <h5 className="vocs_Step_title vocs_Heading mb-0">{title}</h5>
+      {caption ? (
+        <span className="text-sm text-gray-500">{caption}</span>
+      ) : null}
+    </div>
+  );
+};
+
+export const ProgressListContent: FC<ProgressListContentProps> = ({
+  children,
+}) => {
   return (
     <div className="grid grid-cols-[min-content_1fr_min-content] items-start gap-x-4 gap-y-1">
       {children}

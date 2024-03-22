@@ -36,21 +36,25 @@ With no setup (wallet, signatures, etc.), in the browser, from any account (impe
 
 ### Progress
 
-| status    | idea                                                                                                                                                                         |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| available | run transactions in a simulated environment and remember activity on each chain                                                                                              |
-| available | mock network condition/congestion                                                                                                                                            |
-| available | estimate gas fees on EVM L1s, Polygon and OP-stack L2s                                                                                                                       |
-| available | aggregate total fees, include/exclude transactions                                                                                                                           |
-| todo      | provide helpers to generate mock data and quickly estimate costs for selected optimized solutions (e.g. GasliteDrop)                                                         |
-| todo      | run a tx on multiple chains and provide a comparative estimation of gas spent on each                                                                                        |
-| todo      | support Arbitrum orbit for gas fee on L1 submission                                                                                                                          |
-| todo      | paste a contract in a browser editor, deploy it and use it just like a regular forked contract                                                                               |
-| todo      | run ast on a pasted contract and provide inline recommendations to optimize both dependencies (e.g. OZ -> Solady) and known inefficient patterns                             |
-| todo      | provide selected secure and optimized contracts to deploy in a click with mock data + estimate costs (e.g. Gaslite core, Solady libs)                                        |
-| todo      | provide a rpc to publish tests to the Tevm forked chain and keep the state (already possible in the opposite way; fork a local Hardhat node to which tests can be published) |
-| todo      | wallet/social login to save transactions (sync with local storage)                                                                                                           |
-| todo      | separate between two versions: advanced (intended for devs) and "onboarding" for non-crypto natives, with detailed explanations, guidance and examples                       |
+| status    | idea                                                                                                                                                                                                  |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| available | run transactions in a simulated environment and remember activity on each chain                                                                                                                       |
+| available | mock network condition/congestion                                                                                                                                                                     |
+| available | estimate gas fees on EVM L1s, Polygon and OP-stack L2s                                                                                                                                                |
+| available | aggregate total fees, include/exclude transactions                                                                                                                                                    |
+| todo      | provide helpers to generate mock data and quickly estimate costs for selected optimized solutions (e.g. GasliteDrop)                                                                                  |
+| todo      | run a tx on multiple chains and provide a comparative estimation of gas spent on each                                                                                                                 |
+| todo      | support Arbitrum orbit for gas fee on L1 submission                                                                                                                                                   |
+| todo      | paste a contract in a browser editor, deploy it and use it just like a regular forked contract                                                                                                        |
+| todo      | run ast on a pasted contract and provide inline recommendations to optimize both dependencies (e.g. OZ -> Solady) and known inefficient patterns                                                      |
+| todo      | provide selected secure and optimized contracts to deploy in a click with mock data + estimate costs (e.g. Gaslite core, Solady libs)                                                                 |
+| todo      | provide a rpc to publish tests to the Tevm forked chain and keep the state (already possible in the opposite way; fork a local Hardhat node to which tests can be published)                          |
+| todo      | wallet/social login to save transactions (sync with local storage)                                                                                                                                    |
+| todo      | separate between two versions: advanced (intended for devs/experienced users) and "onboarding" for non-crypto natives, with detailed explanations, guidance and examples                              |
+| todo      | impersonate a smart account (see Rhinestone, ERC7579); with utilities to follow the flow, add modules, etc                                                                                            |
+| todo      | use savvy as a browser "extension"/wallet; basically override the injected provider with the impersonated caller, and override the chain with a fresh fork—think of it as a "sandbox" mode for a DApp |
+| todo      | extended account page, with more data to track across calls, e.g. tokens; show traces of the account's activity                                                                                       |
+| todo      | share results so anyone can open them in savvy with the configuration and re-run the transactions                                                                                                     |
 
 And a lot of other possibilities, although not prioritized because there are already great tools for most of these. Like:
 
@@ -156,7 +160,7 @@ You will find references to any code or ideas that were used in the project dire
 - [shadcn/ui](https://ui.shadcn.com/): components, design, code/application structure and best practices
 - [fiveoutofnine](https://www.fiveoutofnine.com/): inspiration, best practices, organization
 
-Obviously, huge thanks and gratitude to [Will Cory](https://twitter.com/FUCORY) for the incredible work on Tevm, and for the countless advice, explanations and feedback. To [Shazow](https://twitter.com/shazow) as well for WhatsABI, and to all open-source contributors maintaining the libraries and tools we're using.
+Obviously, huge thanks and gratitude to [Will Cory](https://twitter.com/FUCORY) for the incredible work on [Tevm](https://tevm.sh/), and for the countless advice, explanations and feedback. To the maintainers and core contributors at [Wevm](https://github.com/wevm) for [Viem](https://viem.sh/), [Vocs](https://vocs.dev/) (used for the documentation), etc. To [Shazow](https://twitter.com/shazow) as well for [[WhatsABI](https://github.com/shazow/whatsabi)], and to all open-source contributors maintaining the libraries and tools we're using.
 
 ## License
 

@@ -6,7 +6,7 @@ Just some personal unfiltered notes, not meant to be read by anyone else than me
 
 - Also that to compile: https://github.com/evmts/tevm-monorepo/blob/40263b9eb62edb557d8ddbea45d29ddf755eb1e1/examples/vite/src/SolcWorker.ts
 
-[ ] use tx hashes instead of id when it's available, sort transactions by timestamp when displayed because it can be in any order
+[ ] use tx hashes instead of id when it's available
 
 [ ] wallet/social login to sync with local storage: display wallet + tooltip on top right; when doing a transaction, after saved to local storage, trigger a sync if connected; on connection, sync, meaning, if a tx hash in not in local storage, get it, and if not online, push it; display tooptip top-right: info when not connected (can't sync), success when synced, some loading when syncing
 
@@ -16,9 +16,9 @@ Just some personal unfiltered notes, not meant to be read by anyone else than me
 - a quick and a more long version of bug reporting: quick is just drop a dm with the logs, longer would be with some details, screenshots, etc
 - maybe just automatically send/save the logs somewhere? would rather have the user decide if they want to send it or not, although the logs (stores) won't contain any sensitive information at all; or at most only send the data that comes from the app and nothing related to the user input
 
-[ ] Fix nextBaseFee => priority ratios; really bad when the base fee starts very low, as it increases way too much
+[ ] Fix nextBaseFee => priority ratios; really bad with Polygon as the priority fee starts too high related to the base fee (needs a special case)
 
-[ ] Save results history in local storage, and let the user retrieve them
+[x] Save results history in local storage, and let the user retrieve them
 
 [ ] Handle issues in retrieving token price (coinmarketcap), and other api calls as well (gas fees) => if error, use a default value & let the user choose
 
@@ -28,22 +28,22 @@ Just some personal unfiltered notes, not meant to be read by anyone else than me
 
 [ ] Button "share results" to export them (md? pdf? json?); probably a table as well as all the details in a concise document
 
-[ ] in the local-chain api, return different error codes based on what failed, and decode them browser-side to display in the toast
+[x] in the local-chain api, return different error codes based on what failed, and decode them browser-side to display in the toast
 
-[ ] When integrating Arbitrum, will need to change 'hasCustomStack' to differenciate OP and Arbitrum + add oracle addresses to config
+[x] When integrating Arbitrum, will need to change 'hasCustomStack' to differenciate OP and Arbitrum
 
-[ ] Add a "underlying" property on rollups to be able to calculate the fee later, for instance the id of the underlying chain (e.g. currentChain being Optimism, we need to access the Ethereum client)
+[x] Add a "underlying" property on rollups to be able to calculate the fee later, for instance the id of the underlying chain (e.g. currentChain being Optimism, we need to access the Ethereum client)
 
 - Use 2 gas price selection to simulate both the L2 and the L1 conditions
 - We can't just return a l1Submission string/bigint to account for that, needs more complex logic
 
-[ ] Allow do estimation with url query (amount of recipients, sender, token address, type…); even though drop.gaslite.org or any app can already do so with `estimateGas`, this provides a nice table with results + lets user estimate with different network conditions
+[ ] Allow do estimation with url query (amount of recipients, sender, token address, type…); even though drop.gaslite.org or any app can already do so with `estimateGas`, this provides a nice table with results + lets user estimate with different network conditions => basically sharing a simulation to reren it
 
 - also maybe if more convenient directly an api endpoint would be better? Actually maybe can be setup from vercel
 
 [x] REFACTORED: Put gas price & native token price inside Advanced (in a collapsible)
 
-[x] DONE: Utils to convert gwei (or anything really) based on currency; e.g. L2 on OP stack need at least 3-4 decimals when Ethereum/Polygon is ok with 2
+[x] Utils to convert gwei (or anything really) based on currency; e.g. L2 on OP stack need at least 3-4 decimals when Ethereum/Polygon is ok with 2
 
 [x] REFACTORED: See if there is a "maxSupply" for the provided token (BEFORE fetching local-chain), and if so, compare it to the amount of tokens airdropped; if not enough, ask the user to provide an account that owns enough tokens
 

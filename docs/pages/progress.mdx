@@ -1,14 +1,22 @@
 import { Step, Steps } from 'vocs/components';
 
-import { ProgressItem, ProgressList } from '../components/progress';
+import {
+  ProgressItem,
+  ProgressListContent,
+  ProgressListHeading,
+} from '../components/progress';
 
 # Progress
 
 Please don't hesitate to [ask](https://github.com/0xpolarzero/savvy/issues) if you have any questions or suggestions, or if you would like a feature to be prioritized!
 
 <Steps className="relative">
-  <Step title="Core" titleLevel={5}>
-    <ProgressList>
+  <Step
+    title={
+      <ProgressListHeading title="Core" caption="Foundations of the app" />
+    }
+  >
+    <ProgressListContent>
       <ProgressItem completed={true} difficulty={3}>
         run transactions in a simulated environment and remember activity on
         each chain
@@ -17,21 +25,28 @@ Please don't hesitate to [ask](https://github.com/0xpolarzero/savvy/issues) if y
         mock network condition/congestion (gas/blob gas price)
       </ProgressItem>
       <ProgressItem completed={true} difficulty={2}>
-        estimate gas fees on EVM L1s, Polygon and OP-stack L2s
+        estimate gas fees on EVM L1s, Polygon and OP stack L2s
       </ProgressItem>
       <ProgressItem completed={true} difficulty={0}>
         aggregate total fees, include/exclude transactions
       </ProgressItem>
-      <ProgressItem completed={false} difficulty={1}>
+      <ProgressItem completed={false} priority difficulty={1}>
         support Arbitrum orbit for gas fee on L1 submission
       </ProgressItem>
       <ProgressItem completed={false} priority difficulty={0}>
         wallet/social login to save transactions (sync with local storage)
       </ProgressItem>
-    </ProgressList>
+    </ProgressListContent>
   </Step>
-  <Step title="Additional features" titleLevel={5}>
-    <ProgressList>
+  <Step
+    title={
+      <ProgressListHeading
+        title="Utilities"
+        caption="Main features facilitating the daily use/activity"
+      />
+    }
+  >
+    <ProgressListContent>
       <ProgressItem completed={false} priority difficulty={1}>
         provide helpers to generate mock data and quickly estimate costs for
         selected optimized solutions (e.g. GasliteDrop)
@@ -40,10 +55,21 @@ Please don't hesitate to [ask](https://github.com/0xpolarzero/savvy/issues) if y
         run a tx on multiple chains and provide a comparative estimation of gas
         spent on each
       </ProgressItem>
-    </ProgressList>
+      <ProgressItem completed={false} difficulty={1}>
+        share results so anyone can open them in savvy with the configuration
+        and re-run the transactions
+      </ProgressItem>
+    </ProgressListContent>
   </Step>
-  <Step title="Core extensions" titleLevel={5}>
-    <ProgressList>
+  <Step
+    title={
+      <ProgressListHeading
+        title="Extensions"
+        caption="Additional features that directly extend the use cases"
+      />
+    }
+  >
+    <ProgressListContent>
       <ProgressItem completed={false} difficulty={2}>
         paste a contract in a browser editor, deploy it and use it just like a
         regular forked contract
@@ -53,25 +79,56 @@ Please don't hesitate to [ask](https://github.com/0xpolarzero/savvy/issues) if y
         optimize both dependencies (e.g. OZ -> Solady) and known inefficient
         patterns
       </ProgressItem>
-      <ProgressItem completed={false} difficulty={3}>
+      <ProgressItem completed={false} difficulty={2}>
         provide selected secure and optimized contracts to deploy in a click
         with mock data + estimate costs (e.g. Gaslite core, Solady libs)
       </ProgressItem>
-    </ProgressList>
+      <ProgressItem completed={false} difficulty={-1}>
+        impersonate a smart account (see Rhinestone, ERC7579); with utilities to
+        follow the flow, add modules, etc
+      </ProgressItem>
+    </ProgressListContent>
   </Step>
-  <Step title="Breaking" titleLevel={5}>
-    <ProgressList>
+  <Step
+    title={
+      <ProgressListHeading
+        title="Infrastructure"
+        caption="Updates that might require breaking changes in core"
+      />
+    }
+  >
+    <ProgressListContent>
       <ProgressItem completed={false} difficulty={-1}>
         provide a rpc to publish tests to the Tevm forked chain and keep the
         state (already possible in the opposite way; fork a local Hardhat node
         to which tests can be published)
       </ProgressItem>
-      <ProgressItem completed={false} difficulty={1}>
-        separate between two versions: advanced (intended for devs) and
-        "onboarding" for non-crypto natives, with detailed explanations,
-        guidance and examples
+      <ProgressItem completed={false} difficulty={2}>
+        extended account page, with more data to track across calls, e.g.
+        tokens; show traces of the account's activity
       </ProgressItem>
-    </ProgressList>
+    </ProgressListContent>
+  </Step>
+  <Step
+    title={
+      <ProgressListHeading
+        title="Vision"
+        caption="Fundamental upgrades representative of the long-term vision for savvy"
+      />
+    }
+  >
+    <ProgressListContent>
+      <ProgressItem completed={false} difficulty={2}>
+        separate between two versions: advanced (intended for devs/experienced
+        users) and "onboarding" for non-crypto natives, with detailed
+        explanations, guidance and examples
+      </ProgressItem>
+      <ProgressItem completed={false} difficulty={3}>
+        use savvy as a browser "extension"/wallet; basically override the
+        injected provider with the impersonated caller, and override the chain
+        with a fresh fork—think of it as a "sandbox" mode for a DApp
+      </ProgressItem>
+    </ProgressListContent>
   </Step>
 </Steps>
 
