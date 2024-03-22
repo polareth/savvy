@@ -5,15 +5,9 @@
 @tailwind utilities;
 
 :root {
-  --flexoki-bg: 48 100% 97%;
-  --vocs-color_background: hsl(var(--flexoki-bg));
-
   --accent: 246 100% 83%; /* --vocs-color_textAccent */
 }
 
 :root.dark {
-  --flexoki-bg: 0 3% 6%;
-  --vocs-color_background: hsl(var(--flexoki-bg));
-
   --accent: 246 100% 83%; /* --vocs-color_textAccent */
 }
