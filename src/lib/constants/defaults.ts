@@ -39,7 +39,7 @@ export const DEFAULTS = {
 export const EXAMPLE_VALUES = {
   chain: extractChain({
     chains: CHAINS,
-    id: Number(11155111), // Ethereum Sepolia
+    id: Number(8453), // Base
   }),
-  contract: '0x1823FbFF49f731061E8216ad2467112C0469cBFD' as const,
+  contract: '0x4200000000000000000000000000000000000006' as const, // WETH
 };

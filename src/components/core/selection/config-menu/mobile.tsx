@@ -84,7 +84,7 @@ const ConfigMenuMobile = () => {
             Config
           </SheetHeader>
           <SheetDescription>
-            <div className="flex flex-col gap-2 overflow-hidden transition-all duration-300 ease-out">
+            <div className="flex flex-col gap-2 overflow-hidden px-[1px] transition-all duration-300 ease-out">
               <ChainSelection />
               <NativePriceSelection />
 

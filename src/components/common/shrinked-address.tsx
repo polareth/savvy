@@ -11,6 +11,7 @@ type ShrinkedAddressProps = {
   address: Address;
   explorer?: string;
   adapt?: boolean;
+  full?: boolean;
   className?: string;
 };
 
@@ -22,12 +23,14 @@ type ShrinkedAddressProps = {
  * @param address The Ethereum address to display
  * @param explorer The URL of the explorer to link the address to
  * @param adapt Whether to adapt the display to the screen size (default: true)
+ * @param full Whether to display the full address (default: false)
  * @param className Additional classes for the component
  */
 const ShrinkedAddress: FC<ShrinkedAddressProps> = ({
   address = '0x', // default to avoid errors
   explorer,
   adapt = true,
+  full = false,
   className,
 }) => {
   const isLargeScreen = useMediaQuery('(min-width: 1280px)'); // xl
@@ -35,9 +38,9 @@ const ShrinkedAddress: FC<ShrinkedAddressProps> = ({
 
   // Display the full address only on large screens (if adapt is true)
   const fullAddress = useMemo(() => {
-    if (isLargeScreen && adapt) return true;
+    if ((isLargeScreen && adapt) || full) return true;
     return false;
-  }, [isLargeScreen, adapt]);
+  }, [isLargeScreen, adapt, full]);
 
   // Open the address in the explorer for this chain
   const openExplorerTab = () => {

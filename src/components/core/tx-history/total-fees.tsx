@@ -36,7 +36,7 @@ const TotalFeesTable: FC<TotalFeesTableProps> = ({
         {txAmount ? (
           <span className="text-sm text-muted-foreground">
             <span className="font-semibold">{totalFees.gasUsed} gas</span>{' '}
-            across {txAmount} transactions
+            across {txAmount} transaction{txAmount > 1 ? 's' : ''}
           </span>
         ) : null}
       </div>

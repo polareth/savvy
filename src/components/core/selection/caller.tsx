@@ -35,8 +35,11 @@ const CallerSelection = () => {
   // Expand from desktop breakpoint
   const isDesktop = useMediaQuery('(min-width: 768px)'); // md
 
-  // The current chain client (Tevm)
-  const client = useProviderStore((state) => state.client);
+  // The current chain & client (Tevm)
+  const { chain, client } = useProviderStore((state) => ({
+    chain: state.chain,
+    client: state.client,
+  }));
 
   const { account, abi, caller, isHydrated, setCaller, resetCaller } =
     useConfigStore((state) => ({
@@ -226,6 +229,7 @@ const CallerSelection = () => {
                   Currently set to{' '}
                   <ShrinkedAddress
                     address={caller}
+                    explorer={chain.blockExplorers?.default.url}
                     adapt={false}
                     className="text-primary"
                   />
@@ -235,7 +239,12 @@ const CallerSelection = () => {
             />
           ) : (
             <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground opacity-80">
-              <Icons.right className="h-4 w-4" /> <pre>{caller}</pre>
+              <Icons.right className="h-4 w-4" />{' '}
+              <ShrinkedAddress
+                address={caller}
+                explorer={chain.blockExplorers?.default.url}
+                adapt={false}
+              />
             </span>
           )
         ) : (

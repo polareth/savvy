@@ -42,10 +42,14 @@ const TxHistory = () => {
   }));
 
   // Remember the tx history & total costs for the current chain
-  const { txHistory, totalFees } = useMemo(
+  const { txHistory, totalFees, txAmount } = useMemo(
     () => ({
       txHistory: globalTxHistory[chain.id] ?? [],
       totalFees: globalTotalFees[chain.id] ?? {},
+      txAmount: globalTxHistory[chain.id]?.reduce(
+        (acc, tx) => (tx.utils.includedInTotalFees ? acc + 1 : acc),
+        0,
+      ),
     }),
     // Refetch when the chain or fork time changes (meaning reset)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,7 +60,7 @@ const TxHistory = () => {
     <>
       <TotalFeesTable
         totalFees={totalFees}
-        txAmount={txHistory.length}
+        txAmount={txAmount}
         hydrating={!isHydrated}
       />
       <TxHistoryTable
