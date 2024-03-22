@@ -18,7 +18,7 @@ type CalculateL1DataFee = (
   nativeTokenDecimals: number,
 ) => Promise<{
   native: bigint | undefined;
-  usd: number | undefined;
+  usd: bigint | undefined;
   error: string | null;
 }>;
 

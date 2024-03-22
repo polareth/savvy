@@ -126,6 +126,7 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
       functionName: string,
       inputValues: { type: string; name: string; value: string | number }[],
       value: string,
+      stateMutability: ABIFunction['stateMutability'],
     ) => {
       // There is no reason this would happen (as the table would not be displayed),
       // but just in the unlikely case we should let the user know
@@ -171,6 +172,7 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
         target: account,
         caller,
         functionName,
+        stateMutability,
         // Convert bigints to strings for local storage
         inputValues: JSON.parse(
           JSON.stringify(formattedInputs, (_, value) =>
@@ -384,6 +386,7 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
                       }))
                     : [],
                   inputValues[id]['value'],
+                  row.original.stateMutability,
                 )
               }
             >

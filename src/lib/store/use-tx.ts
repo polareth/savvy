@@ -2,10 +2,12 @@ import { ABIFunction } from '@shazow/whatsabi/lib.types/abi';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { TxEntry, TxPending } from '@/lib/types/tx';
+import { TotalFees, TxEntry, TxPending } from '@/lib/types/tx';
+import { CHAINS } from '@/lib/constants/providers';
 import { TEVM_PREFIX } from '@/lib/local-storage';
+import { getFunctionId } from '@/lib/utils';
 
-import { getFunctionId } from '../utils';
+import { aggregateChainFees } from '../gas';
 
 /* ---------------------------------- TYPES --------------------------------- */
 // Input values
@@ -21,6 +23,8 @@ type TxInitialState = {
   pending: TxPending | undefined;
   // Input values
   inputValues: InputValues;
+  // Total costs
+  totalFees: TotalFees; // chainId -> costs
 
   isHydrated: boolean;
 };
@@ -35,6 +39,15 @@ type TxSetState = {
   updateInputValue: (id: string, index: number, value: unknown) => void;
   initializeInputs: (abi: ABIFunction[]) => void; // we eliminated events
   resetInputs: () => void;
+  // Total costs
+  toggleIncludeTxInTotalFees: (chainId: number, id: string) => void;
+  includeAllTxsInTotalFees: (chainId: number) => void;
+  excludeAllTxsFromTotalFees: (chainId: number) => void;
+
+  updateTxHistoryAndTotalFees: (
+    chainId: number,
+    newTxHistory: TxEntry[],
+  ) => void;
 
   hydrate: () => void;
 };
@@ -52,19 +65,43 @@ export const useTxStore = create<TxStore>()(
       txHistory: [],
       // Save a transaction to the history
       saveTx: (chainId, tx) => {
-        const { txHistory } = get();
+        const { txHistory, totalFees } = get();
         set({
           txHistory: {
             ...txHistory,
             [chainId]: [...(txHistory[chainId] ?? []), { ...tx }],
           },
         });
+
+        // Update the total costs if the tx should be included
+        if (!tx.utils.includedInTotalFees) return;
+        set({
+          totalFees: {
+            ...totalFees,
+            [chainId]: aggregateChainFees([...txHistory[chainId], tx]),
+          },
+        });
       },
       // Reset the history for a chain
       resetTxs: (chainId) => {
-        set((state) => {
-          delete state.txHistory[chainId];
-          return { txHistory: state.txHistory };
+        const { txHistory, totalFees } = get();
+        set({
+          txHistory: {
+            ...txHistory,
+            [chainId]: [],
+          },
+        });
+
+        // Reset the total costs
+        set({
+          totalFees: {
+            ...totalFees,
+            [chainId]: {
+              costUsd: { root: '0', l1Submission: '0' },
+              costNative: { root: '0', l1Submission: '0' },
+              gasUsed: '0',
+            },
+          },
         });
       },
 
@@ -129,6 +166,74 @@ export const useTxStore = create<TxStore>()(
         set({ inputValues: {} });
       },
 
+      /* ------------------------------- TOTAL COST ------------------------------- */
+      totalFees: CHAINS.reduce(
+        (acc, chain) => ({
+          ...acc,
+          [chain.id]: {
+            costUsd: { root: '0', l1Submission: '0' },
+            costNative: { root: '0', l1Submission: '0' },
+            gasUsed: '0',
+          },
+        }),
+        {},
+      ),
+      // Include/exclude a transaction in the total cost
+      toggleIncludeTxInTotalFees: (chainId, id) => {
+        const { txHistory, updateTxHistoryAndTotalFees } = get();
+        const tx = txHistory[chainId].find((tx) => tx.id === id);
+        if (!tx) return;
+
+        const newTxHistory = txHistory[chainId].map((tx) =>
+          tx.id === id
+            ? {
+                ...tx,
+                utils: {
+                  ...tx.utils,
+                  includedInTotalFees: !tx.utils.includedInTotalFees,
+                },
+              }
+            : tx,
+        );
+        updateTxHistoryAndTotalFees(chainId, newTxHistory);
+      },
+      // Include all transactions in the total cost
+      includeAllTxsInTotalFees: (chainId) => {
+        const { txHistory, updateTxHistoryAndTotalFees } = get();
+        const newTxHistory = txHistory[chainId].map((tx) => ({
+          ...tx,
+          utils: { ...tx.utils, includedInTotalFees: true },
+        }));
+        updateTxHistoryAndTotalFees(chainId, newTxHistory);
+      },
+      // Exclude all transactions from the total cost
+      excludeAllTxsFromTotalFees: (chainId) => {
+        const { txHistory, updateTxHistoryAndTotalFees } = get();
+        const newTxHistory = txHistory[chainId].map((tx) => ({
+          ...tx,
+          utils: { ...tx.utils, includedInTotalFees: false },
+        }));
+        updateTxHistoryAndTotalFees(chainId, newTxHistory);
+      },
+
+      // Helper function to update both the tx history and the total fees
+      updateTxHistoryAndTotalFees: (chainId, newTxHistory) => {
+        const { txHistory, totalFees } = get();
+        set({
+          txHistory: {
+            ...txHistory,
+            [chainId]: newTxHistory,
+          },
+        });
+
+        set({
+          totalFees: {
+            ...totalFees,
+            [chainId]: aggregateChainFees(newTxHistory),
+          },
+        });
+      },
+
       isHydrated: false,
       hydrate: () => set({ isHydrated: true }),
     }),
@@ -154,6 +259,8 @@ export const useTxStore = create<TxStore>()(
             })),
           ]),
         ),
+        // We're keeping the total costs in storage to avoid recomputing it frequently
+        totalFees: state.totalFees,
       }),
       onRehydrateStorage: () => async (state, error) => {
         if (error) console.error('Failed to rehydrate tx store:', error);

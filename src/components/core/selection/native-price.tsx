@@ -65,7 +65,7 @@ const NativePriceSelection = () => {
         <div className="relative">
           <Input
             type="number"
-            className="pl-8"
+            className="pl-8 font-mono"
             style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
             value={Number(nativeTokenPrice.toFixed(2))}
             onChange={(e) => setNativeTokenPrice(Number(e.target.value))}

@@ -1,5 +1,6 @@
 import { GasFeesConfig } from '@/lib/types/gas';
 import { Chain } from '@/lib/types/providers';
+import { TxEntry } from '@/lib/types/tx';
 import { DEFAULTS } from '@/lib/constants/defaults';
 
 type Accumulator = {
@@ -14,6 +15,7 @@ const FEES_DATA_LOWER_BOUND = 30;
 const FEES_DATA_MIDDLE_BOUND = 60;
 const FEES_DATA_UPPER_BOUND = 90;
 const PRECISION = DEFAULTS.precision;
+const DECIMALS_USD = DEFAULTS.decimalsUsd;
 
 // We could use `estimateFeesPerGas` to get maxFee & maxPriorityFee for EIP-1559 chains and
 // gasPrice for legacy chains. But actually:
@@ -143,6 +145,7 @@ export const getGasFeesData = async (
   }
 };
 
+// Estimate the priority fees for a given base fee based on the average bounds
 export const estimatePriorityFeesForBaseFee = (
   baseFee: bigint,
   averageBounds: { low: bigint; mid: bigint; high: bigint },
@@ -166,8 +169,39 @@ export const calculateGasCost = (
 };
 
 // Convert a native token amount to USD based on the native token price and its decimals
-// We're fine with numbers here (!= bigint), and we want full usd precision
+// Note: This will return an usd amount scaled by `PRECISION_USD`
 export const nativeToUsd = (native: bigint, price: number, decimals: number) =>
-  (Number(native) * price * Number(PRECISION)) /
-  10 ** decimals /
-  Number(PRECISION);
+  (native * BigInt(price * 10 ** DECIMALS_USD)) / BigInt(10 ** decimals);
+
+// Aggregate the chain fees from a list of transactions based on if they should be included in the total fees
+export const aggregateChainFees = (txs: TxEntry[]) => {
+  return txs.reduce(
+    (acc, tx) => {
+      if (!tx.utils.includedInTotalFees) return acc;
+      const { costUsd, costNative } = tx.gasCosts;
+      const { gasUsed } = tx;
+
+      acc.costUsd.root = (
+        BigInt(acc.costUsd.root) + BigInt(costUsd.root)
+      ).toString();
+      acc.costUsd.l1Submission = (
+        BigInt(acc.costUsd.l1Submission) + BigInt(costUsd.l1Submission || '0')
+      ).toString();
+      acc.costNative.root = (
+        BigInt(acc.costNative.root) + BigInt(costNative.root)
+      ).toString();
+      acc.costNative.l1Submission = (
+        BigInt(acc.costNative.l1Submission) +
+        BigInt(costNative.l1Submission || '0')
+      ).toString();
+      acc.gasUsed = (BigInt(acc.gasUsed) + BigInt(gasUsed)).toString();
+
+      return acc;
+    },
+    {
+      costUsd: { root: '0', l1Submission: '0' },
+      costNative: { root: '0', l1Submission: '0' },
+      gasUsed: '0',
+    },
+  );
+};

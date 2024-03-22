@@ -61,9 +61,9 @@ const TxHistoryCollapsibleMobile = <TData,>({
                 )
               }
             >
-              <AccordionTrigger className="grid grid-cols-[min-content_1fr_min-content_min-content] justify-start gap-2 hover:no-underline">
+              <AccordionTrigger className="grid grid-cols-[min-content_1fr_min-content_min-content_min-content] justify-start gap-2 hover:no-underline">
                 <>
-                  {/* id | function name | status | expand button */}
+                  {/* id | function name | status | include | expand button */}
                   {flexRender(
                     row.getVisibleCells()[0].column.columnDef.cell,
                     row.getVisibleCells()[0].getContext(),
@@ -75,6 +75,10 @@ const TxHistoryCollapsibleMobile = <TData,>({
                   {flexRender(
                     row.getVisibleCells()[5].column.columnDef.cell,
                     row.getVisibleCells()[5].getContext(),
+                  )}
+                  {flexRender(
+                    row.getVisibleCells()[6].column.columnDef.cell,
+                    row.getVisibleCells()[6].getContext(),
                   )}
                 </>
               </AccordionTrigger>

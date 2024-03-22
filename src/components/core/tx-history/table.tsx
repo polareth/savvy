@@ -16,15 +16,19 @@ import {
 import { TxEntry, TxPending } from '@/lib/types/tx';
 import { CHAINS } from '@/lib/constants/providers';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
+import { useProviderStore } from '@/lib/store/use-provider';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Toggle } from '@/components/ui/toggle';
 import CurrencyAmount from '@/components/common/currency-amount';
 import ElapsedTime from '@/components/common/elapsed-time';
 import GweiAmount from '@/components/common/gwei-amount';
+import { Icons } from '@/components/common/icons';
 import ShrinkedAddress from '@/components/common/shrinked-address';
 import TooltipResponsive from '@/components/common/tooltip-responsive';
 import TxHistoryCollapsibleMobile from '@/components/core/tx-history/collapsible-mobile';
@@ -38,6 +42,11 @@ type TxHistoryTableProps = {
   data: TxEntry[] | undefined;
   hydrating: boolean;
   pending: TxPending | undefined;
+  totalFees: {
+    toggle: (chainId: number, id: string) => void;
+    includeAll: (chainId: number) => void;
+    excludeAll: (chainId: number) => void;
+  };
 };
 
 type CellNodeContext = {
@@ -49,6 +58,7 @@ type CellNodeContext = {
 // The loading row with mock data (just to display a skeleton)
 const getLoadingRow = (pending: TxPending): TxEntry => ({
   ...pending,
+  utils: { includedInTotalFees: false },
   gasCosts: {
     costUsd: { root: '0' },
     costNative: { root: '0' },
@@ -85,16 +95,20 @@ const getCellNode = (
  * @param data The history of transactions fetched from local storage
  * @param hydrating Whether the local storage is still being hydrated or not
  * @param pending Whether a transaction is currently being processed
+ * @param totalFees Utility functions to include/exclude txs from the total fees
  * @returns A table with the history of transactions
  */
 const TxHistoryTable: FC<TxHistoryTableProps> = ({
   data,
   hydrating,
   pending,
+  totalFees,
 }) => {
   /* ---------------------------------- STATE --------------------------------- */
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  const chain = useProviderStore((state) => state.chain);
 
   // Display table layout from md (large layout) to lg (sidebar appeared), then again from xl
   const isMediumOrLarge = useMediaQuery(
@@ -125,7 +139,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
             .indexOf(row.original);
           return (
             <span className="mr-2 text-muted-foreground lg:mr-0">
-              {!index || index === -1 ? (data?.length || 0) + 1 : index + 1}
+              {!index || index === -1 ? data?.length || 1 : index + 1}
             </span>
           );
         },
@@ -151,7 +165,17 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
         cell: ({ row }) =>
           getCellNode(
             <pre className="text-left">
-              {row.original.context.functionName ?? (
+              {row.original.context.functionName ? (
+                <div className="flex items-center gap-2">
+                  {row.original.context.functionName}{' '}
+                  {row.original.context.stateMutability === 'pure' ||
+                  row.original.context.stateMutability === 'view' ? (
+                    <Badge variant="secondary">
+                      {row.original.context.stateMutability}
+                    </Badge>
+                  ) : null}
+                </div>
+              ) : (
                 <span className="text-left text-muted-foreground">
                   arbitrary call
                 </span>
@@ -242,8 +266,40 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
             cellNodeContext(row.original.id),
           ),
       },
+      {
+        accessorKey: 'included',
+        header: () => (
+          <div className="flex items-center gap-2 text-xs">
+            Include
+            <TooltipResponsive
+              trigger="info"
+              content="Include this tx in the total fees"
+            />{' '}
+          </div>
+        ),
+        cell: ({ row }) =>
+          getCellNode(
+            <Toggle
+              aria-label="Include in total fees"
+              size="sm"
+              onClick={(e) => {
+                totalFees.toggle(row.original.context.chainId, row.original.id);
+                e.stopPropagation();
+              }}
+              defaultPressed={row.original.utils.includedInTotalFees}
+              className="h-6 w-6 p-1 data-[state=on]:bg-primary data-[state=on]:text-background"
+            >
+              {row.original.utils.includedInTotalFees ? (
+                <Icons.check className="h-3 w-3" />
+              ) : (
+                <Icons.close className="h-3 w-3" />
+              )}
+            </Toggle>,
+            cellNodeContext(row.original.id),
+          ),
+      },
     ];
-  }, [data, cellNodeContext]);
+  }, [data, cellNodeContext, totalFees]);
 
   /* ------------------------------- EXPANDABLE ------------------------------- */
   // context (chain, target, caller, inputValues), data (decoded?), logs, errors, gasUsed
@@ -489,16 +545,36 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
           />
         ) : null}
         {table.getColumn('status') ? (
-          <DataTableFacetedFilter
-            className="ml-2"
-            column={table.getColumn('status')}
-            title="Status"
-            options={[
-              { value: 'success', label: 'Success' },
-              { value: 'revert', label: 'Reverted' },
-              { value: 'failure', label: 'Error' },
-            ]}
-          />
+          <div className="flex items-center gap-2">
+            <DataTableFacetedFilter
+              className="ml-2"
+              column={table.getColumn('status')}
+              title="Status"
+              options={[
+                { value: 'success', label: 'Success' },
+                { value: 'revert', label: 'Reverted' },
+                { value: 'failure', label: 'Error' },
+              ]}
+            />
+            <Separator orientation="vertical" className="mx-2 h-4" />
+            <span className="text-xs text-muted-foreground">include</span>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="h-6"
+              onClick={() => totalFees.includeAll(chain.id)}
+            >
+              all
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="h-6"
+              onClick={() => totalFees.excludeAll(chain.id)}
+            >
+              none
+            </Button>
+          </div>
         ) : null}
         {largeDisplay ? null : (
           <Input
@@ -512,7 +588,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
         )}
       </>
     ),
-    [table, largeDisplay],
+    [table, chain.id, largeDisplay, totalFees],
   );
 
   /* ---------------------------- RENDER HYDRATING ---------------------------- */
@@ -532,7 +608,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
         table={table}
         expandableRender={expandableCell}
         pagination={dataMemoized.length > 10}
-        className="rounded-none border-secondary px-2"
+        className="rounded-none border-secondary"
         noDataLabel="No transactions yet."
         header={
           <div className="flex w-full items-center justify-between gap-4">
@@ -640,7 +716,11 @@ const TxDetailsSubTable: FC<TxSubTableProps> = ({
       },
       {
         header: () => 'Gas used',
-        cell: () => getCellNode(tx.gasUsed, cellNodeContext(tx.id)),
+        cell: () =>
+          getCellNode(
+            <span className="font-mono">{tx.gasUsed}</span>,
+            cellNodeContext(tx.id),
+          ),
       },
       // 2nd row
       {
@@ -687,7 +767,7 @@ const TxDetailsSubTable: FC<TxSubTableProps> = ({
           getCellNode(
             // It might just be 1 wei
             gasConfig.underlyingBlobBaseFee?.toString() === '1' ? (
-              '1 wei'
+              <span className="font-mono">1 wei</span>
             ) : (
               <GweiAmount
                 amount={gasConfig.underlyingBlobBaseFee || BigInt(0)}
@@ -707,6 +787,7 @@ const TxDetailsSubTable: FC<TxSubTableProps> = ({
             <CurrencyAmount
               amount={tx.context.nativeTokenPrice}
               symbol="USD"
+              scaled
             />,
             cellNodeContext(tx.id),
           ),

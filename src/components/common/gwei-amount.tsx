@@ -47,10 +47,10 @@ const GweiAmount: FC<GweiAmountProps> = ({
   }, [amount, decimals]);
 
   return (
-    <>
+    <span className="font-mono">
       {displayed}
       {noUnit ? '' : ' Gwei'}
-    </>
+    </span>
   );
 };
 

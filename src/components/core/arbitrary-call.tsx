@@ -100,6 +100,7 @@ const ArbitraryCall = () => {
       target: account,
       caller,
       functionName: undefined,
+      stateMutability: undefined,
       inputValues: [{ name: 'data', type: 'bytes', value: dataInput || '0x' }],
       value: valueInput === '' ? '0' : valueInput,
       nativeTokenPrice,

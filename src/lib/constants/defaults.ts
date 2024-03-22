@@ -18,6 +18,8 @@ export const DEFAULTS = {
   gasLimit: BigInt(30_000_000), // 30M
   // The precision to add before divisions for better accuracy
   precision: BigInt(1e18),
+  // The decimals specific to usd values; we need minimum 12 for Coinmarketcap
+  decimalsUsd: 18,
   // The default gas controls, if not provided/available yet for a chain
   gasControls: {
     min: parseGwei('0'),

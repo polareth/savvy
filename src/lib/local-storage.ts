@@ -33,6 +33,11 @@ export const formatTx: FormatTx = (tx, context, id) => {
           context.gasConfig.underlyingBlobBaseFee?.toString(),
       },
     },
+    utils: {
+      includedInTotalFees:
+        context.stateMutability !== 'pure' &&
+        context.stateMutability !== 'view',
+    },
     gasCosts: tx.gasResult,
     gasUsed: tx.result.executionGasUsed.toString(),
     data: dataSerializable,
