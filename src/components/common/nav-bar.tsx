@@ -71,7 +71,9 @@ const DesktopNavBar: FC<SubNavBarProps> = ({ selected = [''] }) => {
           aria-label="Home"
         >
           <Icons.logo className="h-6 w-6" />
-          <span className="mt-[-2px]">{METADATA_BASE.title?.toString()}</span>
+          <span className="mt-[-2px] font-mono">
+            {METADATA_BASE.title?.toString()}
+          </span>
         </Link>
         <NavigationMenu className="ml-4">
           <NavigationMenuList>
