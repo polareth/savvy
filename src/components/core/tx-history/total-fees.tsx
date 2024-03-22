@@ -33,14 +33,16 @@ const TotalFeesTable: FC<TotalFeesTableProps> = ({
       <div className="flex w-full grow items-center gap-2 whitespace-nowrap">
         <Separator orientation="vertical" className="mr-2 h-4" />
         <span className="grow font-medium">Fees</span>
-        <span className="text-sm text-muted-foreground">
-          <span className="font-semibold">{totalFees.gasUsed} gas</span> across{' '}
-          {txAmount} transactions
-        </span>
+        {txAmount ? (
+          <span className="text-sm text-muted-foreground">
+            <span className="font-semibold">{totalFees.gasUsed} gas</span>{' '}
+            across {txAmount} transactions
+          </span>
+        ) : null}
       </div>
       <div className="flex flex-col gap-x-8 gap-y-2 text-sm md:grid md:grid-cols-[1fr_auto_auto]">
         <div className="flex flex-col gap-1 font-medium">
-          {underlying ? (
+          {underlying && txAmount ? (
             <span className="text-xs font-medium text-muted-foreground">
               Total
             </span>
@@ -63,7 +65,7 @@ const TotalFeesTable: FC<TotalFeesTableProps> = ({
             full
           />
         </div>
-        {underlying ? (
+        {underlying && txAmount ? (
           <>
             <div className="flex flex-col gap-1">
               <span className="text-xs font-medium text-muted-foreground">
@@ -97,18 +99,20 @@ const TotalFeesTable: FC<TotalFeesTableProps> = ({
                 full
               />
             </div>
-            <div className="col-span-3 text-muted-foreground">
-              On average, the L1 submission accounted for{' '}
-              <span className="font-semibold">
-                {(
-                  (Number(totalFees.costNative.l1Submission) * 100) /
-                  (Number(totalFees.costNative.root) +
-                    Number(totalFees.costNative.l1Submission))
-                ).toFixed(2)}{' '}
-                %
-              </span>{' '}
-              of the fees.
-            </div>
+            {txAmount ? (
+              <div className="col-span-3 text-muted-foreground">
+                On average, the L1 submission accounted for{' '}
+                <span className="font-semibold">
+                  {(
+                    (Number(totalFees.costNative.l1Submission) * 100) /
+                    (Number(totalFees.costNative.root) +
+                      Number(totalFees.costNative.l1Submission))
+                  ).toFixed(2)}{' '}
+                  %
+                </span>{' '}
+                of the fees.
+              </div>
+            ) : null}
           </>
         ) : null}
       </div>
