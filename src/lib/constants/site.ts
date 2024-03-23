@@ -20,7 +20,7 @@ export const METADATA_BASE: Metadata = {
   authors: { url: authorUrl, name: 'polarzero' },
   keywords: [],
   twitter: {
-    site: '@0xpolarzero',
+    site: '@svvydotsh',
   },
   icons: {
     icon: '/images/favicon.ico',
@@ -52,7 +52,7 @@ export const METADATA_BASE: Metadata = {
 export const METADATA_EXTRA: MetadataExtra = {
   links: {
     github: 'https://github.com/0xpolarzero/savvy',
-    twitter: 'https://twitter.com/0xpolarzero',
+    twitter: 'https://twitter.com/svvydotsh',
     documentation: 'https://docs.svvy.sh',
   },
 };

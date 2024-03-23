@@ -31,7 +31,7 @@ export default defineConfig({
     },
     {
       icon: 'x',
-      link: 'https://twitter.com/0xpolarzero',
+      link: 'https://twitter.com/svvydotsh',
     },
   ],
   theme: {
