@@ -62,7 +62,13 @@ export const useTxStore = create<TxStore>()(
   persist(
     (set, get) => ({
       /* --------------------------------- HISTORY -------------------------------- */
-      txHistory: [],
+      txHistory: CHAINS.reduce(
+        (acc, chain) => ({
+          ...acc,
+          [chain.id]: [],
+        }),
+        {},
+      ),
       // Save a transaction to the history
       saveTx: (chainId, tx) => {
         const { txHistory, totalFees } = get();
