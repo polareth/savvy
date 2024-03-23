@@ -67,7 +67,7 @@ const TotalFeesTable: FC<TotalFeesTableProps> = ({
         </div>
         {underlying && txAmount ? (
           <>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 text-xs md:gap-2 xl:gap-1 xl:text-sm">
               <span className="text-xs font-medium text-muted-foreground">
                 L2 ({chain.name})
               </span>
@@ -83,7 +83,7 @@ const TotalFeesTable: FC<TotalFeesTableProps> = ({
                 full
               />
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 text-xs md:gap-2 xl:gap-1 xl:text-sm">
               <span className="text-xs font-medium text-muted-foreground">
                 L1 submission ({underlying})
               </span>

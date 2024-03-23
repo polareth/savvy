@@ -545,46 +545,79 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
           />
         ) : null}
         {table.getColumn('status') ? (
-          <div className="flex items-center gap-2">
-            <DataTableFacetedFilter
-              className="ml-2"
-              column={table.getColumn('status')}
-              title="Status"
-              options={[
-                { value: 'success', label: 'Success' },
-                { value: 'revert', label: 'Reverted' },
-                { value: 'failure', label: 'Error' },
-              ]}
-            />
-            <Separator orientation="vertical" className="mx-2 h-4" />
-            <span className="text-xs text-muted-foreground">include</span>
-            <Button
-              variant="secondary"
-              size="sm"
-              className="h-6"
-              onClick={() => totalFees.includeAll(chain.id)}
+          <>
+            <div
+              className={cn(
+                'flex items-center gap-2',
+                !largeDisplay && 'justify-end',
+              )}
             >
-              all
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              className="h-6"
-              onClick={() => totalFees.excludeAll(chain.id)}
-            >
-              none
-            </Button>
-          </div>
+              <DataTableFacetedFilter
+                className="ml-2"
+                column={table.getColumn('status')}
+                title="Status"
+                options={[
+                  { value: 'success', label: 'Success' },
+                  { value: 'revert', label: 'Reverted' },
+                  { value: 'failure', label: 'Error' },
+                ]}
+              />
+              {largeDisplay ? (
+                <>
+                  <Separator orientation="vertical" className="mx-2 h-4" />
+                  <span className="text-xs text-muted-foreground">include</span>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-6"
+                    onClick={() => totalFees.includeAll(chain.id)}
+                  >
+                    all
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-6"
+                    onClick={() => totalFees.excludeAll(chain.id)}
+                  >
+                    none
+                  </Button>
+                </>
+              ) : null}
+            </div>
+          </>
         ) : null}
         {largeDisplay ? null : (
-          <Input
-            placeholder="Filter transactions..."
-            value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-            onChange={(e) =>
-              table.getColumn('name')?.setFilterValue(e.target.value)
-            }
-            className={largeDisplay ? 'max-w-sm' : 'col-span-2'}
-          />
+          <>
+            <Input
+              placeholder="Filter transactions..."
+              value={
+                (table.getColumn('name')?.getFilterValue() as string) ?? ''
+              }
+              onChange={(e) =>
+                table.getColumn('name')?.setFilterValue(e.target.value)
+              }
+            />
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">include</span>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="h-6"
+                onClick={() => totalFees.includeAll(chain.id)}
+              >
+                all
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="h-6"
+                onClick={() => totalFees.excludeAll(chain.id)}
+              >
+                none
+              </Button>
+            </div>
+          </>
         )}
       </>
     ),
@@ -612,7 +645,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
         noDataLabel="No transactions yet."
         header={
           <div className="flex w-full items-center justify-between gap-4">
-            <div className="flex items-center gap-4">{header}</div>
+            {header}
             <DataTableViewOptions table={table} />
           </div>
         }
