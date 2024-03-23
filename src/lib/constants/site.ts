@@ -12,6 +12,7 @@ const websiteUrl = 'https://svvy.sh';
 /*                                  METADATA                                  */
 /* -------------------------------------------------------------------------- */
 
+/* ---------------------------------- BASE ---------------------------------- */
 export const METADATA_BASE: Metadata = {
   title: title,
   description: description,
@@ -21,8 +22,13 @@ export const METADATA_BASE: Metadata = {
   twitter: {
     site: '@0xpolarzero',
   },
-  // robots? icons?
-  // manifest
+  icons: {
+    icon: '/images/favicon.ico',
+    apple: '/images/apple-touch-icon.png',
+    shortcut: '/images/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
+  // robots?
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -42,6 +48,7 @@ export const METADATA_BASE: Metadata = {
   },
 };
 
+/* ---------------------------------- EXTRA --------------------------------- */
 export const METADATA_EXTRA: MetadataExtra = {
   links: {
     github: 'https://github.com/0xpolarzero/savvy',
