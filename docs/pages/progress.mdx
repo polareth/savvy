@@ -1,5 +1,6 @@
 import { Step, Steps } from 'vocs/components';
 
+import { Link } from '../components/link';
 import {
   ProgressItem,
   ProgressListContent,
@@ -84,7 +85,9 @@ Please don't hesitate to [ask](https://github.com/0xpolarzero/savvy/issues) if y
         with mock data + estimate costs (e.g. Gaslite core, Solady libs)
       </ProgressItem>
       <ProgressItem completed={false} difficulty={-1}>
-        impersonate a smart account (see Rhinestone, ERC7579); with utilities to
+        impersonate a smart account (see{' '}
+        <Link href="https://www.rhinestone.wtf/">Rhinestone</Link>,{' '}
+        <Link href="https://erc7579.com/">ERC7579</Link>); with utilities to
         follow the flow, add modules, etc
       </ProgressItem>
     </ProgressListContent>
@@ -126,7 +129,13 @@ Please don't hesitate to [ask](https://github.com/0xpolarzero/savvy/issues) if y
       <ProgressItem completed={false} difficulty={3}>
         use savvy as a browser "extension"/wallet; basically override the
         injected provider with the impersonated caller, and override the chain
-        with a fresh fork—think of it as a "sandbox" mode for a DApp
+        with a fresh fork—think of it as a "sandbox" mode for a DApp (see{' '}
+        <Link href="https://chromewebstore.google.com/detail/interceptor/mekcodfnjfedkfgcnabhdabapbolmbeg?pli=1">
+          Interceptor
+        </Link>
+        , <Link href="https://chromewebstore.google.com/detail/fire/kglcipoddmbniebnibibkghfijekllbl">
+          Fire
+        </Link>, <Link href="https://impersonator.xyz/">Impersonator</Link>)
       </ProgressItem>
     </ProgressListContent>
   </Step>
