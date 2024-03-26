@@ -16,7 +16,7 @@ const Interface = () => {
   }));
 
   if (!abi && !fetchingAccount && !fetchingAbi) return null;
-  return <InterfaceTable data={abi} loading={fetchingAbi} />;
+  return <InterfaceTable abi={abi} loading={fetchingAbi} />;
 };
 
 export default Interface;

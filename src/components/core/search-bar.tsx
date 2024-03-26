@@ -148,7 +148,7 @@ const SearchBar: FC<SearchBarProps> = ({
       </div>
       {!isValidAddress && inputValue !== '' ? (
         <span className="text-sm font-medium text-muted-foreground">
-          Invalid address
+          Invalid address or ENS
         </span>
       ) : null}
     </div>

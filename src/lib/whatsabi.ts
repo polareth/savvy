@@ -8,11 +8,11 @@ import { getFunctionName } from '@/lib/utils';
 /**
  * @type {Object} FetchAbiResponse
  * @property {boolean} success Whether the fetch was successful
- * @property {ABI | null} data The fetched abi
+ * @property {Object} data The fetched data (abi and resolved address, useful if it's a proxy)
  */
 type FetchAbiResponse = {
   success: boolean;
-  data: ABI | null;
+  data: { abi: ABI | null; resolvedAddress: Address };
 };
 
 /**
@@ -51,20 +51,29 @@ export const fetchAbi: FetchAbi = async (contractAddress, chain) => {
 
   if (!response.ok) {
     console.error('Failed to fetch abi:', response);
-    return { success: false, data: null };
+    return {
+      success: false,
+      data: { abi: null, resolvedAddress: contractAddress },
+    };
   }
 
-  const abi = ((await response.json()) as FetchAbiResponse).data;
-  if (!abi) {
-    return { success: true, data: null };
+  const { data } = (await response.json()) as FetchAbiResponse;
+  if (!data.abi) {
+    return {
+      success: true,
+      data: { abi: null, resolvedAddress: contractAddress },
+    };
   }
 
   return {
     success: true,
     // If a function doesn't have a name, use its selector or its signature for easier calling
-    data: abi.map((funcOrEvent) => ({
-      ...funcOrEvent,
-      name: getFunctionName(funcOrEvent, abi.indexOf(funcOrEvent)),
-    })),
+    data: {
+      abi: data.abi.map((funcOrEvent) => ({
+        ...funcOrEvent,
+        name: getFunctionName(funcOrEvent, data.abi!.indexOf(funcOrEvent)),
+      })),
+      resolvedAddress: data.resolvedAddress,
+    },
   };
 };

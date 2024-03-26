@@ -29,13 +29,14 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Icons } from '@/components/common/icons';
+import ShrinkedAddress from '@/components/common/shrinked-address';
 import TooltipResponsive from '@/components/common/tooltip-responsive';
 import { DataTableColumnHeader } from '@/components/templates/table/column-header';
 import DataTable from '@/components/templates/table/data-table';
 import { DataTableViewOptions } from '@/components/templates/table/view';
 
 type InterfaceTableProps = {
-  data: ABI | null;
+  abi: ABI | undefined;
   loading?: boolean;
 };
 
@@ -47,11 +48,11 @@ const SkeletonCell = () => <Skeleton className="h-4 w-16" />;
  * @dev This will display the contract's functions and ignore events.
  * @dev Each row shows the function's name, details, inputs that should be filled by the user,
  * and a button to call it.
- * @param data The contract's ABI
+ * @param abi The contract's ABI
  * @param loading Whether the data is still loading
  * @returns A table with the contract's functions
  */
-const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
+const InterfaceTable: FC<InterfaceTableProps> = ({ abi, loading }) => {
   /* ---------------------------------- STATE --------------------------------- */
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -67,7 +68,7 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
   const {
     account,
     caller,
-    abi,
+    abiAddress,
     skipBalance,
     nativeTokenPrice,
     gasFeesConfig,
@@ -75,7 +76,7 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
   } = useConfigStore((state) => ({
     account: state.account,
     caller: state.caller,
-    abi: state.abi,
+    abiAddress: state.abiAddress,
     skipBalance: state.skipBalance,
     nativeTokenPrice: state.nativeTokenPrice,
     gasFeesConfig: state.gasFeesConfig,
@@ -313,7 +314,7 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
                     id={`${id}-value`}
                     type="text"
                     placeholder="0"
-                    className="h-7 w-full max-w-xs text-xs"
+                    className="h-7 w-full min-w-[100px] max-w-xs bg-background text-xs"
                     value={inputValues[id]['value'] as string}
                     onFocus={() => (focusedInputRef.current = `${id}-value`)}
                     onBlur={() => (focusedInputRef.current = null)}
@@ -333,7 +334,7 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
                   <Input
                     id={`${id}-args-${index}`}
                     placeholder={input.type}
-                    className="h-7 w-full max-w-xs text-xs"
+                    className="z- h-7 w-full min-w-[100px] max-w-xs bg-background text-xs"
                     value={inputValues[id]['args'][index] as string | number}
                     onFocus={() =>
                       (focusedInputRef.current = `${id}-args-${index}`)
@@ -415,10 +416,10 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
   /* ---------------------------------- DATA ---------------------------------- */
   const dataMemoized: ABIFunction[] = useMemo(() => {
     if (loading) return Array(5).fill({});
-    if (!data) return [];
+    if (!abi) return [];
 
     // Filter out events
-    const filtered = data.filter(
+    const filtered = abi.filter(
       (func) => func.type === 'function',
     ) as ABIFunction[];
     // Initialize the input values for each function
@@ -428,7 +429,7 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
     return filtered.sort((a, b) =>
       (a.name?.toLowerCase() || '') > (b.name?.toLowerCase() || '') ? 1 : -1,
     );
-  }, [data, loading, initializeInputs]);
+  }, [abi, loading, initializeInputs]);
 
   const table = useReactTable<ABIFunction>({
     data: dataMemoized,
@@ -490,24 +491,39 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ data, loading }) => {
       pagination={dataMemoized.length > 10}
       className="rounded-none"
       header={
-        <div className="flex w-full items-center justify-between gap-4">
-          <div className="flex grow items-center gap-2 whitespace-nowrap font-medium">
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            Contract interface
+        <div className="flex w-full flex-col gap-2">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex grow items-center gap-2 whitespace-nowrap font-medium">
+              <Separator orientation="vertical" className="mr-2 h-4" />
+              Contract interface
+            </div>
+            <div className="flex items-center">
+              <Input
+                placeholder="Filter functions..."
+                value={
+                  (table.getColumn('name')?.getFilterValue() as string) ?? ''
+                }
+                onChange={(e) =>
+                  table.getColumn('name')?.setFilterValue(e.target.value)
+                }
+                className="max-w-sm"
+              />
+            </div>
+            <DataTableViewOptions table={table} />
           </div>
-          <div className="flex items-center">
-            <Input
-              placeholder="Filter functions..."
-              value={
-                (table.getColumn('name')?.getFilterValue() as string) ?? ''
-              }
-              onChange={(e) =>
-                table.getColumn('name')?.setFilterValue(e.target.value)
-              }
-              className="max-w-sm"
-            />
-          </div>
-          <DataTableViewOptions table={table} />
+          {!loading && abiAddress && abiAddress !== account?.address ? (
+            <Badge
+              className="flex w-min gap-2 whitespace-nowrap text-sm"
+              variant="secondary"
+            >
+              ABI for the implementation contract at{' '}
+              <ShrinkedAddress
+                address={abiAddress}
+                explorer={chain.blockExplorers?.default.url}
+                className="inline-block"
+              />
+            </Badge>
+          ) : null}
         </div>
       }
     />

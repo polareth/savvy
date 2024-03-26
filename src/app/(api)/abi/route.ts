@@ -47,9 +47,13 @@ export async function POST(req: Request) {
       provider,
       // If there is no Etherscan-like api, we can't use the EtherscanABILoader
       abiLoader: apiUrl ? new MultiABILoader(loaders) : loaders[1],
+      followProxies: true,
     });
 
-    return Response.json({ success: true, data: res.abi });
+    return Response.json({
+      success: true,
+      data: { abi: res.abi, resolvedAddress: res.address },
+    });
   } catch (err) {
     return Response.json({ error: 'Failed to fetch abi' });
   }

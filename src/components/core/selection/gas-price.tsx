@@ -234,7 +234,7 @@ const GasPriceSelection = () => {
 /* -------------------------------------------------------------------------- */
 
 type BaseFeeButtonProps = {
-  gasFeesConfig: GasFeesConfig | null;
+  gasFeesConfig: GasFeesConfig | undefined;
   selectedPriorityFee: Priority;
   loading: boolean;
   setGasFeesConfig: (gasFeesConfig: GasFeesConfig) => void;

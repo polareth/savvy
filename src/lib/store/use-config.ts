@@ -17,14 +17,15 @@ import { fetchAbi } from '@/lib/whatsabi';
 
 /* ---------------------------------- TYPES --------------------------------- */
 type ConfigInitialState = {
-  account: Account | null;
+  account: Account | undefined;
   fetchingAccount: boolean;
-  abi: ABI | null;
+  abi: ABI | undefined;
+  abiAddress: Address | undefined;
   fetchingAbi: boolean;
   caller: Address;
   skipBalance: boolean;
 
-  gasFeesConfig: GasFeesConfig | null;
+  gasFeesConfig: GasFeesConfig | undefined;
   fetchingGasFeesData: boolean;
   nativeTokenPrice: number;
   fetchingNativeTokenPrice: boolean;
@@ -37,7 +38,7 @@ type ConfigSetState = {
     addressOrEns: Address | string,
     options: UpdateAccountOptions,
   ) => Promise<Account>;
-  setAbi: (abi: ABI | null) => void;
+  setAbi: (abi: ABI | undefined) => void;
   setCaller: (address: Address) => void;
   resetCaller: () => void;
   setSkipBalance: (skip: boolean) => void;
@@ -60,11 +61,13 @@ export const useConfigStore = create<ConfigStore>()(
   persist(
     (set) => ({
       // A valid Ethereum account (either a contract or an EOA)
-      account: null,
+      account: undefined,
       // Whether the account is currently being fetched
       fetchingAccount: false,
       // The contract's abi after it's been fetched with WhatsABI
-      abi: null,
+      abi: undefined,
+      // The address of the contract's abi (can be a proxy implementation)
+      abiAddress: undefined,
       // Whether the abi is currently being fetched
       fetchingAbi: false,
       // The current address to impersonate as the caller
@@ -73,7 +76,7 @@ export const useConfigStore = create<ConfigStore>()(
       skipBalance: true,
 
       // Gas fees configuration
-      gasFeesConfig: null,
+      gasFeesConfig: undefined,
       // Whether the gas fees history is currently being fetched to set the base config
       fetchingGasFeesData: false,
       // The current native token price
@@ -98,16 +101,16 @@ export const useConfigStore = create<ConfigStore>()(
           // TODO maybe it's bad practice to manage the toast here—i.e. in a zustand store?
           const toastId = toast.loading('Fetching ABI');
 
-          const { success, data: abi } = await fetchAbi(account.address, chain);
+          const { success, data } = await fetchAbi(account.address, chain);
 
           // Set the abi in the store if it's successful
-          if (success && abi && abi.length > 0) {
-            set({ abi });
+          if (success && data.abi && data.abi.length > 0) {
+            set({ abi: data.abi, abiAddress: data.resolvedAddress });
             toast.success('ABI fetched', {
               id: toastId,
             });
           } else {
-            set({ abi: null });
+            set({ abi: undefined, abiAddress: undefined });
             toast.error('Failed to retrieve the ABI', {
               id: toastId,
               description:
@@ -115,7 +118,7 @@ export const useConfigStore = create<ConfigStore>()(
             });
           }
         } else {
-          if (updateAbi) set({ abi: null });
+          if (updateAbi) set({ abi: undefined, abiAddress: undefined });
         }
 
         // Set the new account in any case
