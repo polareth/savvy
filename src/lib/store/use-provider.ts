@@ -1,5 +1,4 @@
 import { MemoryClient } from 'tevm';
-import { Address, getAddress } from 'tevm/utils';
 import { extractChain } from 'viem';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -26,7 +25,6 @@ type ProviderInitialState = {
 type ProviderSetState = {
   setProvider: (
     chain: Chain,
-    address?: Address,
     hydrate?: boolean,
   ) => Promise<MemoryClient | null>;
   setForkTime: (chainId: Chain['id'], status?: 'loading' | 'update') => void;
@@ -63,8 +61,7 @@ export const useProviderStore = create<ProviderStore>()(
       initializing: false,
 
       // Set the selected chain and its client on user selection (or on first mount)
-      // Fetch the state of the account if there is one
-      setProvider: async (chain, address, hydrate) => {
+      setProvider: async (chain, hydrate) => {
         const {
           chainId: currentChainId,
           client: currentClient,
@@ -159,21 +156,8 @@ export const useProviderStore = create<ProviderStore>()(
         const chain = chainId
           ? extractChain({ chains: CHAINS, id: chainId })
           : DEFAULTS.chain;
-
-        // In case the user is directly landing on an address page (or refreshing)
-        const addressInSearch = window.location.pathname.split('/').pop();
-        const address = addressInSearch
-          ? getAddress(addressInSearch)
-          : undefined;
-
-        const client = await setProvider(chain, address, true);
-        if (address && client) {
-          useConfigStore.getState().updateAccount(address, {
-            updateAbi: true,
-            chain,
-            client,
-          });
-        }
+        // and set the provider
+        await setProvider(chain, true);
 
         hydrate();
       },

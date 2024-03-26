@@ -30,17 +30,12 @@ type ChainSelectionProps = {
 const ChainSelection: FC<ChainSelectionProps> = ({ hydrating = false }) => {
   /* ---------------------------------- STATE --------------------------------- */
   // Get the account & abi (+ method to fetch & update)
-  const {
-    account,
-    updateAccount,
-    getLatestGasFeesData,
-    getLatestNativeTokenPrice,
-  } = useConfigStore((state) => ({
-    account: state.account,
-    updateAccount: state.updateAccount,
-    getLatestGasFeesData: state.getLatestGasFeesData,
-    getLatestNativeTokenPrice: state.getLatestNativeTokenPrice,
-  }));
+  const { getLatestGasFeesData, getLatestNativeTokenPrice } = useConfigStore(
+    (state) => ({
+      getLatestGasFeesData: state.getLatestGasFeesData,
+      getLatestNativeTokenPrice: state.getLatestNativeTokenPrice,
+    }),
+  );
 
   const { chain, client, forkTime, initializing, setProvider, setForkTime } =
     useProviderStore((state) => ({
@@ -77,15 +72,6 @@ const ChainSelection: FC<ChainSelectionProps> = ({ hydrating = false }) => {
     if (success) {
       // Reset the transaction history for the current chain
       resetTxs(chain.id);
-
-      // Update the state of the account if there is one set
-      if (account) {
-        updateAccount(account.address, {
-          updateAbi: true,
-          chain,
-          client,
-        });
-      }
 
       toast.success('Chain reset', {
         id: loading,
@@ -144,26 +130,13 @@ const ChainSelection: FC<ChainSelectionProps> = ({ hydrating = false }) => {
               id: Number(chainOption.value),
             });
             // Change the chain
-            const newClient = await setProvider(
-              selectedChain,
-              account?.address,
-            );
+            const newClient = await setProvider(selectedChain);
             // Catch any issue if the client could not be set
             if (!newClient) {
               toast.error('Failed to set provider', {
                 description: `The provider for ${selectedChain.name} could not be retrieved`,
               });
               return;
-            }
-
-            // Update the state of the account if an account is set
-            // If an account is set, update its state
-            if (account && newClient) {
-              updateAccount(account.address, {
-                updateAbi: true,
-                chain: selectedChain,
-                client: newClient,
-              });
             }
 
             // Fetch the latest gas fees and native token price

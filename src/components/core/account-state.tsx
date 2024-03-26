@@ -1,7 +1,6 @@
 'use client';
 
 import { FC, useEffect } from 'react';
-import { Address, isAddress } from 'tevm/utils';
 
 import { useConfigStore } from '@/lib/store/use-config';
 import { useProviderStore } from '@/lib/store/use-provider';
@@ -12,7 +11,7 @@ import ShrinkedAddress from '@/components/common/shrinked-address';
 import TooltipResponsive from '@/components/common/tooltip-responsive';
 
 type AccountStateProps = {
-  initialAddress: string;
+  initialSearchedAccount: string;
 };
 
 /**
@@ -20,13 +19,16 @@ type AccountStateProps = {
  * @dev This will display the data about the current account.
  * @dev This will be updated after searching for an address or making a call.
  */
-const AccountState: FC<AccountStateProps> = ({ initialAddress }) => {
+const AccountState: FC<AccountStateProps> = ({ initialSearchedAccount }) => {
   /* ---------------------------------- STATE --------------------------------- */
-  const { chain, client, initializing } = useProviderStore((state) => ({
-    chain: state.chain,
-    client: state.client,
-    initializing: state.initializing,
-  }));
+  const { chain, client, forkTime, initializing } = useProviderStore(
+    (state) => ({
+      chain: state.chain,
+      client: state.client,
+      forkTime: state.forkTime,
+      initializing: state.initializing,
+    }),
+  );
 
   const { account, fetchingAccount, updateAccount } = useConfigStore(
     (state) => ({
@@ -39,19 +41,19 @@ const AccountState: FC<AccountStateProps> = ({ initialAddress }) => {
   const loading = initializing || fetchingAccount;
 
   /* --------------------------------- EFFECTS -------------------------------- */
-  // Update the account if the address in the URL changes (on search, reload, or navigation)
+  // Update the account:
+  // - on chain change/reset
+  // - on refresh (direct mount or search)
   useEffect(() => {
-    if (
-      client &&
-      isAddress(initialAddress) &&
-      (!account || account.address !== initialAddress)
-    )
-      updateAccount(initialAddress as Address, {
+    if (client) {
+      updateAccount(initialSearchedAccount, {
         updateAbi: true,
         chain,
         client,
       });
-  }, [initialAddress, account, chain, client, updateAccount]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chain, client, forkTime[chain.id]]);
 
   /* --------------------------------- RENDER --------------------------------- */
   if (!account && !fetchingAccount) return null;
@@ -78,7 +80,7 @@ const AccountState: FC<AccountStateProps> = ({ initialAddress }) => {
       {loading || !account ? (
         <Skeleton className="h-6 w-24" />
       ) : (
-        <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex flex-col gap-x-4 sm:flex-row sm:items-center">
           <ShrinkedAddress
             address={account.address}
             explorer={chain.blockExplorers?.default.url}
@@ -94,6 +96,13 @@ const AccountState: FC<AccountStateProps> = ({ initialAddress }) => {
               content="This account has never been initialized (0 balance, 0 nonce, no deployed bytecode)"
               classNameTrigger="flex items-center"
             />
+          ) : account.ens ? (
+            <Badge
+              variant="secondary"
+              className="w-min whitespace-nowrap font-mono"
+            >
+              {account.ens}
+            </Badge>
           ) : null}
         </div>
       )}

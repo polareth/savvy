@@ -1,8 +1,9 @@
 import { ABIFunction } from '@shazow/whatsabi/lib.types/abi';
-import { CallResult, ContractResult, GetAccountResult } from 'tevm';
+import { CallResult, ContractResult } from 'tevm';
 import { Log } from 'tevm/actions-types';
 import { Address, Hex } from 'tevm/utils';
 
+import { Account } from '@/lib/types/config';
 import { RollupFramework } from '@/lib/types/providers';
 
 /* ---------------------------------- UTILS --------------------------------- */
@@ -114,7 +115,7 @@ export type TxGasResult = {
  * @type {Object} TxContext
  * @notice The context of a transaction (for the local storage)
  * @property {number} chainId The id of the chain the transaction was made on
- * @property {GetAccountResult} target The account targeted by the transaction (contract or EOA)
+ * @property {Account} target The account targeted by the transaction (contract or EOA)
  * @property {Address} caller The address of the impersonated caller
  * @property {string} functionName The name of the function called; undefined if low level call
  * @property {AbiFunction['stateMutability'] | undefined} stateMutability The state mutability of the function called (or undefined if unknown or low-level call)
@@ -126,7 +127,7 @@ export type TxGasResult = {
 
 export type TxContext = {
   chainId: number;
-  target: GetAccountResult;
+  target: Account;
   caller: Address;
   functionName: string | undefined;
   stateMutability: ABIFunction['stateMutability'] | undefined;

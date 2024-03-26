@@ -1,10 +1,10 @@
 import { ABI } from '@shazow/whatsabi/lib.types/abi';
 import { toast } from 'sonner';
-import { GetAccountResult } from 'tevm';
 import { Address } from 'tevm/utils';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import { Account } from '@/lib/types/config';
 import { GasFeesConfig } from '@/lib/types/gas';
 import { UpdateAccountOptions } from '@/lib/types/providers';
 import { DEFAULTS } from '@/lib/constants/defaults';
@@ -17,7 +17,7 @@ import { fetchAbi } from '@/lib/whatsabi';
 
 /* ---------------------------------- TYPES --------------------------------- */
 type ConfigInitialState = {
-  account: GetAccountResult | null;
+  account: Account | null;
   fetchingAccount: boolean;
   abi: ABI | null;
   fetchingAbi: boolean;
@@ -34,9 +34,9 @@ type ConfigInitialState = {
 
 type ConfigSetState = {
   updateAccount: (
-    address: Address,
+    addressOrEns: Address | string,
     options: UpdateAccountOptions,
-  ) => Promise<GetAccountResult>;
+  ) => Promise<Account>;
   setAbi: (abi: ABI | null) => void;
   setCaller: (address: Address) => void;
   resetCaller: () => void;
@@ -87,9 +87,9 @@ export const useConfigStore = create<ConfigStore>()(
 
       // Update the account with its latest state, and fetch the abi if it's a contract
       // This will be called upon search, chain change/reset, and after making a call
-      updateAccount: async (address, { updateAbi, chain, client }) => {
+      updateAccount: async (addressOrEns, { updateAbi, chain, client }) => {
         set({ fetchingAccount: true, fetchingAbi: updateAbi });
-        const account = await getAccount(client, address);
+        const account = await getAccount(client, chain, addressOrEns);
         set({ fetchingAccount: false });
 
         // If we can't be sure if it's a contract, we can attempt to fetch the abi anyway

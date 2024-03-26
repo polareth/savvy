@@ -2,6 +2,7 @@
 
 import { FC, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Address } from 'tevm/utils';
 
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
@@ -33,6 +34,7 @@ const ShrinkedAddress: FC<ShrinkedAddressProps> = ({
   full = false,
   className,
 }) => {
+  const pathname = usePathname();
   const isLargeScreen = useMediaQuery('(min-width: 1280px)'); // xl
   const [copy, setCopy] = useState(false);
 
@@ -75,7 +77,12 @@ const ShrinkedAddress: FC<ShrinkedAddressProps> = ({
   if (explorer)
     return (
       <div className="flex items-center gap-2">
-        <Link href={address} className="cursor-pointer hover:underline">
+        <Link
+          href={
+            pathname.includes('address') ? `${address}` : `/address/${address}`
+          }
+          className="cursor-pointer hover:underline"
+        >
           <pre className={className}>
             {fullAddress
               ? address

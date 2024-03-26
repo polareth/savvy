@@ -22,9 +22,9 @@ export default function AccountPage({
 }) {
   return (
     <div className="flex grow flex-col gap-4">
-      <Header initialAddress={params.account} />
+      <Header initialSearchedAccount={params.account} />
 
-      <AccountState initialAddress={params.account} />
+      <AccountState initialSearchedAccount={params.account} />
       <Interact />
 
       <Separator />
