@@ -48,8 +48,6 @@ export const getAccount: GetAccount = async (client, chain, addressOrENS) => {
       ? chain.custom.config.provider
       : chain.custom.tech.underlying?.custom.config.provider;
 
-    console.log(provider);
-
     // If an ENS was provided and there is no provider, return an error
     if (!provider && !isAddress(addressOrENS)) {
       return {

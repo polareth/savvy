@@ -42,6 +42,10 @@ export async function POST(req: Request) {
     }),
   ];
 
+  // console.log('contractAddress', contractAddress);
+  // console.log('apiUrl', apiUrl);
+  // console.log('provider', provider);
+
   try {
     const res = await autoload(contractAddress, {
       provider,

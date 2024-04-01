@@ -49,7 +49,11 @@ export const fetchAbi: FetchAbi = async (contractAddress, chain) => {
     }),
   });
 
-  if (!response.ok) {
+  const resJson = response.ok
+    ? ((await response.json()) as FetchAbiResponse)
+    : undefined;
+
+  if (!resJson || !resJson.success) {
     console.error('Failed to fetch abi:', response);
     return {
       success: false,
@@ -57,7 +61,7 @@ export const fetchAbi: FetchAbi = async (contractAddress, chain) => {
     };
   }
 
-  const { data } = (await response.json()) as FetchAbiResponse;
+  const data = resJson.data;
   if (!data.abi) {
     return {
       success: true,
