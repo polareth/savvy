@@ -1,7 +1,6 @@
 import { MemoryClient } from 'tevm';
 
 import { Chain } from '@/lib/types/providers';
-import { STANDALONE_RPC_CHAINS } from '@/lib/constants/providers';
 
 const alchemyApiKey = process.env.ALCHEMY_API_KEY || '';
 

@@ -1,7 +1,7 @@
 import { parseGwei } from 'tevm';
 import { createPublicClient, http } from 'viem';
 import {
-  arbitrum,
+  // arbitrum,
   base,
   foundry,
   mainnet,
@@ -38,14 +38,6 @@ const RPC_URLS = {
   zora: 'https://rpc.zora.energy/',
 };
 
-// Chains that don't need an API key
-export const STANDALONE_RPC_CHAINS = [
-  // Foundry/Hardhat
-  31337,
-  // Zora
-  7777777,
-];
-
 /**
  * @notice Create a viem provider for a given chain
  * @param chain The viem chain object
@@ -54,9 +46,9 @@ export const STANDALONE_RPC_CHAINS = [
 export const createProvider = (chain: ViemChain, rpcUrl: string) => {
   return createPublicClient({
     chain,
-    transport: STANDALONE_RPC_CHAINS.includes(chain.id)
-      ? http(rpcUrl)
-      : http(`${rpcUrl}${alchemyApiKey}`),
+    transport: rpcUrl.endsWith('g.alchemy.com/v2/')
+      ? http(`${rpcUrl}${alchemyApiKey}`)
+      : http(rpcUrl),
   });
 };
 

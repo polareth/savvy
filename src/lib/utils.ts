@@ -3,14 +3,15 @@ import { clsx, type ClassValue } from 'clsx';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 import {
-  Address,
+  // Address,
   getAddress,
   Hex,
-  isAddress,
+  // isAddress,
   isHex,
-  parseEther,
+  // parseEther,
 } from 'tevm/utils';
-import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts';
+
+// import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts';
 
 // import { AirdropData, Token } from '@/lib/types/solutions/airdrop';
 import { ExpectedType } from '@/lib/types/tx';
