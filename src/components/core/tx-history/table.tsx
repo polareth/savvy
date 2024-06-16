@@ -13,8 +13,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
+import { Chain } from '@/lib/types/providers';
 import { TxEntry, TxPending } from '@/lib/types/tx';
-import { CHAINS } from '@/lib/constants/providers';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { useProviderStore } from '@/lib/store/use-provider';
 import { cn } from '@/lib/utils';
@@ -108,7 +108,10 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  const chain = useProviderStore((state) => state.chain);
+  const { chains, chain } = useProviderStore((state) => ({
+    chains: state.chains,
+    chain: state.chain,
+  }));
 
   // Display table layout from md (large layout) to lg (sidebar appeared), then again from xl
   const isMediumOrLarge = useMediaQuery(
@@ -199,11 +202,11 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
                   BigInt(row.original.gasCosts.costNative.l1Submission || 0)
                 }
                 symbol={
-                  CHAINS.find((c) => c.id === row.original.context.chainId)
+                  chains.find((c) => c.id === row.original.context.chainId)
                     ?.nativeCurrency.symbol
                 }
                 decimals={
-                  CHAINS.find((c) => c.id === row.original.context.chainId)
+                  chains.find((c) => c.id === row.original.context.chainId)
                     ?.nativeCurrency.decimals
                 }
                 className="flex items-center"
@@ -299,17 +302,18 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
           ),
       },
     ];
-  }, [data, cellNodeContext, totalFees]);
+  }, [chains, data, cellNodeContext, totalFees]);
 
   /* ------------------------------- EXPANDABLE ------------------------------- */
   // context (chain, target, caller, inputValues), data (decoded?), logs, errors, gasUsed
   const expandableCell = (row: Row<TxEntry>) => {
-    const txChain = CHAINS.find((c) => c.id === row.original.context.chainId);
+    const txChain = chains.find((c) => c.id === row.original.context.chainId);
     const hasUnderlying = !!txChain?.custom.tech.underlying;
 
     return (
       <>
         <TxDetailsSubTable
+          chains={chains}
           tx={row.original}
           largeDisplay={largeDisplay}
           cellNodeContext={cellNodeContext}
@@ -673,6 +677,7 @@ const TxHistoryTable: FC<TxHistoryTableProps> = ({
 /* -------------------------------------------------------------------------- */
 
 type TxSubTableProps = {
+  chains: Chain[];
   tx: TxEntry;
   cellNodeContext: (id: string) => CellNodeContext;
   largeDisplay?: boolean;
@@ -689,15 +694,16 @@ type TxSubTableProps = {
  * @returns A sub-table with the details of the transaction
  */
 const TxDetailsSubTable: FC<TxSubTableProps> = ({
+  chains,
   tx,
   cellNodeContext,
   largeDisplay,
 }) => {
-  const txChain = CHAINS.find((c) => c.id === tx.context.chainId);
+  const txChain = chains.find((c) => c.id === tx.context.chainId);
 
   const gasConfig = tx.context.gasConfig;
   const hasPriorityFee = gasConfig.hasChainPriorityFee;
-  const hasUnderlying = !!gasConfig.stack;
+  const hasUnderlying = !!gasConfig.underlyingBaseFee;
 
   /* ---------------------------------- TABLE --------------------------------- */
   const table = useMemo(

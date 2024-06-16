@@ -46,15 +46,14 @@ const createClient: CreateClient = async (chainId, forkUrl) => {
     'tevm/sync-storage-persister'
   );
 
+  const needsAlchemyApiKey = forkUrl.endsWith('g.alchemy.com/v2/');
   return createMemoryClient({
     persister: createSyncStoragePersister({
       storage: localStorage,
       key: `TEVM_CLIENT_${chainId.toString()}`,
     }),
     fork: {
-      url: STANDALONE_RPC_CHAINS.includes(chainId)
-        ? forkUrl
-        : `${forkUrl}${alchemyApiKey}`,
+      url: needsAlchemyApiKey ? `${forkUrl}${alchemyApiKey}` : forkUrl,
     },
   });
 };

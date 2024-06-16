@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Settings } from 'lucide-react';
 
+import { CustomChainOptions } from '@/lib/types/providers';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { useConfigStore } from '@/lib/store/use-config';
 import { useProviderStore } from '@/lib/store/use-provider';
@@ -20,12 +21,16 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTrigger,
 } from '@/components/ui/sheet';
 import GweiAmount from '@/components/common/gwei-amount';
 import CallerSelection from '@/components/core/selection/caller';
 import ChainSelection from '@/components/core/selection/chain';
+import CustomChainCreation, {
+  CustomChainCreationButtons,
+} from '@/components/core/selection/custom-chain';
 import GasPriceSelection from '@/components/core/selection/gas-price';
 import NativePriceSelection from '@/components/core/selection/native-price';
 
@@ -36,6 +41,10 @@ import NativePriceSelection from '@/components/core/selection/native-price';
  */
 const ConfigMenuMobile = () => {
   const [open, setOpen] = useState(false);
+  const [chainCreation, setChainCreation] = useState(false);
+  const [customChainOptions, setCustomChainOptions] = useState<
+    CustomChainOptions | undefined
+  >(undefined);
   const isTablet = useMediaQuery('(max-width: 1024px)');
 
   const chain = useProviderStore((state) => state.chain);
@@ -43,49 +52,69 @@ const ConfigMenuMobile = () => {
 
   if (!isTablet) return null;
   return (
-    <>
-      <Sheet open={open} onOpenChange={(o) => setOpen(o)}>
-        <SheetTrigger>
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbPage>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className={cn(
-                      'ml-1 transition-opacity duration-300',
-                      open && 'opacity-70',
-                    )}
-                  >
-                    <Settings className="h-6 w-5" />
-                  </Button>
-                </BreadcrumbPage>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink className="font-medium">
-                  {chain.name}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink>
-                  <GweiAmount
-                    amount={gasFeesConfig?.nextBaseFeePerGas || BigInt(0)}
-                  />
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </SheetTrigger>
+    <Sheet open={open} onOpenChange={(o) => setOpen(o)}>
+      <SheetTrigger>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbPage>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className={cn(
+                    'ml-1 transition-opacity duration-300',
+                    open && 'opacity-70',
+                  )}
+                >
+                  <Settings className="h-6 w-5" />
+                </Button>
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink className="font-medium">
+                {chain.name}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink>
+                <GweiAmount
+                  amount={gasFeesConfig?.nextBaseFeePerGas || BigInt(0)}
+                />
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </SheetTrigger>
+      {/* Creating a new chain, replace the layour with the form */}
+      {chainCreation ? (
+        <SheetContent side="bottom" className="pt-2">
+          <SheetHeader className="pb-4 text-muted-foreground">
+            Custom chain
+          </SheetHeader>
+          <SheetDescription>
+            <div className="flex flex-col gap-2 overflow-hidden px-[1px] pt-[1px] transition-all duration-300 ease-out">
+              <CustomChainCreation
+                setCustomChainOptions={setCustomChainOptions}
+              />
+            </div>
+          </SheetDescription>
+          <SheetFooter className="mt-4 flex flex-row items-center gap-4">
+            <CustomChainCreationButtons
+              customChainOptions={customChainOptions}
+              setChainCreation={setChainCreation}
+            />
+          </SheetFooter>
+        </SheetContent>
+      ) : (
         <SheetContent side="bottom" className="pt-2">
           <SheetHeader className="pb-4 text-muted-foreground">
             Config
           </SheetHeader>
           <SheetDescription>
-            <div className="flex flex-col gap-2 overflow-hidden px-[1px] transition-all duration-300 ease-out">
-              <ChainSelection />
+            <div className="flex flex-col gap-2 overflow-hidden px-[1px] pt-[1px] transition-all duration-300 ease-out">
+              <ChainSelection setChainCreation={setChainCreation} />
               <NativePriceSelection />
 
               <GasPriceSelection />
@@ -93,8 +122,8 @@ const ConfigMenuMobile = () => {
             </div>
           </SheetDescription>
         </SheetContent>
-      </Sheet>
-    </>
+      )}
+    </Sheet>
   );
 };
 

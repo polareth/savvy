@@ -4,7 +4,6 @@ import { FC } from 'react';
 import { toast } from 'sonner';
 import { extractChain } from 'viem';
 
-import { CHAINS } from '@/lib/constants/providers';
 import { useConfigStore } from '@/lib/store/use-config';
 import { useProviderStore } from '@/lib/store/use-provider';
 import { useTxStore } from '@/lib/store/use-tx';
@@ -41,21 +40,30 @@ const ChainSelection: FC<ChainSelectionProps> = ({
     }),
   );
 
-  const { chain, client, forkTime, initializing, setProvider, setForkTime } =
-    useProviderStore((state) => ({
-      // Get the current chain (selected from the combobox)
-      chain: state.chain,
-      // Get the current Tevm client
-      client: state.client,
-      // The fork time for the current chain
-      forkTime: state.forkTime,
-      // Whether the client is still initializing
-      initializing: state.initializing,
-      // Set the current provider from the combobox (chain + Tevm client)
-      setProvider: state.setProvider,
-      // Set the fork time for the current chain
-      setForkTime: state.setForkTime,
-    }));
+  const {
+    chains,
+    chain,
+    client,
+    forkTime,
+    initializing,
+    setProvider,
+    setForkTime,
+  } = useProviderStore((state) => ({
+    // All chains (including custom ones)
+    chains: state.chains,
+    // Get the current chain (selected from the combobox)
+    chain: state.chain,
+    // Get the current Tevm client
+    client: state.client,
+    // The fork time for the current chain
+    forkTime: state.forkTime,
+    // Whether the client is still initializing
+    initializing: state.initializing,
+    // Set the current provider from the combobox (chain + Tevm client)
+    setProvider: state.setProvider,
+    // Set the fork time for the current chain
+    setForkTime: state.setForkTime,
+  }));
 
   // Reset the transaction history for a chain
   const resetTxs = useTxStore((state) => state.resetTxs);
@@ -115,7 +123,7 @@ const ChainSelection: FC<ChainSelectionProps> = ({
         <Skeleton className="col-span-2 h-[36px] w-full" />
       ) : (
         <ComboBoxResponsive
-          items={CHAINS.map((chain) => ({
+          items={chains.map((chain) => ({
             value: chain.id.toString(),
             label: chain.name,
             icon: chain.custom.config.icon,
@@ -134,7 +142,7 @@ const ChainSelection: FC<ChainSelectionProps> = ({
             if (chainId === -1) return;
 
             const selectedChain = extractChain({
-              chains: CHAINS,
+              chains: chains,
               id: chainId,
             });
 
@@ -156,6 +164,7 @@ const ChainSelection: FC<ChainSelectionProps> = ({
             label: 'Custom chain',
             icon: Icons.add,
             onClick: () => setChainCreation(true),
+            alwaysIcon: true,
           }}
           header="Select a chain"
           className="col-span-2 w-full"

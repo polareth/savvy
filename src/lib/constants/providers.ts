@@ -278,7 +278,7 @@ export const createCustomChain = ({
   evmCompatible,
   hasPriorityFee,
   rollup,
-  underlying,
+  underlyingChain,
 }: CustomChainOptions): Chain => {
   const chain = {
     name,
@@ -305,7 +305,7 @@ export const createCustomChain = ({
         evmCompatible,
         hasPriorityFee,
         rollup,
-        underlying,
+        underlying: CHAINS.find((c) => c.name === underlyingChain),
       },
       config: {
         rpcUrl,

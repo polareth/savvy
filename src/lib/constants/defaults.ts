@@ -29,6 +29,12 @@ export const DEFAULTS = {
   },
   // The default caller for any calls
   caller: `0x73767679${'0'.repeat(24)}73767679` as const,
+  // Empty total fees
+  totalFees: {
+    costUsd: { root: '0', l1Submission: '0' },
+    costNative: { root: '0', l1Submission: '0' },
+    gasUsed: '0',
+  },
 };
 
 /* -------------------------------------------------------------------------- */

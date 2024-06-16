@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 
+import { DEFAULTS } from '@/lib/constants/defaults';
 import { useProviderStore } from '@/lib/store/use-provider';
 import { useTxStore } from '@/lib/store/use-tx';
 import TxHistoryTable from '@/components/core/tx-history/table';
@@ -45,7 +46,7 @@ const TxHistory = () => {
   const { txHistory, totalFees, txAmount } = useMemo(
     () => ({
       txHistory: globalTxHistory[chain.id] ?? [],
-      totalFees: globalTotalFees[chain.id] ?? {},
+      totalFees: globalTotalFees[chain.id] ?? DEFAULTS.totalFees,
       txAmount: globalTxHistory[chain.id]?.reduce(
         (acc, tx) => (tx.utils.includedInTotalFees ? acc + 1 : acc),
         0,

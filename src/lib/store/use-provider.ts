@@ -10,14 +10,17 @@ import { TEVM_PREFIX } from '@/lib/local-storage';
 import { useConfigStore } from '@/lib/store/use-config';
 import { initializeClient } from '@/lib/tevm/client';
 
+import { useTxStore } from './use-tx';
+
 /* ---------------------------------- TYPES --------------------------------- */
 type ProviderInitialState = {
+  chains: Chain[];
+  customChains: CustomChainOptions[];
   chain: Chain;
   chainId: Chain['id'] | undefined; // synced with local storage
   client: MemoryClient | null;
   forkTime: Record<Chain['id'], number>; // synced with local storage
   initializedClients: MemoryClient[] | [];
-  customChains: CustomChainOptions[];
   initializing: boolean;
 
   isHydrated: boolean;
@@ -32,6 +35,7 @@ type ProviderSetState = {
   // TODO: chain creation options
   addChain: (options: CustomChainOptions) => void;
   removeChain: (chainId: number, chainName: string) => void;
+  setChains: (chains: Chain[]) => void;
 
   hydrate: () => void;
 };
@@ -45,6 +49,8 @@ type ProviderStore = ProviderInitialState & ProviderSetState;
 export const useProviderStore = create<ProviderStore>()(
   persist(
     (set, get) => ({
+      chains: [],
+      customChains: [],
       // The current chain the contract is on
       chain: DEFAULTS.chain,
       chainId: undefined,
@@ -61,8 +67,6 @@ export const useProviderStore = create<ProviderStore>()(
 
       // Clients that were already initialized
       initializedClients: [],
-      // Custom chains that were added by the user
-      customChains: [],
       // Whether a client is being initialized
       initializing: false,
 
@@ -145,22 +149,30 @@ export const useProviderStore = create<ProviderStore>()(
 
       // Add a custom chain to the list of chains
       addChain: (options) => {
-        const { customChains, setProvider } = get();
-        set({ customChains: [...customChains, options] });
+        const { chains, customChains, setProvider } = get();
 
         const chain = createCustomChain(options);
+        set({
+          chains: [...chains, chain],
+          customChains: [...customChains, options],
+        });
+        useTxStore.getState().initChain(chain.id);
         setProvider(chain);
       },
 
       // Remove a custom chain from the list of chains
-      removeChain: (chainId, chainName) => {
-        const { customChains } = get();
+      removeChain: (chainId) => {
+        const { chains, customChains } = get();
         set({
+          chains: chains.filter((chain) => chain.id !== chainId),
           customChains: customChains.filter(
-            (chain) => chain.chainId !== chainId && chain.name !== chainName,
+            (chain) => chain.chainId !== chainId,
           ),
         });
       },
+
+      // Set chains
+      setChains: (chains) => set({ chains }),
 
       hydrate: () => set({ isHydrated: true }),
     }),
@@ -177,21 +189,19 @@ export const useProviderStore = create<ProviderStore>()(
         if (error) console.error('Failed to rehydrate provider store:', error);
         if (!state) return;
 
-        // Retrieve the full chain object from the id
-        const { chainId, customChains, setProvider, hydrate } = state;
-        // Retrieve custom chain from local storage
-        const customChainOptions = chainId
-          ? customChains.find((option) => option.chainId === chainId)
-          : undefined;
+        const { chainId, customChains, setChains, setProvider, hydrate } =
+          state;
+        const chains = customChains
+          .map((options) => createCustomChain(options))
+          .concat(CHAINS);
 
-        // Load either custom chain or existing one from the last session
-        const chain = chainId
-          ? customChainOptions
-            ? createCustomChain(customChainOptions)
-            : extractChain({ chains: CHAINS, id: chainId })
+        // Retrieve the chain from last session
+        const currentChain = chainId
+          ? extractChain({ chains: chains, id: chainId })
           : DEFAULTS.chain;
         // and set the provider
-        await setProvider(chain, true);
+        setChains(chains);
+        await setProvider(currentChain, true);
 
         hydrate();
       },

@@ -97,7 +97,7 @@ export type CustomChainOptions = {
   evmCompatible: boolean;
   hasPriorityFee: boolean;
   rollup?: RollupFramework;
-  underlying?: Chain;
+  underlyingChain?: string;
 };
 
 /* -------------------------------------------------------------------------- */

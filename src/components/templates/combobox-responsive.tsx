@@ -171,7 +171,6 @@ const ItemList: FC<ItemListProps> = ({
               key={item.value}
               value={item.value.toString()}
               onSelect={(value) => {
-                console.log(value, items);
                 setSelectedItem(
                   items.find(
                     (priority) =>
@@ -183,7 +182,12 @@ const ItemList: FC<ItemListProps> = ({
                 item.onClick?.();
               }}
             >
-              <div className="flex items-center">{item.label}</div>
+              <div className="flex items-center">
+                {item.alwaysIcon && item.icon ? (
+                  <item.icon className="mr-2 h-4 w-4" />
+                ) : null}
+                {item.label}
+              </div>
             </CommandItem>
           ))}
         </CommandGroup>
