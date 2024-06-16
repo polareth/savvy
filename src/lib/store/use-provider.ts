@@ -164,6 +164,7 @@ export const useProviderStore = create<ProviderStore>()(
       removeChain: (chainId) => {
         const { chains, customChains } = get();
         set({
+          chain: DEFAULTS.chain,
           chains: chains.filter((chain) => chain.id !== chainId),
           customChains: customChains.filter(
             (chain) => chain.chainId !== chainId,
