@@ -34,6 +34,7 @@ type ComboBoxResponsiveProps = {
   header?: string;
   disabled?: boolean;
   className?: string;
+  footer?: ComboboxOption;
 };
 
 /**
@@ -45,6 +46,7 @@ type ComboBoxResponsiveProps = {
  * @param header The header to display in the drawer (default: 'Select a {label}')
  * @param disabled Whether the whole combobox is disabled (default: false)
  * @param className Additional classses to apply to the button
+ * @param footer Additional content to display at the bottom of the drawer as a last button
  * @dev Modified from shadcn/ui
  * @see https://ui.shadcn.com/docs/components/combobox
  */
@@ -146,14 +148,18 @@ type ItemListProps = {
   label: string;
   setOpen: (open: boolean) => void;
   setSelectedItem: (item: ComboboxOption) => void;
+  footer?: ComboboxOption;
 };
 
 const ItemList: FC<ItemListProps> = ({
-  items,
+  items: _items,
   label,
   setOpen,
   setSelectedItem,
+  footer,
 }) => {
+  const items = _items.concat(footer || []);
+
   return (
     <Command>
       <CommandInput placeholder={`Filter ${label.toLowerCase()}s...`} />
@@ -173,9 +179,15 @@ const ItemList: FC<ItemListProps> = ({
                   ) || items[0],
                 );
                 setOpen(false);
+                item.onClick?.();
               }}
             >
-              <div className="flex items-center">{item.label}</div>
+              <div className="flex items-center">
+                {item.alwaysIcon && item.icon ? (
+                  <item.icon className="mr-2 h-4 w-4" />
+                ) : null}
+                {item.label}
+              </div>
             </CommandItem>
           ))}
         </CommandGroup>

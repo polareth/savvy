@@ -3,11 +3,11 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { TotalFees, TxEntry, TxPending } from '@/lib/types/tx';
+import { DEFAULTS } from '@/lib/constants/defaults';
 import { CHAINS } from '@/lib/constants/providers';
+import { aggregateChainFees } from '@/lib/gas';
 import { TEVM_PREFIX } from '@/lib/local-storage';
 import { getFunctionId } from '@/lib/utils';
-
-import { aggregateChainFees } from '../gas';
 
 /* ---------------------------------- TYPES --------------------------------- */
 // Input values
@@ -40,6 +40,7 @@ type TxSetState = {
   initializeInputs: (abi: ABIFunction[]) => void; // we eliminated events
   resetInputs: () => void;
   // Total costs
+  initChain: (chainId: number) => void;
   toggleIncludeTxInTotalFees: (chainId: number, id: string) => void;
   includeAllTxsInTotalFees: (chainId: number) => void;
   excludeAllTxsFromTotalFees: (chainId: number) => void;
@@ -74,7 +75,7 @@ export const useTxStore = create<TxStore>()(
         const { txHistory, totalFees } = get();
         set({
           txHistory: {
-            ...txHistory,
+            ...(txHistory || {}),
             [chainId]: [...(txHistory[chainId] ?? []), { ...tx }],
           },
         });
@@ -102,11 +103,7 @@ export const useTxStore = create<TxStore>()(
         set({
           totalFees: {
             ...totalFees,
-            [chainId]: {
-              costUsd: { root: '0', l1Submission: '0' },
-              costNative: { root: '0', l1Submission: '0' },
-              gasUsed: '0',
-            },
+            [chainId]: DEFAULTS.totalFees,
           },
         });
       },
@@ -176,14 +173,24 @@ export const useTxStore = create<TxStore>()(
       totalFees: CHAINS.reduce(
         (acc, chain) => ({
           ...acc,
-          [chain.id]: {
-            costUsd: { root: '0', l1Submission: '0' },
-            costNative: { root: '0', l1Submission: '0' },
-            gasUsed: '0',
-          },
+          [chain.id]: DEFAULTS.totalFees,
         }),
         {},
       ),
+      // Initialize the total costs and history for a chain
+      initChain: (chainId) => {
+        const { txHistory, totalFees } = get();
+        set({
+          txHistory: {
+            ...txHistory,
+            [chainId]: [],
+          },
+          totalFees: {
+            ...totalFees,
+            [chainId]: DEFAULTS.totalFees,
+          },
+        });
+      },
       // Include/exclude a transaction in the total cost
       toggleIncludeTxInTotalFees: (chainId, id) => {
         const { txHistory, updateTxHistoryAndTotalFees } = get();

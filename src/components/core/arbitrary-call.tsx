@@ -132,7 +132,14 @@ const ArbitraryCall = () => {
       skipBalance,
     );
 
-    const formattedTx = await handleAfterCall(tx, context, id, client, loading);
+    const formattedTx = await handleAfterCall(
+      chain,
+      tx,
+      context,
+      id,
+      client,
+      loading,
+    );
 
     setPending(undefined);
 

@@ -4,7 +4,6 @@ import { FC } from 'react';
 import { toast } from 'sonner';
 import { extractChain } from 'viem';
 
-import { CHAINS } from '@/lib/constants/providers';
 import { useConfigStore } from '@/lib/store/use-config';
 import { useProviderStore } from '@/lib/store/use-provider';
 import { useTxStore } from '@/lib/store/use-tx';
@@ -17,6 +16,7 @@ import TooltipResponsive from '@/components/common/tooltip-responsive';
 import ComboBoxResponsive from '@/components/templates/combobox-responsive';
 
 type ChainSelectionProps = {
+  setChainCreation: (value: boolean) => void;
   hydrating?: boolean;
 };
 
@@ -27,7 +27,10 @@ type ChainSelectionProps = {
  * on their own key
  * @param hydrating Whether the app is still hydrating or not
  */
-const ChainSelection: FC<ChainSelectionProps> = ({ hydrating = false }) => {
+const ChainSelection: FC<ChainSelectionProps> = ({
+  setChainCreation,
+  hydrating = false,
+}) => {
   /* ---------------------------------- STATE --------------------------------- */
   // Get the account & abi (+ method to fetch & update)
   const { getLatestGasFeesData, getLatestNativeTokenPrice } = useConfigStore(
@@ -37,21 +40,30 @@ const ChainSelection: FC<ChainSelectionProps> = ({ hydrating = false }) => {
     }),
   );
 
-  const { chain, client, forkTime, initializing, setProvider, setForkTime } =
-    useProviderStore((state) => ({
-      // Get the current chain (selected from the combobox)
-      chain: state.chain,
-      // Get the current Tevm client
-      client: state.client,
-      // The fork time for the current chain
-      forkTime: state.forkTime,
-      // Whether the client is still initializing
-      initializing: state.initializing,
-      // Set the current provider from the combobox (chain + Tevm client)
-      setProvider: state.setProvider,
-      // Set the fork time for the current chain
-      setForkTime: state.setForkTime,
-    }));
+  const {
+    chains,
+    chain,
+    client,
+    forkTime,
+    initializing,
+    setProvider,
+    setForkTime,
+  } = useProviderStore((state) => ({
+    // All chains (including custom ones)
+    chains: state.chains,
+    // Get the current chain (selected from the combobox)
+    chain: state.chain,
+    // Get the current Tevm client
+    client: state.client,
+    // The fork time for the current chain
+    forkTime: state.forkTime,
+    // Whether the client is still initializing
+    initializing: state.initializing,
+    // Set the current provider from the combobox (chain + Tevm client)
+    setProvider: state.setProvider,
+    // Set the fork time for the current chain
+    setForkTime: state.setForkTime,
+  }));
 
   // Reset the transaction history for a chain
   const resetTxs = useTxStore((state) => state.resetTxs);
@@ -111,7 +123,7 @@ const ChainSelection: FC<ChainSelectionProps> = ({ hydrating = false }) => {
         <Skeleton className="col-span-2 h-[36px] w-full" />
       ) : (
         <ComboBoxResponsive
-          items={CHAINS.map((chain) => ({
+          items={chains.map((chain) => ({
             value: chain.id.toString(),
             label: chain.name,
             icon: chain.custom.config.icon,
@@ -125,10 +137,15 @@ const ChainSelection: FC<ChainSelectionProps> = ({ hydrating = false }) => {
             disabled: chain.custom.config.disabled,
           }}
           setSelected={async (chainOption) => {
+            const chainId = Number(chainOption.value);
+            // Custom chain
+            if (chainId === -1) return;
+
             const selectedChain = extractChain({
-              chains: CHAINS,
-              id: Number(chainOption.value),
+              chains: chains,
+              id: chainId,
             });
+
             // Change the chain
             const newClient = await setProvider(selectedChain);
             // Catch any issue if the client could not be set
@@ -141,6 +158,13 @@ const ChainSelection: FC<ChainSelectionProps> = ({ hydrating = false }) => {
 
             // Fetch the latest gas fees and native token price
             Promise.all([getLatestGasFeesData(), getLatestNativeTokenPrice()]);
+          }}
+          footer={{
+            value: '-1',
+            label: 'Custom chain',
+            icon: Icons.add,
+            onClick: () => setChainCreation(true),
+            alwaysIcon: true,
           }}
           header="Select a chain"
           className="col-span-2 w-full"

@@ -211,6 +211,7 @@ const InterfaceTable: FC<InterfaceTableProps> = ({ abi, loading }) => {
       );
 
       const formattedTx = await handleAfterCall(
+        chain,
         tx,
         context,
         id,

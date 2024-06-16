@@ -1,7 +1,7 @@
 import { parseGwei } from 'tevm';
-import { createPublicClient, http, Chain as ViemChain } from 'viem';
+import { createPublicClient, http } from 'viem';
 import {
-  arbitrum,
+  // arbitrum,
   base,
   foundry,
   mainnet,
@@ -11,7 +11,12 @@ import {
   zora,
 } from 'viem/chains';
 
-import { Chain, OptimisticRollupBase } from '@/lib/types/providers';
+import {
+  Chain,
+  CustomChainOptions,
+  OptimisticRollupBase,
+  ViemChain,
+} from '@/lib/types/providers';
 import { Icons } from '@/components/common/icons';
 
 // TODO Create client here when top-level await is solved
@@ -33,14 +38,6 @@ const RPC_URLS = {
   zora: 'https://rpc.zora.energy/',
 };
 
-// Chains that don't need an API key
-export const STANDALONE_RPC_CHAINS = [
-  // Foundry/Hardhat
-  31337,
-  // Zora
-  7777777,
-];
-
 /**
  * @notice Create a viem provider for a given chain
  * @param chain The viem chain object
@@ -49,9 +46,9 @@ export const STANDALONE_RPC_CHAINS = [
 export const createProvider = (chain: ViemChain, rpcUrl: string) => {
   return createPublicClient({
     chain,
-    transport: STANDALONE_RPC_CHAINS.includes(chain.id)
-      ? http(rpcUrl)
-      : http(`${rpcUrl}${alchemyApiKey}`),
+    transport: rpcUrl.endsWith('g.alchemy.com/v2/')
+      ? http(`${rpcUrl}${alchemyApiKey}`)
+      : http(rpcUrl),
   });
 };
 
@@ -263,3 +260,60 @@ export const CHAINS: Chain[] = [
     },
   },
 ];
+
+export const createCustomChain = ({
+  name,
+  rpcUrl,
+  chainId,
+  nativeToken,
+  layer,
+  evmCompatible,
+  hasPriorityFee,
+  rollup,
+  underlyingChain,
+}: CustomChainOptions): Chain => {
+  const chain = {
+    name,
+    id: chainId,
+    nativeCurrency: {
+      name: nativeToken.name,
+      symbol: nativeToken.symbol,
+      decimals: nativeToken.decimals,
+    },
+    rpcUrls: {
+      default: {
+        http: [rpcUrl],
+      },
+    },
+  } as const satisfies ViemChain;
+
+  return {
+    ...chain,
+    custom: {
+      tech: {
+        consensusMechanism: undefined,
+        avgBlockTime: 0,
+        layer,
+        evmCompatible,
+        hasPriorityFee,
+        rollup,
+        underlying: CHAINS.find((c) => c.name === underlyingChain),
+      },
+      config: {
+        rpcUrl,
+        provider: createPublicClient({
+          chain,
+          transport: http(rpcUrl),
+        }),
+        nativeTokenSlug: nativeToken.slug,
+        gasControls: {
+          min: parseGwei('0.01'),
+          max: parseGwei('1000'),
+          step: parseGwei('1'),
+          gweiDecimals: 4,
+        },
+        icon: Icons.explorer,
+      },
+    },
+  } as const satisfies Chain;
+};

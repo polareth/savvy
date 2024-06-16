@@ -6,8 +6,8 @@ import { Abi, CallParams, ContractParams, MemoryClient } from 'tevm';
 import { Address, encodeFunctionData, Hex } from 'tevm/utils';
 import { serializeTransaction } from 'viem/op-stack';
 
+import { Chain } from '@/lib/types/providers';
 import { ExpectedType, TxContext, TxEntry, TxResponse } from '@/lib/types/tx';
-import { CHAINS } from '@/lib/constants/providers';
 import { calculateGasCost } from '@/lib/gas';
 import { formatTx as formatTxForLocalStorage } from '@/lib/local-storage';
 import { calculateL1DataFee as calculateOpStackL1DataFee } from '@/lib/tevm/op-stack';
@@ -77,6 +77,7 @@ type HandleCall = (
 
 /**
  * @type {Function} HandleAfterCall
+ * @param {Chain} chain The chain the transaction was executed on
  * @param {TxResponse} tx The result of the transaction
  * @param {TxContext} context The context of the transaction
  * @param {string} id The unique id of the transaction
@@ -84,6 +85,7 @@ type HandleCall = (
  * @returns {Promise<TxEntry>} The formatted transaction
  */
 type HandleAfterCall = (
+  chain: Chain,
   tx: TxResponse,
   context: TxContext,
   id: string,
@@ -248,13 +250,13 @@ const handleCall: HandleCall = async (
  * @dev It will also return the formatted transaction for local storage
  */
 export const handleAfterCall: HandleAfterCall = async (
+  chain,
   tx,
   context,
   id,
   client,
   toastId,
 ) => {
-  const chain = CHAINS.find((chain) => chain.id === context.chainId);
   const gasConfig = context.gasConfig;
 
   // Calculate the gas cost of the transaction

@@ -44,9 +44,8 @@ export const getGasFeesData = async (
     feeHistory.baseFeePerGas[feeHistory.baseFeePerGas.length - 1],
   );
 
-  // If it's a layer 2 with an underlying chain, get its base fee as well
-  const underlying =
-    chain.custom.tech.layer >= 2 && chain.custom.tech.underlying;
+  // If it has a settlement chain, get its base fee as well
+  const underlying = chain.custom.tech.underlying;
   const underlyingNextBaseFeePerGas = underlying
     ? (
         await underlying.custom.config.provider.getFeeHistory({

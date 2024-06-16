@@ -45,6 +45,7 @@ export const fetchAbi: FetchAbi = async (contractAddress, chain) => {
     body: JSON.stringify({
       chainId: chain.id,
       contractAddress,
+      rpcUrl: chain.rpcUrls.default.http,
       apiUrl,
     }),
   });

@@ -15,6 +15,7 @@ import {
   Info,
   Loader2,
   Moon,
+  Plus,
   SunMedium,
   X,
   type LucideIcon,
@@ -66,6 +67,7 @@ export const Icons = {
   right: ChevronRight,
   explorer: Compass,
   coin: Coins,
+  add: Plus,
   /* --------------------------------- CHAINS --------------------------------- */
   arbitrum: ArbitrumIcon,
   base: BaseIcon,
