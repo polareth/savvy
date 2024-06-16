@@ -8,6 +8,17 @@ import { useConfigStore } from '@/lib/store/use-config';
 import { useProviderStore } from '@/lib/store/use-provider';
 import { useTxStore } from '@/lib/store/use-tx';
 import { resetClient } from '@/lib/tevm/client';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import ElapsedTime from '@/components/common/elapsed-time';
@@ -42,15 +53,19 @@ const ChainSelection: FC<ChainSelectionProps> = ({
 
   const {
     chains,
+    customChains,
     chain,
     client,
     forkTime,
     initializing,
     setProvider,
+    removeChain,
     setForkTime,
   } = useProviderStore((state) => ({
     // All chains (including custom ones)
     chains: state.chains,
+    // All custom chains
+    customChains: state.customChains,
     // Get the current chain (selected from the combobox)
     chain: state.chain,
     // Get the current Tevm client
@@ -63,6 +78,8 @@ const ChainSelection: FC<ChainSelectionProps> = ({
     setProvider: state.setProvider,
     // Set the fork time for the current chain
     setForkTime: state.setForkTime,
+    // Delete a custom chain
+    removeChain: state.removeChain,
   }));
 
   // Reset the transaction history for a chain
@@ -110,14 +127,48 @@ const ChainSelection: FC<ChainSelectionProps> = ({
       {initializing || hydrating ? (
         <Skeleton className="h-4 w-[85px]" />
       ) : (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-6 text-muted-foreground"
-          onClick={resetCurrentClient}
-        >
-          fork chain
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 text-muted-foreground"
+            onClick={resetCurrentClient}
+          >
+            fork chain
+          </Button>
+
+          {customChains.some((option) => option.chainId === chain.id) ? (
+            <AlertDialog>
+              <AlertDialogTrigger>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="h-6 text-muted-foreground"
+                >
+                  delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete the chain configuration from
+                    local storage.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <Button
+                    asChild
+                    onClick={() => removeChain(chain.id, chain.name)}
+                  >
+                    <AlertDialogAction>Continue</AlertDialogAction>
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : null}
+        </div>
       )}
       {initializing || hydrating ? (
         <Skeleton className="col-span-2 h-[36px] w-full" />
