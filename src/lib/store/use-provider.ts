@@ -197,9 +197,10 @@ export const useProviderStore = create<ProviderStore>()(
           .concat(CHAINS);
 
         // Retrieve the chain from last session
-        const currentChain = chainId
-          ? extractChain({ chains: chains, id: chainId })
-          : DEFAULTS.chain;
+        const currentChain =
+          chainId || chainId === 0
+            ? extractChain({ chains: chains, id: chainId })
+            : DEFAULTS.chain;
         // and set the provider
         setChains(chains);
         await setProvider(currentChain, true);
