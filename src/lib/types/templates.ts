@@ -6,6 +6,7 @@ export type ComboboxOption = {
   icon?: Icon;
   iconColor?: string;
   disabled?: boolean;
+  onClick?: () => void;
 };
 
 export type AirdropDataType = {

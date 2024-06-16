@@ -1,5 +1,5 @@
 import { parseGwei } from 'tevm';
-import { createPublicClient, http, Chain as ViemChain } from 'viem';
+import { createPublicClient, http } from 'viem';
 import {
   arbitrum,
   base,
@@ -11,7 +11,12 @@ import {
   zora,
 } from 'viem/chains';
 
-import { Chain, OptimisticRollupBase } from '@/lib/types/providers';
+import {
+  Chain,
+  CustomChainOptions,
+  OptimisticRollupBase,
+  ViemChain,
+} from '@/lib/types/providers';
 import { Icons } from '@/components/common/icons';
 
 // TODO Create client here when top-level await is solved
@@ -263,3 +268,60 @@ export const CHAINS: Chain[] = [
     },
   },
 ];
+
+export const createCustomChain = ({
+  name,
+  rpcUrl,
+  chainId,
+  nativeToken,
+  layer,
+  evmCompatible,
+  hasPriorityFee,
+  rollup,
+  underlying,
+}: CustomChainOptions): Chain => {
+  const chain = {
+    name,
+    id: chainId,
+    nativeCurrency: {
+      name: nativeToken.name,
+      symbol: nativeToken.symbol,
+      decimals: nativeToken.decimals,
+    },
+    rpcUrls: {
+      default: {
+        http: [rpcUrl],
+      },
+    },
+  } as const satisfies ViemChain;
+
+  return {
+    ...chain,
+    custom: {
+      tech: {
+        consensusMechanism: undefined,
+        avgBlockTime: 0,
+        layer,
+        evmCompatible,
+        hasPriorityFee,
+        rollup,
+        underlying,
+      },
+      config: {
+        rpcUrl,
+        provider: createPublicClient({
+          chain,
+          transport: http(rpcUrl),
+        }),
+        nativeTokenSlug: nativeToken.slug,
+        gasControls: {
+          min: parseGwei('0.01'),
+          max: parseGwei('1000'),
+          step: parseGwei('1'),
+          gweiDecimals: 4,
+        },
+        icon: Icons.explorer,
+      },
+    },
+  } as const satisfies Chain;
+};

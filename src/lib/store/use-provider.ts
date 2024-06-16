@@ -3,9 +3,9 @@ import { extractChain } from 'viem';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { Chain } from '@/lib/types/providers';
+import { Chain, CustomChainOptions } from '@/lib/types/providers';
 import { DEFAULTS } from '@/lib/constants/defaults';
-import { CHAINS } from '@/lib/constants/providers';
+import { CHAINS, createCustomChain } from '@/lib/constants/providers';
 import { TEVM_PREFIX } from '@/lib/local-storage';
 import { useConfigStore } from '@/lib/store/use-config';
 import { initializeClient } from '@/lib/tevm/client';
@@ -17,6 +17,7 @@ type ProviderInitialState = {
   client: MemoryClient | null;
   forkTime: Record<Chain['id'], number>; // synced with local storage
   initializedClients: MemoryClient[] | [];
+  customChains: CustomChainOptions[];
   initializing: boolean;
 
   isHydrated: boolean;
@@ -28,6 +29,9 @@ type ProviderSetState = {
     hydrate?: boolean,
   ) => Promise<MemoryClient | null>;
   setForkTime: (chainId: Chain['id'], status?: 'loading' | 'update') => void;
+  // TODO: chain creation options
+  addChain: (options: CustomChainOptions) => void;
+  removeChain: (chainId: number, chainName: string) => void;
 
   hydrate: () => void;
 };
@@ -57,6 +61,8 @@ export const useProviderStore = create<ProviderStore>()(
 
       // Clients that were already initialized
       initializedClients: [],
+      // Custom chains that were added by the user
+      customChains: [],
       // Whether a client is being initialized
       initializing: false,
 
@@ -137,6 +143,25 @@ export const useProviderStore = create<ProviderStore>()(
         }));
       },
 
+      // Add a custom chain to the list of chains
+      addChain: (options) => {
+        const { customChains, setProvider } = get();
+        set({ customChains: [...customChains, options] });
+
+        const chain = createCustomChain(options);
+        setProvider(chain);
+      },
+
+      // Remove a custom chain from the list of chains
+      removeChain: (chainId, chainName) => {
+        const { customChains } = get();
+        set({
+          customChains: customChains.filter(
+            (chain) => chain.chainId !== chainId && chain.name !== chainName,
+          ),
+        });
+      },
+
       hydrate: () => set({ isHydrated: true }),
     }),
     {
@@ -146,15 +171,24 @@ export const useProviderStore = create<ProviderStore>()(
       partialize: (state: ProviderStore) => ({
         chainId: state.chain.id,
         forkTime: state.forkTime,
+        customChains: state.customChains,
       }),
       onRehydrateStorage: () => async (state, error) => {
         if (error) console.error('Failed to rehydrate provider store:', error);
         if (!state) return;
 
         // Retrieve the full chain object from the id
-        const { chainId, setProvider, hydrate } = state;
+        const { chainId, customChains, setProvider, hydrate } = state;
+        // Retrieve custom chain from local storage
+        const customChainOptions = chainId
+          ? customChains.find((option) => option.chainId === chainId)
+          : undefined;
+
+        // Load either custom chain or existing one from the last session
         const chain = chainId
-          ? extractChain({ chains: CHAINS, id: chainId })
+          ? customChainOptions
+            ? createCustomChain(customChainOptions)
+            : extractChain({ chains: CHAINS, id: chainId })
           : DEFAULTS.chain;
         // and set the provider
         await setProvider(chain, true);

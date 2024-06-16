@@ -30,7 +30,7 @@ export type RollupFramework = 'op-stack' | 'arbitrum-orbit';
  * @param rollup The rollup development framework (optional)
  */
 type ChainTech = {
-  consensusMechanism: ConsensusMechanism;
+  consensusMechanism: ConsensusMechanism | undefined;
   avgBlockTime: number;
   layer: number;
   evmCompatible: boolean;
@@ -58,6 +58,8 @@ type ChainConfig = {
 };
 
 /* --------------------------------- EXPORTS -------------------------------- */
+export type { ViemChain };
+
 /**
  * @type {Chain}
  * @notice A Viem chain with custom technical details and configuration
@@ -79,6 +81,24 @@ export type OptimisticRollupBase = Omit<
   ChainTech,
   'avgBlockTime' | 'hasPriorityFee' | 'rollup'
 >;
+
+/* --------------------------------- CUSTOM --------------------------------- */
+export type CustomChainOptions = {
+  name: string;
+  rpcUrl: string;
+  chainId: number;
+  nativeToken: {
+    name: string;
+    symbol: string;
+    decimals: number;
+    slug: string;
+  };
+  layer: number;
+  evmCompatible: boolean;
+  hasPriorityFee: boolean;
+  rollup?: RollupFramework;
+  underlying?: Chain;
+};
 
 /* -------------------------------------------------------------------------- */
 /*                                  ACCOUNTS                                  */

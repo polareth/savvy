@@ -17,6 +17,7 @@ import TooltipResponsive from '@/components/common/tooltip-responsive';
 import ComboBoxResponsive from '@/components/templates/combobox-responsive';
 
 type ChainSelectionProps = {
+  setChainCreation: (value: boolean) => void;
   hydrating?: boolean;
 };
 
@@ -27,7 +28,10 @@ type ChainSelectionProps = {
  * on their own key
  * @param hydrating Whether the app is still hydrating or not
  */
-const ChainSelection: FC<ChainSelectionProps> = ({ hydrating = false }) => {
+const ChainSelection: FC<ChainSelectionProps> = ({
+  setChainCreation,
+  hydrating = false,
+}) => {
   /* ---------------------------------- STATE --------------------------------- */
   // Get the account & abi (+ method to fetch & update)
   const { getLatestGasFeesData, getLatestNativeTokenPrice } = useConfigStore(
@@ -125,10 +129,15 @@ const ChainSelection: FC<ChainSelectionProps> = ({ hydrating = false }) => {
             disabled: chain.custom.config.disabled,
           }}
           setSelected={async (chainOption) => {
+            const chainId = Number(chainOption.value);
+            // Custom chain
+            if (chainId === -1) return;
+
             const selectedChain = extractChain({
               chains: CHAINS,
-              id: Number(chainOption.value),
+              id: chainId,
             });
+
             // Change the chain
             const newClient = await setProvider(selectedChain);
             // Catch any issue if the client could not be set
@@ -141,6 +150,12 @@ const ChainSelection: FC<ChainSelectionProps> = ({ hydrating = false }) => {
 
             // Fetch the latest gas fees and native token price
             Promise.all([getLatestGasFeesData(), getLatestNativeTokenPrice()]);
+          }}
+          footer={{
+            value: '-1',
+            label: 'Custom chain',
+            icon: Icons.add,
+            onClick: () => setChainCreation(true),
           }}
           header="Select a chain"
           className="col-span-2 w-full"
