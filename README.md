@@ -2,7 +2,7 @@
 
 **An interface for the EVM in the browser, to simulate and visualize your onchain activity, especially the costs associated with it.**
 
-_A more comprehensive/readable version is available [in the documentation](https://docs.svvy.sh)._
+_A more comprehensive/readable version is available [in the documentation](https://docs.svvy.polareth.org)._
 
 ## Table of contents
 

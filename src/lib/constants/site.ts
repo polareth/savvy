@@ -6,7 +6,7 @@ const title = 'savvy';
 const description =
   'An interface for the EVM in the browser, to simulate & visualize onchain activity.';
 const authorUrl = 'https://twitter.com/0xpolarzero';
-const websiteUrl = 'https://svvy.sh';
+const websiteUrl = 'https://svvy.polareth.org';
 
 /* -------------------------------------------------------------------------- */
 /*                                  METADATA                                  */
@@ -53,7 +53,7 @@ export const METADATA_EXTRA: MetadataExtra = {
   links: {
     github: 'https://github.com/0xpolarzero/savvy',
     twitter: 'https://twitter.com/svvydotsh',
-    documentation: 'https://docs.svvy.sh',
+    documentation: 'https://docs.svvy.polareth.org',
   },
 };
 

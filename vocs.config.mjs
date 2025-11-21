@@ -1,7 +1,7 @@
 import { defineConfig } from 'vocs';
 
 export default defineConfig({
-  baseUrl: 'https://docs.svvy.sh',
+  baseUrl: 'https://docs.svvy.polareth.org',
   title: 'savvy · docs',
   titleTemplate: '%s – savvy • docs',
   description:
@@ -103,6 +103,6 @@ export default defineConfig({
       text: 'Progress',
       link: '/progress',
     },
-    { text: 'savvy', link: 'https://svvy.sh' },
+    { text: 'savvy', link: 'https://svvy.polareth.org' },
   ],
 });
